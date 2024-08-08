@@ -1,0 +1,581 @@
+{
+  "active": true,
+  "connections": {
+    "Freshdesk": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Current Timestamp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Current Timestamp": {
+      "main": [
+        [
+          {
+            "node": "Get Day Before",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Day Before": {
+      "main": [
+        [
+          {
+            "node": "Freshdesk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-05-07T10:47:57.924Z",
+  "id": "AKynYo9Jcej0gvFr",
+  "name": "[TREVO CX] Accident Handling",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "options": {
+          "include": [
+            "stats"
+          ],
+          "updatedSince": "={{ $json.newDate }}"
+        }
+      },
+      "id": "af5fa436-392c-4908-8904-4016e3567264",
+      "name": "Freshdesk",
+      "type": "n8n-nodes-base.freshdesk",
+      "typeVersion": 1,
+      "position": [
+        820,
+        400
+      ],
+      "credentials": {
+        "freshdeskApi": {
+          "id": "22",
+          "name": "SOCAR CS Freshdesk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "2a0bb738-6fa7-4596-bf67-85312d0c4c98",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        300,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.custom_fields.cf_level1 }}",
+              "value2": "Operations (AH/Dispatch)"
+            },
+            {
+              "value1": "={{ $json.custom_fields.cf_country }}",
+              "value2": "Malaysia"
+            },
+            {
+              "value1": "={{ $json.type }}",
+              "operation": "notEqual",
+              "value2": "SOCAR"
+            },
+            {
+              "value1": "={{ $json.custom_fields.cf_level2 }}",
+              "value2": "Accident Related"
+            }
+          ]
+        }
+      },
+      "id": "7da99ffe-c059-451e-9a4f-bb11917543ee",
+      "name": "Filter",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1RcadOYU0tQqah2H7WfADQ2jSAQFw5zJikHWcCJdeT4c",
+          "mode": "list",
+          "cachedResultName": "Trevo Accident Handling - iNCIDENT",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RcadOYU0tQqah2H7WfADQ2jSAQFw5zJikHWcCJdeT4c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RcadOYU0tQqah2H7WfADQ2jSAQFw5zJikHWcCJdeT4c/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "A": "={{ $json.custom_fields.cf_level2 }}",
+            "B": "={{ $json.custom_fields.cf_level3 }}",
+            "C": "={{ $json.custom_fields.cf_mid }}",
+            "D": "={{ $json.custom_fields.cf_source }}",
+            "F": "={{ $json.custom_fields.cf_booking_ref_num }}",
+            "E": "={{ $json.custom_fields.cf_call_back_agent_name }}",
+            "G": "={{ $json.custom_fields.cf_call_back_required }}",
+            "H": "={{ $json.created_at }}",
+            "I": "={{ $json.internal_agent_id }}",
+            "Contact Reason L2": "={{ $json.custom_fields.cf_level2 }}",
+            "Contact Reason L3": "={{ $json.custom_fields.cf_level3 }}",
+            "CF Mid": "={{ $json.custom_fields.cf_mid }}",
+            "Source": "={{ $json.custom_fields.cf_source }}",
+            "Callback Agent Name": "={{ $json.custom_fields.cf_call_back_agent_name }}",
+            "Booking Ref": "={{ $json.custom_fields.cf_booking_ref_num }}",
+            "Callback Required": "={{ $json.custom_fields.cf_call_back_required }}",
+            "Created At": "={{ $json.created_at }}",
+            "Internal Agent ID": "={{ $json.internal_agent_id }}",
+            "Ticket Status": "={{ $json.status }}",
+            "Type": "={{ $json.type }}"
+          },
+          "matchingColumns": [
+            "Booking Ref"
+          ],
+          "schema": [
+            {
+              "id": "Contact Reason L2",
+              "displayName": "Contact Reason L2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Contact Reason L3",
+              "displayName": "Contact Reason L3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CF Mid",
+              "displayName": "CF Mid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Callback Agent Name",
+              "displayName": "Callback Agent Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Booking Ref",
+              "displayName": "Booking Ref",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Callback Required",
+              "displayName": "Callback Required",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Created At",
+              "displayName": "Created At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ticket Status",
+              "displayName": "Ticket Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Type",
+              "displayName": "Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2177bddb-eb1d-4ca5-b24c-4b960461589f",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1660,
+        420
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "POVMRt7PE7R00O4v",
+          "name": "Alief - Google Sheet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $json.created_at }}",
+        "options": {
+          "timezone": false
+        }
+      },
+      "id": "c39fec60-217a-4618-b0cc-612ac213fc5e",
+      "name": "Date & Time",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        480
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "30e581bd-0997-4175-949c-9eee5419e9e5",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        1480,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "1bc1679d-832e-4c5f-b21c-af326e137b67",
+      "name": "Get Current Timestamp",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        460,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "subtractFromDate",
+        "magnitude": "={{ $json.currentDate }}",
+        "duration": 1
+      },
+      "id": "3097ec03-5bed-40a5-9af3-8d22e9092c25",
+      "name": "Get Day Before",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        640,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1RcadOYU0tQqah2H7WfADQ2jSAQFw5zJikHWcCJdeT4c",
+          "mode": "list",
+          "cachedResultName": "Trevo Accident Handling - iNCIDENT",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RcadOYU0tQqah2H7WfADQ2jSAQFw5zJikHWcCJdeT4c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RcadOYU0tQqah2H7WfADQ2jSAQFw5zJikHWcCJdeT4c/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "A": "={{ $json.custom_fields.cf_level2 }}",
+            "B": "={{ $json.custom_fields.cf_level3 }}",
+            "C": "={{ $json.custom_fields.cf_mid }}",
+            "D": "={{ $json.custom_fields.cf_source }}",
+            "F": "={{ $json.custom_fields.cf_booking_ref_num }}",
+            "E": "={{ $json.custom_fields.cf_call_back_agent_name }}",
+            "G": "={{ $json.custom_fields.cf_call_back_required }}",
+            "H": "={{ $json.created_at }}",
+            "I": "={{ $json.internal_agent_id }}",
+            "Contact Reason L2": "={{ $json.custom_fields.cf_level2 }}",
+            "Contact Reason L3": "={{ $json.custom_fields.cf_level3 }}",
+            "CF Mid": "={{ $json.custom_fields.cf_mid }}",
+            "Source": "={{ $json.custom_fields.cf_source }}",
+            "Callback Agent Name": "={{ $json.custom_fields.cf_call_back_agent_name }}",
+            "Booking Ref": "={{ $json.custom_fields.cf_booking_ref_num }}",
+            "Callback Required": "={{ $json.custom_fields.cf_call_back_required }}",
+            "Created At": "={{ $json.created_at }}",
+            "Internal Agent ID": "={{ $json.internal_agent_id }}"
+          },
+          "matchingColumns": [
+            "Booking Ref"
+          ],
+          "schema": [
+            {
+              "id": "Contact Reason L2",
+              "displayName": "Contact Reason L2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Contact Reason L3",
+              "displayName": "Contact Reason L3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CF Mid",
+              "displayName": "CF Mid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Callback Agent Name",
+              "displayName": "Callback Agent Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Booking Ref",
+              "displayName": "Booking Ref",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Callback Required",
+              "displayName": "Callback Required",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Created At",
+              "displayName": "Created At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Internal Agent ID",
+              "displayName": "Internal Agent ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7e2e1d4e-0122-48bd-a034-3694c76d1e11",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1700,
+        680
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "POVMRt7PE7R00O4v",
+          "name": "Alief - Google Sheet"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.custom_fields.cf_level1 }}",
+              "value2": "Operations (AH/Dispatch)"
+            },
+            {
+              "value1": "={{ $json.custom_fields.cf_country }}",
+              "value2": "Malaysia"
+            }
+          ]
+        }
+      },
+      "id": "82852524-d069-47e0-a1a4-3ad7c0dab82b",
+      "name": "Filter1",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 1,
+      "position": [
+        940,
+        580
+      ],
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-05-09T01:18:17.842Z",
+  "versionId": "e0f6b136-75c2-4c72-897e-595a9539490f"
+}
