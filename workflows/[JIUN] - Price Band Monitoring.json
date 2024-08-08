@@ -1,0 +1,262 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-05-08T08:01:36.271Z",
+  "id": "ahbzirm1IEQtfES5",
+  "name": "[JIUN] - Price Band Monitoring",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "2e614347-bc4c-461d-a730-49d31136c05d",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        260,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\n--Price band monitoring\nselect distinct l.id, \nl.user_id, \nconcat(u.first_name,' ',u.last_name)as host_name,\nm.name as model,\nli.insured_amount, \nlp.base_price, \n(lp.base_price/nullif(li.insured_amount,0))*100 as price_band,\nto_char(clt.clt,'YYYY-MM-DD') as clt, \nto_char(la.max_avai,'YYYY-MM-DD') as max_avai,\ncase when ll.city_id in (1) then 'KV'   \nwhen ll.city_id in (2,12) then 'PGM' when ll.city_id in (48) then 'PGI'\nwhen ll.city_id in (3,19,20,21) then 'KK'   when ll.city_id in (4) then 'JB' \nwhen ll.city_id in (5) then 'IP'   when ll.city_id in (47) then 'NS'\nwhen ll.city_id in (13) then 'LGK' \nwhen ll.city_id in (14) then 'PRLS'\nwhen ll.city_id in (15) then 'MLK'\nwhen ll.city_id in (16) then 'PHG'\nwhen ll.city_id in (17) then 'TRGN'\nwhen ll.city_id in (18) then 'KLT'\nwhen ll.city_id in (22,23) then 'KCH'\nelse 'Others' end as City, \ncase when t.name like 'SC -%' then t.name else null end as tag, \ncase when t.name like 'SC -%' then t.updated_at else null end as tag_updated\nfrom listings l \nleft join listing_insurance li on li.listing_id = l.id\nleft join listing_pricing lp on lp.listing_id = l.id\nleft join listing_location ll on ll.listing_id = l.id\nleft join users u on u.id = l.user_id\nleft join models m on m.id = l.model_id\nleft join tag_taggables tt on tt.taggable_id = l.id\nleft join tags t on t.id = tt.tag_id \n--\nleft join \n\t(select distinct b.listing_id,\nmax(b.request_end_at::timestamp)as clt\n\tfrom bookings b \n\twhere b.status = 'completed'\n\tgroup by 1) clt\n\ton clt.listing_id = l.id\n--\nleft join \n\t(select distinct la.listing_id, \n\tmax(la.end_date::timestamp)as max_avai\n\tfrom listing_availability la\n\tgroup by 1)la\n\ton la.listing_id = l.id\n--\n    left join \n    (select distinct l.id,  \n    max(t.updated_at::timestamp) as max_updated_at \n    from listings l \n    left join tag_taggables tt on tt.taggable_id = l.id \n    left join tags t on t.id = tt.tag_id \n    where (t.name like 'SC -%')\n    group by 1)sct\n    on sct.id = l.id and sct.max_updated_at = t.updated_at\nwhere 1=1 \nand l.status = 'approved'\nand l.deleted_at is null\nand ll.country = 'Malaysia'\nand clt.clt >= (NOW() - interval '6 months')\nand la.max_avai >= NOW()\nand sct.max_updated_at is not null\norder by 7 desc",
+        "options": {}
+      },
+      "id": "ba80a26c-7c51-46b5-a6f1-7be6051e679c",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        620,
+        240
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1Iy-V27GYBpedu2ETvFbf0hL8Mxp4iScunDJEyzTDC9U",
+          "mode": "list",
+          "cachedResultName": "Price Band Monitoring",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Iy-V27GYBpedu2ETvFbf0hL8Mxp4iScunDJEyzTDC9U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Iy-V27GYBpedu2ETvFbf0hL8Mxp4iScunDJEyzTDC9U/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "host_name",
+              "displayName": "host_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "model",
+              "displayName": "model",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "insured_amount",
+              "displayName": "insured_amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "base_price",
+              "displayName": "base_price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "price_band",
+              "displayName": "price_band",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "clt",
+              "displayName": "clt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "max_avai",
+              "displayName": "max_avai",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "a3e7f0d9-4c47-4564-90d9-6afbe59f81af",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        800,
+        240
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1Iy-V27GYBpedu2ETvFbf0hL8Mxp4iScunDJEyzTDC9U",
+          "mode": "list",
+          "cachedResultName": "Price Band Monitoring",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Iy-V27GYBpedu2ETvFbf0hL8Mxp4iScunDJEyzTDC9U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Iy-V27GYBpedu2ETvFbf0hL8Mxp4iScunDJEyzTDC9U/edit#gid=0"
+        },
+        "clear": "specificRange",
+        "range": "A2:Z"
+      },
+      "id": "1085fd07-39aa-4e8c-b704-518a03f1bcfb",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        440,
+        240
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-05-15T09:00:07.745Z",
+  "versionId": "77b249cc-ccc7-4d87-99f1-d2f17a769d49"
+}
