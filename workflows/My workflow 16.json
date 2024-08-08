@@ -1,0 +1,249 @@
+{
+  "active": false,
+  "connections": {
+    "Freshdesk": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Current Timestamp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Google Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Current Timestamp": {
+      "main": [
+        [
+          {
+            "node": "Get Day Before",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Day Before": {
+      "main": [
+        [
+          {
+            "node": "Freshdesk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-06-05T07:44:01.752Z",
+  "id": "WCDTaV7zZ9KmOzLv",
+  "name": "My workflow 16",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "options": {
+          "include": [
+            "stats"
+          ],
+          "updatedSince": "={{ $json.newDate }}"
+        }
+      },
+      "id": "c0a9c2cb-0707-4d24-8f2f-c1d402904fd2",
+      "name": "Freshdesk",
+      "type": "n8n-nodes-base.freshdesk",
+      "typeVersion": 1,
+      "position": [
+        900,
+        160
+      ],
+      "credentials": {
+        "freshdeskApi": {
+          "id": "22",
+          "name": "SOCAR CS Freshdesk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "c3388459-4d7b-4902-88b7-15a529a579ed",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        380,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.custom_fields.cf_level1 }}",
+              "value2": "TREVO Bookings Conversion"
+            },
+            {
+              "value1": "={{ $json.custom_fields.cf_country }}",
+              "value2": "Malaysia"
+            }
+          ]
+        }
+      },
+      "id": "cb4c05b0-95d0-4843-86ff-5a707f1f42b6",
+      "name": "Filter",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $json.created_at }}",
+        "options": {
+          "timezone": false
+        }
+      },
+      "id": "8c45e83d-55d2-48a0-9267-4eef33d035f6",
+      "name": "Date & Time",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        240
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "45522b1e-c250-4598-b1b0-2d016b72786c",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        1560,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "7e393649-510f-456a-8404-977160e63cf3",
+      "name": "Get Current Timestamp",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        540,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "subtractFromDate",
+        "magnitude": "={{ $json.currentDate }}",
+        "duration": 1
+      },
+      "id": "f05b416a-db50-48ea-81ae-b56b79917bc4",
+      "name": "Get Day Before",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        720,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "spaceId": "M",
+        "messageUi": {
+          "text": ""
+        },
+        "additionalFields": {}
+      },
+      "id": "85732b65-c451-41ab-a7e4-a0b762b932ab",
+      "name": "Google Chat",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        1780,
+        180
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "KLTRtq2ol89LlMaH",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-06-05T07:44:01.752Z",
+  "versionId": "063726d7-6201-46d6-a350-229394c64239"
+}
