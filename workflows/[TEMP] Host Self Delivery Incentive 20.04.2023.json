@@ -1,0 +1,175 @@
+{
+  "active": false,
+  "connections": {
+    "SendInBlue": {
+      "main": [
+        []
+      ]
+    },
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "SIB API1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-04-20T14:46:17.679Z",
+  "id": "69",
+  "name": "[TEMP] Host Self Delivery Incentive 20.04.2023",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "upsert",
+        "email": "={{ $json.email }}",
+        "upsertAttributes": {
+          "upsertAttributesValues": [
+            {
+              "fieldName": "CPHOSTNAME",
+              "fieldValue": "={{ $json.user_name }}"
+            }
+          ]
+        }
+      },
+      "id": "51f80f8f-cb77-443f-8acf-b9c42d3c5134",
+      "name": "SendInBlue",
+      "type": "n8n-nodes-base.sendInBlue",
+      "typeVersion": 1,
+      "position": [
+        960,
+        160
+      ],
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\"to\":[{\"email\":\"{{ $node[\"Google Sheets\"].json[\"email\"] }}\"}],\n\"templateId\":590\n}\n",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        340
+      ],
+      "id": "a5313fbe-42e3-47d9-9abc-9fd46cc8db49",
+      "retryOnFail": true,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {},
+      "id": "5b668a30-e73d-44d5-8402-14cf49593c4e",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        600,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1U1FybyQXVsG3JiRY9SKJDyNkYyTH98-wzg85imIEMmc",
+          "mode": "list",
+          "cachedResultName": "2023.05.03 - Host Self Delivery Incentive",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1U1FybyQXVsG3JiRY9SKJDyNkYyTH98-wzg85imIEMmc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UUGkGfMZdonin7IxL27jmQbtkxMiShZZXsib6seItcc/edit#gid=0"
+        },
+        "options": {
+          "outputFormatting": {
+            "values": {
+              "general": "UNFORMATTED_VALUE",
+              "date": "FORMATTED_STRING"
+            }
+          }
+        }
+      },
+      "id": "b1b2c4b3-4364-4aa5-80f9-46ce6e026125",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        840,
+        340
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "WITH hosts AS (\nSELECT distinct l.host_id\n, u.user_name \n, u.email\n, l.registration_no \nfrom trevo_proc.my_raw_bookings b\nLEFT JOIN trevo_proc.my_raw_listings l ON l.listing_id = b.listing_id \nLEFT JOIN trevo_proc.date_format df ON df.date = b.request_start_at::DATE\nLEFT JOIN trevo_proc.my_raw_users u ON u.user_id = l.host_id \nWHERE b.status = 'completed'\nAND b.request_start_at >= NOW() - INTERVAL '3 MONTH'\n--GROUP BY 1\nORDER BY 1 DESC)\n\n, exclude AS (\nSELECT distinct l.host_id\n, l.registration_no\nfrom trevo_proc.my_raw_bookings b\nLEFT JOIN trevo_proc.my_raw_listings l ON l.listing_id = b.listing_id \nLEFT JOIN trevo_proc.date_format df ON df.date = b.request_end_at::DATE\nLEFT JOIN trevo_proc.my_raw_users u ON u.user_id = l.host_id \nWHERE b.new_status IN ('fulfilled')\nAND b.request_end_at >= NOW()\nAND b.delivery_agent IN ('Dash - Deliver & Host - Return', 'Host - Return', 'Host - Both')\n)\n\n, exclude2 AS (\nSELECT distinct l.host_id\n, l.registration_no\nfrom trevo_proc.my_raw_bookings b\nLEFT JOIN trevo_proc.my_raw_listings l ON l.listing_id = b.listing_id \nLEFT JOIN trevo_proc.date_format df ON df.date = b.request_end_at::DATE\nLEFT JOIN trevo_proc.my_raw_users u ON u.user_id = l.host_id \nWHERE b.new_status IN ('fulfilled')\nAND b.request_start_at <= '2023-04-24'\nAND b.delivery_agent IN ('Host - Both', 'Host - Deliver & Dash - Return',' Host - Deliver')\n)\n\nSELECT DISTINCT h.host_id, h.email, h.user_name FROM hosts h\nWHERE h.host_id NOT IN (\n  SELECT host_id FROM exclude\n)\nAND h.host_id NOT IN (\n  SELECT host_id FROM exclude2\n)\n\n-- At least 1 booking requested within the last 3 months \n-- Has active bookings and have opted-in for self delivery within the incentive period.",
+        "height": 980.0841463414636,
+        "width": 799.1463414634154
+      },
+      "id": "e20fdf3b-5f6a-4e17-9520-f2a78189c83d",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        -120
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2023-04-20T14:46:13.712Z",
+      "updatedAt": "2023-04-20T14:46:13.712Z",
+      "id": "6",
+      "name": "One Time"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2023-05-02T09:41:01.541Z",
+  "versionId": "112a98c2-92c1-403d-bf85-0b552bdf8209"
+}
