@@ -1,0 +1,1318 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres2": {
+      "main": [
+        [
+          {
+            "node": "Function1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Function4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Postgres2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "Function",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres3": {
+      "main": [
+        [
+          {
+            "node": "Function2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function1": {
+      "main": [
+        [
+          {
+            "node": "LP API - Send PN",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SIB API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function4": {
+      "main": [
+        [
+          {
+            "node": "LP API - Send PN1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SIB API4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function": {
+      "main": [
+        [
+          {
+            "node": "LP API - Send PN2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SIB API1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function2": {
+      "main": [
+        [
+          {
+            "node": "LP API - Send PN3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SIB API2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SIB API": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LP API - Send PN": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SIB API4": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LP API - Send PN1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SIB API1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LP API - Send PN2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SIB API2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LP API - Send PN3": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-01-17T07:36:30.437Z",
+  "id": "27",
+  "name": "[KAVI & JIUN] [HOST COMMUNITY] [PROJECT ONG TU-GETHER] - 1st & 2nd Rejection PN and EDM Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "e6b8c54d-4247-427f-8205-6e9a62ecb307",
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        600,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 1st Rejection Workflow (Non-Weekend rejection)\n",
+        "height": 91.35426361250266,
+        "width": 330.35458310776687
+      },
+      "id": "f3480464-9339-4b49-b522-b326432f794c",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        256.1090909090911,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect distinct l.id, \nl.registration_no, \nm.name as model,\ncase when ll.city_id in (1) then '1. KV'   \nwhen ll.city_id in (2,12) then '2. PG'\nwhen ll.city_id in (3,19,20,21) then '3. KK'  \nwhen ll.city_id in (4,15) then '4. JB' \nwhen ll.city_id in (5) then '5. IP' \nwhen ll.city_id in (47) then '6. NS'\nwhen ll.city_id in (13) then '7. LGK'\nelse '8. Others' end as city,\nl.user_id, \nconcat(u.first_name, ' ',u.last_name)as host_name, \nu.email, \nu.uuid,\nu.phone_number,\nola.overall_avai_days,\ncase when obj.ov_rej_booking is null then '0' else obj.ov_rej_booking end as overall_rej_booking,\ncase when obj.unfair_rej_booking is null then '0' else obj.unfair_rej_booking end as unfair_rej_booking,\ncase when obj.real_rej_booking is null then '0' else obj.real_rej_booking end as real_rej_booking,\ncase when obf.overall_fuld_booking is null then '0' else obf.overall_fuld_booking end as overall_fuld_booking,\ncase when wbj.ov_rej_booking is null then '0' else wbj.ov_rej_booking end as weekend_overall_rej_booking,\ncase when wbj.unfair_rej_booking is null then '0' else wbj.unfair_rej_booking end as weekend_unfair_rej_booking,\ncase when wbj.real_rej_booking is null then '0' else wbj.real_rej_booking end as weekend_real_rej_booking,\nwla.weekend_avai_days,\ncase when wbf.weekend_fuld_booking is null then '0' else wbf.weekend_fuld_booking end as weekend_fuld_booking\nfrom listings l \nleft join users u on u.id = l.user_id\nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = l.id\nleft join models m on m.id = l.model_id\nleft join companies c on c.owner_id = l.user_id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) or (b.status in ('withdrawn', 'cancelled') and b.reason ~* '(host|owner|avai|car)') then b.ref_no end) as ov_rej_booking,\n\t\tcount(distinct case when (b.reason = 'Host is taking a long time to respond' and ((extract(EPOCH FROM b.updated_at::timestamp) - EXTRACT(EPOCH FROM b.created_at::timestamp))/60::integer)< '20' ) then b.ref_no end)as unfair_rej_booking,\n\t\tCOALESCE(count(distinct case when (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) or (b.status in ('withdrawn', 'cancelled') and b.reason ~* '(host|owner|avai|car)') then b.ref_no end) - count(distinct case when (b.reason = 'Host is taking a long time to respond' and ((extract(EPOCH FROM b.updated_at::timestamp) - EXTRACT(EPOCH FROM b.created_at::timestamp))/60::integer)< '20' ) then b.ref_no end),0) as real_rej_booking  \n        from bookings b \n        where b.request_end_at::timestamp >= '2023-01-18 00:00' and b.request_start_at::timestamp <= '2023-01-31 23:59'\n        group by 1)obj\n        on obj.listing_id = l.id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) or (b.status in ('withdrawn', 'cancelled') and b.reason ~* '(host|owner|avai|car)') then b.ref_no end) as ov_rej_booking,\n\t\tcount(distinct case when (b.reason = 'Host is taking a long time to respond' and ((extract(EPOCH FROM b.updated_at::timestamp) - EXTRACT(EPOCH FROM b.created_at::timestamp))/60::integer)< '20' ) then b.ref_no end)as unfair_rej_booking,\n\t\tCOALESCE(count(distinct case when (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) or (b.status in ('withdrawn', 'cancelled') and b.reason ~* '(host|owner|avai|car)') then b.ref_no end) - count(distinct case when (b.reason = 'Host is taking a long time to respond' and ((extract(EPOCH FROM b.updated_at::timestamp) - EXTRACT(EPOCH FROM b.created_at::timestamp))/60::integer)< '20' ) then b.ref_no end),0) as real_rej_booking\n        from bookings b \n        where (b.request_start_at::timestamp between '2023-01-20 00:00' and '2023-01-23 23:59') or (b.request_start_at::timestamp between '2023-01-27 00:00' and '2023-01-29 23:59')\n        group by 1)wbj\n        on wbj.listing_id = l.id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when b.status in ('completed','start_driving','waiting_for_inspection', 'return_car','accepted') then b.id end) as overall_fuld_booking\n        from bookings b \n        where b.request_end_at::timestamp >= '2023-01-18 00:00' and b.request_start_at::timestamp <= '2023-01-31 23:59'\n        group by 1)obf\n        on obf.listing_id = l.id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when b.status in ('completed','start_driving','waiting_for_inspection', 'return_car','accepted') then b.id end) as weekend_fuld_booking\n        from bookings b \n        where (b.request_start_at::timestamp between '2023-01-20 00:00' and '2023-01-23 23:59') or (b.request_start_at::timestamp between '2023-01-27 00:00' and '2023-01-29 23:59')\n        group by 1)wbf\n        on wbf.listing_id = l.id\n--\nleft join \n        (select l.id,\n        count(dates.ymd) as overall_avai_days\n        from listings l\n        left join listing_availability la on la.listing_id=l.id\n        left join (SELECT generate_series(timestamp '2023-01-18', timestamp '2023-01-31', interval '1 day')::date ymd) dates on \n        dates.ymd between la.start_date::date and la.end_date::date\n        where l.status='approved' and l.deleted_at is null \n        GROUP BY 1)ola\n        on ola.id = l.id\n--\nleft join \n        (select l.id,\n        count(case when (dates.ymd between '2023-01-20' and '2023-01-23') or (dates.ymd between '2023-01-27' and '2023-01-29') then dates.ymd end) as weekend_avai_days\n        from listings l\n        left join listing_availability la on la.listing_id=l.id\n        left join (SELECT generate_series(timestamp '2023-01-18', timestamp '2023-01-31', interval '1 day')::date ymd) dates on \n        dates.ymd between la.start_date::date and la.end_date::date\n        where l.status='approved' and l.deleted_at is null\n        GROUP BY 1)wla\n        on wla.id = l.id\nwhere l.status = 'approved'\nand l.deleted_at is null\nand ((c.owner_id is null) or (l.user_id in (942862,344308,756223,31534,176936,551568,59693,120252,113801,483725,839440,760777,59551,58937,725875,797829,810417,1415199,1594773,50832,684922,1387955,548329,259352,81472,399266,79964,92561,93080,177014,89213,925742,758921,46071,1072616,1751078,82304)))\nand l.registration_no in ({{ $json[\"String\"] }})\nand obj.real_rej_booking = 1 and wbj.real_rej_booking = 0\norder by 10 desc",
+        "additionalFields": {}
+      },
+      "id": "65062986-cb1e-43d0-a6fe-9f40578a96df",
+      "name": "Postgres2",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        -340
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"id\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['id']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        -340
+      ],
+      "id": "29c7646e-a810-4508-b2fd-c831c75b6715"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect distinct l.id, \nl.registration_no, \nm.name as model,\ncase when ll.city_id in (1) then '1. KV'   \nwhen ll.city_id in (2,12) then '2. PG'\nwhen ll.city_id in (3,19,20,21) then '3. KK'  \nwhen ll.city_id in (4,15) then '4. JB' \nwhen ll.city_id in (5) then '5. IP' \nwhen ll.city_id in (47) then '6. NS'\nwhen ll.city_id in (13) then '7. LGK'\nelse '8. Others' end as city,\nl.user_id, \nconcat(u.first_name, ' ',u.last_name)as host_name, \nu.email, \nu.uuid,\nu.phone_number,\nola.overall_avai_days,\ncase when obj.ov_rej_booking is null then '0' else obj.ov_rej_booking end as overall_rej_booking,\ncase when obj.unfair_rej_booking is null then '0' else obj.unfair_rej_booking end as unfair_rej_booking,\ncase when obj.real_rej_booking is null then '0' else obj.real_rej_booking end as real_rej_booking,\ncase when obf.overall_fuld_booking is null then '0' else obf.overall_fuld_booking end as overall_fuld_booking,\ncase when wbj.ov_rej_booking is null then '0' else wbj.ov_rej_booking end as weekend_overall_rej_booking,\ncase when wbj.unfair_rej_booking is null then '0' else wbj.unfair_rej_booking end as weekend_unfair_rej_booking,\ncase when wbj.real_rej_booking is null then '0' else wbj.real_rej_booking end as weekend_real_rej_booking,\nwla.weekend_avai_days,\ncase when wbf.weekend_fuld_booking is null then '0' else wbf.weekend_fuld_booking end as weekend_fuld_booking\nfrom listings l \nleft join users u on u.id = l.user_id\nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = l.id\nleft join models m on m.id = l.model_id\nleft join companies c on c.owner_id = l.user_id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) or (b.status in ('withdrawn', 'cancelled') and b.reason ~* '(host|owner|avai|car)') then b.ref_no end) as ov_rej_booking,\n\t\tcount(distinct case when (b.reason = 'Host is taking a long time to respond' and ((extract(EPOCH FROM b.updated_at::timestamp) - EXTRACT(EPOCH FROM b.created_at::timestamp))/60::integer)< '20' ) then b.ref_no end)as unfair_rej_booking,\n\t\tCOALESCE(count(distinct case when (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) or (b.status in ('withdrawn', 'cancelled') and b.reason ~* '(host|owner|avai|car)') then b.ref_no end) - count(distinct case when (b.reason = 'Host is taking a long time to respond' and ((extract(EPOCH FROM b.updated_at::timestamp) - EXTRACT(EPOCH FROM b.created_at::timestamp))/60::integer)< '20' ) then b.ref_no end),0) as real_rej_booking  \n        from bookings b \n        where b.request_end_at::timestamp >= '2023-01-18 00:00' and b.request_start_at::timestamp <= '2023-01-31 23:59'\n        group by 1)obj\n        on obj.listing_id = l.id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) or (b.status in ('withdrawn', 'cancelled') and b.reason ~* '(host|owner|avai|car)') then b.ref_no end) as ov_rej_booking,\n\t\tcount(distinct case when (b.reason = 'Host is taking a long time to respond' and ((extract(EPOCH FROM b.updated_at::timestamp) - EXTRACT(EPOCH FROM b.created_at::timestamp))/60::integer)< '20' ) then b.ref_no end)as unfair_rej_booking,\n\t\tCOALESCE(count(distinct case when (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) or (b.status in ('withdrawn', 'cancelled') and b.reason ~* '(host|owner|avai|car)') then b.ref_no end) - count(distinct case when (b.reason = 'Host is taking a long time to respond' and ((extract(EPOCH FROM b.updated_at::timestamp) - EXTRACT(EPOCH FROM b.created_at::timestamp))/60::integer)< '20' ) then b.ref_no end),0) as real_rej_booking\n        from bookings b \n        where (b.request_start_at::timestamp between '2023-01-20 00:00' and '2023-01-23 23:59') or (b.request_start_at::timestamp between '2023-01-27 00:00' and '2023-01-29 23:59')\n        group by 1)wbj\n        on wbj.listing_id = l.id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when b.status in ('completed','start_driving','waiting_for_inspection', 'return_car','accepted') then b.id end) as overall_fuld_booking\n        from bookings b \n        where b.request_end_at::timestamp >= '2023-01-18 00:00' and b.request_start_at::timestamp <= '2023-01-31 23:59'\n        group by 1)obf\n        on obf.listing_id = l.id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when b.status in ('completed','start_driving','waiting_for_inspection', 'return_car','accepted') then b.id end) as weekend_fuld_booking\n        from bookings b \n        where (b.request_start_at::timestamp between '2023-01-20 00:00' and '2023-01-23 23:59') or (b.request_start_at::timestamp between '2023-01-27 00:00' and '2023-01-29 23:59')\n        group by 1)wbf\n        on wbf.listing_id = l.id\n--\nleft join \n        (select l.id,\n        count(dates.ymd) as overall_avai_days\n        from listings l\n        left join listing_availability la on la.listing_id=l.id\n        left join (SELECT generate_series(timestamp '2023-01-18', timestamp '2023-01-31', interval '1 day')::date ymd) dates on \n        dates.ymd between la.start_date::date and la.end_date::date\n        where l.status='approved' and l.deleted_at is null \n        GROUP BY 1)ola\n        on ola.id = l.id\n--\nleft join \n        (select l.id,\n        count(case when (dates.ymd between '2023-01-20' and '2023-01-23') or (dates.ymd between '2023-01-27' and '2023-01-29') then dates.ymd end) as weekend_avai_days\n        from listings l\n        left join listing_availability la on la.listing_id=l.id\n        left join (SELECT generate_series(timestamp '2023-01-18', timestamp '2023-01-31', interval '1 day')::date ymd) dates on \n        dates.ymd between la.start_date::date and la.end_date::date\n        where l.status='approved' and l.deleted_at is null\n        GROUP BY 1)wla\n        on wla.id = l.id\nwhere l.status = 'approved'\nand l.deleted_at is null\nand ((c.owner_id is null) or (l.user_id in (942862,344308,756223,31534,176936,551568,59693,120252,113801,483725,839440,760777,59551,58937,725875,797829,810417,1415199,1594773,50832,684922,1387955,548329,259352,81472,399266,79964,92561,93080,177014,89213,925742,758921,46071,1072616,1751078,82304)))\nand l.registration_no in ({{ $json[\"String\"] }})\nand obj.real_rej_booking = 2 and wbj.real_rej_booking = 0\norder by 10 desc",
+        "additionalFields": {}
+      },
+      "id": "76a231c4-4d69-4b78-bc91-382b129ca1ca",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        100
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 2nd Rejection Workflow (Non-Weekend rejection)\n",
+        "height": 91.35426361250266,
+        "width": 330.35458310776687
+      },
+      "id": "10b32840-a1e5-4437-88df-fcf954a0b5c5",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        260,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1j07W-fwHDU5-2Ta8cYq9kvdOu0Uiqnu0D16zq2vab1U",
+          "mode": "list",
+          "cachedResultName": "Ong Tù-Gether Opt In (Responses)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1j07W-fwHDU5-2Ta8cYq9kvdOu0Uiqnu0D16zq2vab1U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 782357221,
+          "mode": "list",
+          "cachedResultName": "Registration No",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1j07W-fwHDU5-2Ta8cYq9kvdOu0Uiqnu0D16zq2vab1U/edit#gid=782357221"
+        },
+        "options": {}
+      },
+      "id": "5ac8d4e4-d2ca-4430-a3b8-03fe4fece9ca",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        800,
+        300
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect distinct l.id, \nl.registration_no, \nm.name as model,\ncase when ll.city_id in (1) then '1. KV'   \nwhen ll.city_id in (2,12) then '2. PG'\nwhen ll.city_id in (3,19,20,21) then '3. KK'  \nwhen ll.city_id in (4,15) then '4. JB' \nwhen ll.city_id in (5) then '5. IP' \nwhen ll.city_id in (47) then '6. NS'\nwhen ll.city_id in (13) then '7. LGK'\nelse '8. Others' end as city,\nl.user_id, \nconcat(u.first_name, ' ',u.last_name)as host_name, \nu.email, \nu.uuid,\nu.phone_number,\nola.overall_avai_days,\ncase when obj.ov_rej_booking is null then '0' else obj.ov_rej_booking end as overall_rej_booking,\ncase when obj.unfair_rej_booking is null then '0' else obj.unfair_rej_booking end as unfair_rej_booking,\ncase when obj.real_rej_booking is null then '0' else obj.real_rej_booking end as real_rej_booking,\ncase when obf.overall_fuld_booking is null then '0' else obf.overall_fuld_booking end as overall_fuld_booking,\ncase when wbj.ov_rej_booking is null then '0' else wbj.ov_rej_booking end as weekend_overall_rej_booking,\ncase when wbj.unfair_rej_booking is null then '0' else wbj.unfair_rej_booking end as weekend_unfair_rej_booking,\ncase when wbj.real_rej_booking is null then '0' else wbj.real_rej_booking end as weekend_real_rej_booking,\nwla.weekend_avai_days,\ncase when wbf.weekend_fuld_booking is null then '0' else wbf.weekend_fuld_booking end as weekend_fuld_booking\nfrom listings l \nleft join users u on u.id = l.user_id\nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = l.id\nleft join models m on m.id = l.model_id\nleft join companies c on c.owner_id = l.user_id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) or (b.status in ('withdrawn', 'cancelled') and b.reason ~* '(host|owner|avai|car)') then b.ref_no end) as ov_rej_booking,\n\t\tcount(distinct case when (b.reason = 'Host is taking a long time to respond' and ((extract(EPOCH FROM b.updated_at::timestamp) - EXTRACT(EPOCH FROM b.created_at::timestamp))/60::integer)< '20' ) then b.ref_no end)as unfair_rej_booking,\n\t\tCOALESCE(count(distinct case when (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) or (b.status in ('withdrawn', 'cancelled') and b.reason ~* '(host|owner|avai|car)') then b.ref_no end) - count(distinct case when (b.reason = 'Host is taking a long time to respond' and ((extract(EPOCH FROM b.updated_at::timestamp) - EXTRACT(EPOCH FROM b.created_at::timestamp))/60::integer)< '20' ) then b.ref_no end),0) as real_rej_booking  \n        from bookings b \n        where b.request_end_at::timestamp >= '2023-01-18 00:00' and b.request_start_at::timestamp <= '2023-01-31 23:59'\n        group by 1)obj\n        on obj.listing_id = l.id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) or (b.status in ('withdrawn', 'cancelled') and b.reason ~* '(host|owner|avai|car)') then b.ref_no end) as ov_rej_booking,\n\t\tcount(distinct case when (b.reason = 'Host is taking a long time to respond' and ((extract(EPOCH FROM b.updated_at::timestamp) - EXTRACT(EPOCH FROM b.created_at::timestamp))/60::integer)< '20' ) then b.ref_no end)as unfair_rej_booking,\n\t\tCOALESCE(count(distinct case when (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) or (b.status in ('withdrawn', 'cancelled') and b.reason ~* '(host|owner|avai|car)') then b.ref_no end) - count(distinct case when (b.reason = 'Host is taking a long time to respond' and ((extract(EPOCH FROM b.updated_at::timestamp) - EXTRACT(EPOCH FROM b.created_at::timestamp))/60::integer)< '20' ) then b.ref_no end),0) as real_rej_booking\n        from bookings b \n        where (b.request_start_at::timestamp between '2023-01-20 00:00' and '2023-01-23 23:59') or (b.request_start_at::timestamp between '2023-01-27 00:00' and '2023-01-29 23:59')\n        group by 1)wbj\n        on wbj.listing_id = l.id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when b.status in ('completed','start_driving','waiting_for_inspection', 'return_car','accepted') then b.id end) as overall_fuld_booking\n        from bookings b \n        where b.request_end_at::timestamp >= '2023-01-18 00:00' and b.request_start_at::timestamp <= '2023-01-31 23:59'\n        group by 1)obf\n        on obf.listing_id = l.id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when b.status in ('completed','start_driving','waiting_for_inspection', 'return_car','accepted') then b.id end) as weekend_fuld_booking\n        from bookings b \n        where (b.request_start_at::timestamp between '2023-01-20 00:00' and '2023-01-23 23:59') or (b.request_start_at::timestamp between '2023-01-27 00:00' and '2023-01-29 23:59')\n        group by 1)wbf\n        on wbf.listing_id = l.id\n--\nleft join \n        (select l.id,\n        count(dates.ymd) as overall_avai_days\n        from listings l\n        left join listing_availability la on la.listing_id=l.id\n        left join (SELECT generate_series(timestamp '2023-01-18', timestamp '2023-01-31', interval '1 day')::date ymd) dates on \n        dates.ymd between la.start_date::date and la.end_date::date\n        where l.status='approved' and l.deleted_at is null \n        GROUP BY 1)ola\n        on ola.id = l.id\n--\nleft join \n        (select l.id,\n        count(case when (dates.ymd between '2023-01-20' and '2023-01-23') or (dates.ymd between '2023-01-27' and '2023-01-29') then dates.ymd end) as weekend_avai_days\n        from listings l\n        left join listing_availability la on la.listing_id=l.id\n        left join (SELECT generate_series(timestamp '2023-01-18', timestamp '2023-01-31', interval '1 day')::date ymd) dates on \n        dates.ymd between la.start_date::date and la.end_date::date\n        where l.status='approved' and l.deleted_at is null\n        GROUP BY 1)wla\n        on wla.id = l.id\nwhere l.status = 'approved'\nand l.deleted_at is null\nand ((c.owner_id is null) or (l.user_id in (942862,344308,756223,31534,176936,551568,59693,120252,113801,483725,839440,760777,59551,58937,725875,797829,810417,1415199,1594773,50832,684922,1387955,548329,259352,81472,399266,79964,92561,93080,177014,89213,925742,758921,46071,1072616,1751078,82304)))\nand l.registration_no in ({{ $json[\"String\"] }})\nand wbj.real_rej_booking = 1 and obj.real_rej_booking <= 2\norder by 10 desc",
+        "additionalFields": {}
+      },
+      "id": "239d51fb-4ac5-49d4-9232-2fd19732a13d",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        540
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 1st Rejection Workflow (Weekend rejection)\n",
+        "height": 99.09971815795721,
+        "width": 329.06367401685776
+      },
+      "id": "4d3ff953-6b85-4ae6-8da6-5c681fb94f0a",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        260,
+        540
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect distinct l.id, \nl.registration_no, \nm.name as model,\ncase when ll.city_id in (1) then '1. KV'   \nwhen ll.city_id in (2,12) then '2. PG'\nwhen ll.city_id in (3,19,20,21) then '3. KK'  \nwhen ll.city_id in (4,15) then '4. JB' \nwhen ll.city_id in (5) then '5. IP' \nwhen ll.city_id in (47) then '6. NS'\nwhen ll.city_id in (13) then '7. LGK'\nelse '8. Others' end as city,\nl.user_id, \nconcat(u.first_name, ' ',u.last_name)as host_name, \nu.email, \nu.uuid,\nu.phone_number,\nola.overall_avai_days,\ncase when obj.ov_rej_booking is null then '0' else obj.ov_rej_booking end as overall_rej_booking,\ncase when obj.unfair_rej_booking is null then '0' else obj.unfair_rej_booking end as unfair_rej_booking,\ncase when obj.real_rej_booking is null then '0' else obj.real_rej_booking end as real_rej_booking,\ncase when obf.overall_fuld_booking is null then '0' else obf.overall_fuld_booking end as overall_fuld_booking,\ncase when wbj.ov_rej_booking is null then '0' else wbj.ov_rej_booking end as weekend_overall_rej_booking,\ncase when wbj.unfair_rej_booking is null then '0' else wbj.unfair_rej_booking end as weekend_unfair_rej_booking,\ncase when wbj.real_rej_booking is null then '0' else wbj.real_rej_booking end as weekend_real_rej_booking,\nwla.weekend_avai_days,\ncase when wbf.weekend_fuld_booking is null then '0' else wbf.weekend_fuld_booking end as weekend_fuld_booking\nfrom listings l \nleft join users u on u.id = l.user_id\nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = l.id\nleft join models m on m.id = l.model_id\nleft join companies c on c.owner_id = l.user_id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) or (b.status in ('withdrawn', 'cancelled') and b.reason ~* '(host|owner|avai|car)') then b.ref_no end) as ov_rej_booking,\n\t\tcount(distinct case when (b.reason = 'Host is taking a long time to respond' and ((extract(EPOCH FROM b.updated_at::timestamp) - EXTRACT(EPOCH FROM b.created_at::timestamp))/60::integer)< '20' ) then b.ref_no end)as unfair_rej_booking,\n\t\tCOALESCE(count(distinct case when (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) or (b.status in ('withdrawn', 'cancelled') and b.reason ~* '(host|owner|avai|car)') then b.ref_no end) - count(distinct case when (b.reason = 'Host is taking a long time to respond' and ((extract(EPOCH FROM b.updated_at::timestamp) - EXTRACT(EPOCH FROM b.created_at::timestamp))/60::integer)< '20' ) then b.ref_no end),0) as real_rej_booking  \n        from bookings b \n        where b.request_end_at::timestamp >= '2023-01-18 00:00' and b.request_start_at::timestamp <= '2023-01-31 23:59'\n        group by 1)obj\n        on obj.listing_id = l.id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) or (b.status in ('withdrawn', 'cancelled') and b.reason ~* '(host|owner|avai|car)') then b.ref_no end) as ov_rej_booking,\n\t\tcount(distinct case when (b.reason = 'Host is taking a long time to respond' and ((extract(EPOCH FROM b.updated_at::timestamp) - EXTRACT(EPOCH FROM b.created_at::timestamp))/60::integer)< '20' ) then b.ref_no end)as unfair_rej_booking,\n\t\tCOALESCE(count(distinct case when (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) or (b.status in ('withdrawn', 'cancelled') and b.reason ~* '(host|owner|avai|car)') then b.ref_no end) - count(distinct case when (b.reason = 'Host is taking a long time to respond' and ((extract(EPOCH FROM b.updated_at::timestamp) - EXTRACT(EPOCH FROM b.created_at::timestamp))/60::integer)< '20' ) then b.ref_no end),0) as real_rej_booking\n        from bookings b \n        where (b.request_start_at::timestamp between '2023-01-20 00:00' and '2023-01-23 23:59') or (b.request_start_at::timestamp between '2023-01-27 00:00' and '2023-01-29 23:59')\n        group by 1)wbj\n        on wbj.listing_id = l.id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when b.status in ('completed','start_driving','waiting_for_inspection', 'return_car','accepted') then b.id end) as overall_fuld_booking\n        from bookings b \n        where b.request_end_at::timestamp >= '2023-01-18 00:00' and b.request_start_at::timestamp <= '2023-01-31 23:59'\n        group by 1)obf\n        on obf.listing_id = l.id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when b.status in ('completed','start_driving','waiting_for_inspection', 'return_car','accepted') then b.id end) as weekend_fuld_booking\n        from bookings b \n        where (b.request_start_at::timestamp between '2023-01-20 00:00' and '2023-01-23 23:59') or (b.request_start_at::timestamp between '2023-01-27 00:00' and '2023-01-29 23:59')\n        group by 1)wbf\n        on wbf.listing_id = l.id\n--\nleft join \n        (select l.id,\n        count(dates.ymd) as overall_avai_days\n        from listings l\n        left join listing_availability la on la.listing_id=l.id\n        left join (SELECT generate_series(timestamp '2023-01-18', timestamp '2023-01-31', interval '1 day')::date ymd) dates on \n        dates.ymd between la.start_date::date and la.end_date::date\n        where l.status='approved' and l.deleted_at is null \n        GROUP BY 1)ola\n        on ola.id = l.id\n--\nleft join \n        (select l.id,\n        count(case when (dates.ymd between '2023-01-20' and '2023-01-23') or (dates.ymd between '2023-01-27' and '2023-01-29') then dates.ymd end) as weekend_avai_days\n        from listings l\n        left join listing_availability la on la.listing_id=l.id\n        left join (SELECT generate_series(timestamp '2023-01-18', timestamp '2023-01-31', interval '1 day')::date ymd) dates on \n        dates.ymd between la.start_date::date and la.end_date::date\n        where l.status='approved' and l.deleted_at is null\n        GROUP BY 1)wla\n        on wla.id = l.id\nwhere l.status = 'approved'\nand l.deleted_at is null\nand ((c.owner_id is null) or (l.user_id in (942862,344308,756223,31534,176936,551568,59693,120252,113801,483725,839440,760777,59551,58937,725875,797829,810417,1415199,1594773,50832,684922,1387955,548329,259352,81472,399266,79964,92561,93080,177014,89213,925742,758921,46071,1072616,1751078,82304)))\nand l.registration_no in ({{ $json[\"String\"] }})\nand (wbj.real_rej_booking > 1 or obj.real_rej_booking > 2)\norder by 10 desc",
+        "additionalFields": {}
+      },
+      "id": "a8bf0038-890e-408e-94a0-698c34746e5b",
+      "name": "Postgres3",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        980
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Disqualified Workflow\n",
+        "height": 80,
+        "width": 329.06367401685776
+      },
+      "id": "97dc099f-d4e3-4d0c-9c3b-925ab842a375",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        260,
+        980
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\"to\":[{\"email\":\"{{$json[\"email\"]}}\",\"name\":\"{{$json[\"host_name\"]}}\"}],\n\"templateId\":381,\"params\":{ \"CPHOSTNAME\":\"{{$json[\"host_name\"]}}\"}}\n\n",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        -460
+      ],
+      "id": "b580eb4d-ed72-4566-933e-7a3ecc61b265",
+      "retryOnFail": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "5",
+          "name": "SendInBlue - Header Key"
+        },
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.leanplum.com/api?action=startCampaign",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={ \"appId\" : \"app_BXrjE7dc15VWXDLRfh77tActhBhSkCHeQhETDE1mXfQ\", \"clientKey\" : \"dev_L9yBjOmwfR3fNiVjL9woIYfWzsy5hMcGDx0og8isAFw\", \"apiVersion\" : \"1.0.6\", \"userId\":\"{{ $json[\"uuid\"] }}\", \"campaignId\":\"6465160768716800\", \"createDisposition\" : \"CreateNever\"}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "LP API - Send PN",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        -220
+      ],
+      "id": "77a382be-7b65-4dab-a76d-62f59b8eb43b"
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.leanplum.com/api?action=startCampaign",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={ \"appId\" : \"app_BXrjE7dc15VWXDLRfh77tActhBhSkCHeQhETDE1mXfQ\", \"clientKey\" : \"dev_L9yBjOmwfR3fNiVjL9woIYfWzsy5hMcGDx0og8isAFw\", \"apiVersion\" : \"1.0.6\", \"userId\":\"{{ $json[\"uuid\"] }}\", \"campaignId\":\"6393311904989184\", \"createDisposition\" : \"CreateNever\"}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "LP API - Send PN1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        240
+      ],
+      "id": "1dd96218-98d6-4e12-840e-27da37ae46cb"
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.leanplum.com/api?action=startCampaign",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={ \"appId\" : \"app_BXrjE7dc15VWXDLRfh77tActhBhSkCHeQhETDE1mXfQ\", \"clientKey\" : \"dev_L9yBjOmwfR3fNiVjL9woIYfWzsy5hMcGDx0og8isAFw\", \"apiVersion\" : \"1.0.6\", \"userId\":\"{{ $json[\"uuid\"] }}\", \"campaignId\":\"4564925167501312\", \"createDisposition\" : \"CreateNever\"}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "LP API - Send PN2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        680
+      ],
+      "id": "973647ef-0940-4abd-a37b-2744858f9f8e"
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.leanplum.com/api?action=startCampaign",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={ \"appId\" : \"app_BXrjE7dc15VWXDLRfh77tActhBhSkCHeQhETDE1mXfQ\", \"clientKey\" : \"dev_L9yBjOmwfR3fNiVjL9woIYfWzsy5hMcGDx0og8isAFw\", \"apiVersion\" : \"1.0.6\", \"userId\":\"{{ $json[\"uuid\"] }}\", \"campaignId\":\"5774303904202752\", \"createDisposition\" : \"CreateNever\"}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "LP API - Send PN3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        1120
+      ],
+      "id": "2b988263-188f-4a48-b09d-550d89d081de"
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"registration_no\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['registration_no']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function4",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        100
+      ],
+      "id": "1194afde-2138-472c-a189-a83ea83f3f61"
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"registration_no\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['registration_no']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        540
+      ],
+      "id": "0e008e71-36e3-43f0-83eb-0ab0645705a4"
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"registration_no\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['registration_no']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function2",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        980
+      ],
+      "id": "647e4181-57cc-4fe8-8a4a-3f763b342879"
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\"to\":[{\"email\":\"{{$json[\"email\"]}}\",\"name\":\"{{$json[\"host_name\"]}}\"}],\n\"templateId\":382,\"params\":{ \"CPHOSTNAME\":\"{{$json[\"host_name\"]}}\"}}\n\n",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API4",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        20
+      ],
+      "id": "68fb9c83-d21e-4cc8-942e-525e38537ab9",
+      "retryOnFail": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "5",
+          "name": "SendInBlue - Header Key"
+        },
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\"to\":[{\"email\":\"{{$json[\"email\"]}}\",\"name\":\"{{$json[\"host_name\"]}}\"}],\n\"templateId\":384,\"params\":{ \"CPHOSTNAME\":\"{{$json[\"host_name\"]}}\"}}\n\n",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        480
+      ],
+      "id": "3ec81154-4b39-41f4-8214-25e9c43b803d",
+      "retryOnFail": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "5",
+          "name": "SendInBlue - Header Key"
+        },
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\"to\":[{\"email\":\"{{$json[\"email\"]}}\",\"name\":\"{{$json[\"host_name\"]}}\"}],\n\"templateId\":383,\"params\":{ \"CPHOSTNAME\":\"{{$json[\"host_name\"]}}\", \"CPLATE\":\"{{$json[\"registration_no\"]}}\"}}\n\n",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        920
+      ],
+      "id": "df236db0-9408-4b24-8480-9e5cd193928d",
+      "retryOnFail": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "5",
+          "name": "SendInBlue - Header Key"
+        },
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1YLMEmBnbZNbvwDypwpwoNQwV2Vc2OaGoVCkFnym5CGw",
+          "mode": "list",
+          "cachedResultName": "PNTracker - Ong",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YLMEmBnbZNbvwDypwpwoNQwV2Vc2OaGoVCkFnym5CGw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "REJ1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YLMEmBnbZNbvwDypwpwoNQwV2Vc2OaGoVCkFnym5CGw/edit#gid=0"
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ $node[\"Postgres2\"].json[\"id\"] }}"
+            },
+            {
+              "fieldId": "reg_no",
+              "fieldValue": "={{ $node[\"Postgres2\"].json[\"registration_no\"] }}"
+            },
+            {
+              "fieldId": "host_name",
+              "fieldValue": "={{ $node[\"Postgres2\"].json[\"host_name\"] }}"
+            },
+            {
+              "fieldId": "ovr_rej",
+              "fieldValue": "={{ $node[\"Postgres2\"].json[\"real_rej_booking\"] }}"
+            },
+            {
+              "fieldId": "week_rej",
+              "fieldValue": "={{ $node[\"Postgres2\"].json[\"weekend_real_rej_booking\"] }}"
+            },
+            {
+              "fieldId": "lp_true_false",
+              "fieldValue": "={{ $json[\"response\"][0][\"success\"] }}"
+            },
+            {
+              "fieldId": "sendinblue_true_false",
+              "fieldValue": "={{ $json[\"messageId\"] }}"
+            },
+            {
+              "fieldId": "timestamp",
+              "fieldValue": "={{ $node[\"Schedule Trigger1\"].json[\"timestamp\"] }}"
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "f5a0fd7e-418a-494a-9ccb-0c411bfad2e7",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1760,
+        -340
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1YLMEmBnbZNbvwDypwpwoNQwV2Vc2OaGoVCkFnym5CGw",
+          "mode": "list",
+          "cachedResultName": "PNTracker - Ong",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YLMEmBnbZNbvwDypwpwoNQwV2Vc2OaGoVCkFnym5CGw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 514700573,
+          "mode": "list",
+          "cachedResultName": "REJ2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YLMEmBnbZNbvwDypwpwoNQwV2Vc2OaGoVCkFnym5CGw/edit#gid=514700573"
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ $node[\"Postgres2\"].json[\"id\"] }}"
+            },
+            {
+              "fieldId": "reg_no",
+              "fieldValue": "={{ $node[\"Postgres2\"].json[\"registration_no\"] }}"
+            },
+            {
+              "fieldId": "host_name",
+              "fieldValue": "={{ $node[\"Postgres2\"].json[\"host_name\"] }}"
+            },
+            {
+              "fieldId": "ovr_rej",
+              "fieldValue": "={{ $node[\"Postgres2\"].json[\"real_rej_booking\"] }}"
+            },
+            {
+              "fieldId": "week_rej",
+              "fieldValue": "={{ $node[\"Postgres2\"].json[\"weekend_real_rej_booking\"] }}"
+            },
+            {
+              "fieldId": "lp_true_false",
+              "fieldValue": "={{ $json[\"response\"][0][\"success\"] }}"
+            },
+            {
+              "fieldId": "sendinblue_true_false",
+              "fieldValue": "={{ $json[\"messageId\"] }}"
+            },
+            {
+              "fieldId": "timestamp",
+              "fieldValue": "={{ $node[\"Schedule Trigger1\"].json[\"timestamp\"] }}"
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "68a660a2-815d-4ba7-bb82-30f66b903d5b",
+      "name": "Google Sheets2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1740,
+        100
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1YLMEmBnbZNbvwDypwpwoNQwV2Vc2OaGoVCkFnym5CGw",
+          "mode": "list",
+          "cachedResultName": "PNTracker - Ong",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YLMEmBnbZNbvwDypwpwoNQwV2Vc2OaGoVCkFnym5CGw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1757594587,
+          "mode": "list",
+          "cachedResultName": "WEREJ1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YLMEmBnbZNbvwDypwpwoNQwV2Vc2OaGoVCkFnym5CGw/edit#gid=1757594587"
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ $node[\"Postgres2\"].json[\"id\"] }}"
+            },
+            {
+              "fieldId": "reg_no",
+              "fieldValue": "={{ $node[\"Postgres2\"].json[\"registration_no\"] }}"
+            },
+            {
+              "fieldId": "host_name",
+              "fieldValue": "={{ $node[\"Postgres2\"].json[\"host_name\"] }}"
+            },
+            {
+              "fieldId": "ovr_rej",
+              "fieldValue": "={{ $node[\"Postgres2\"].json[\"real_rej_booking\"] }}"
+            },
+            {
+              "fieldId": "week_rej",
+              "fieldValue": "={{ $node[\"Postgres2\"].json[\"weekend_real_rej_booking\"] }}"
+            },
+            {
+              "fieldId": "lp_true_false",
+              "fieldValue": "={{ $json[\"response\"][0][\"success\"] }}"
+            },
+            {
+              "fieldId": "sendinblue_true_false",
+              "fieldValue": "={{ $json[\"messageId\"] }}"
+            },
+            {
+              "fieldId": "timestamp",
+              "fieldValue": "={{ $node[\"Schedule Trigger1\"].json[\"timestamp\"] }}"
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "a6fc9b0e-47e1-45ef-bee5-930809e59ace",
+      "name": "Google Sheets3",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1720,
+        580
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1YLMEmBnbZNbvwDypwpwoNQwV2Vc2OaGoVCkFnym5CGw",
+          "mode": "list",
+          "cachedResultName": "PNTracker - Ong",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YLMEmBnbZNbvwDypwpwoNQwV2Vc2OaGoVCkFnym5CGw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1431005167,
+          "mode": "list",
+          "cachedResultName": "DISQAL",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YLMEmBnbZNbvwDypwpwoNQwV2Vc2OaGoVCkFnym5CGw/edit#gid=1431005167"
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ $node[\"Postgres2\"].json[\"id\"] }}"
+            },
+            {
+              "fieldId": "reg_no",
+              "fieldValue": "={{ $node[\"Postgres2\"].json[\"registration_no\"] }}"
+            },
+            {
+              "fieldId": "host_name",
+              "fieldValue": "={{ $node[\"Postgres2\"].json[\"host_name\"] }}"
+            },
+            {
+              "fieldId": "ovr_rej",
+              "fieldValue": "={{ $node[\"Postgres2\"].json[\"real_rej_booking\"] }}"
+            },
+            {
+              "fieldId": "week_rej",
+              "fieldValue": "={{ $node[\"Postgres2\"].json[\"weekend_real_rej_booking\"] }}"
+            },
+            {
+              "fieldId": "lp_true_false",
+              "fieldValue": "={{ $json[\"response\"][0][\"success\"] }}"
+            },
+            {
+              "fieldId": "sendinblue_true_false",
+              "fieldValue": "={{ $json[\"messageId\"] }}"
+            },
+            {
+              "fieldId": "timestamp",
+              "fieldValue": "={{ $node[\"Schedule Trigger1\"].json[\"timestamp\"] }}"
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "9a4608b5-2145-4704-b4ab-dabb11ca5ae4",
+      "name": "Google Sheets4",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1720,
+        1000
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "callerPolicy": "any",
+    "errorWorkflow": "11",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": false
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds": [
+        24531,
+        22940,
+        38444,
+        23056,
+        6298,
+        27750,
+        "VFE7024",
+        "VAW4857",
+        "LF4501",
+        "VAV9642",
+        "WYQ1125",
+        "WA1643M",
+        "QAB9290C",
+        "ST563X",
+        39776,
+        22669,
+        17462,
+        "VCN6755",
+        "SB5733D",
+        40888,
+        24765,
+        22119,
+        36994,
+        "PLJ2419",
+        "WB7344W",
+        "VBT5631",
+        "SMG3100",
+        "WA271V",
+        42343,
+        35632,
+        "KV3026E",
+        "SU3834G",
+        "SAB8688X",
+        "SAC3056B",
+        "QM3699A",
+        "VHC326",
+        "KFF919",
+        "RAD6193",
+        "SYW4514",
+        "SAC8435B",
+        "VBM4960",
+        "WXL9777",
+        "WC8495B",
+        "BQF720",
+        "VAX5557",
+        "BPJ7700",
+        "JSG6718",
+        "WC2110G",
+        "W6322U",
+        "SYK856",
+        "TCC4900",
+        "WC5716M",
+        "VS6864",
+        "JQE5841",
+        "SYK1124",
+        "PMU3025",
+        "PPR6219",
+        "VB3375",
+        "WC9429D",
+        "PQA6499",
+        "BAD9999",
+        "SAC203A",
+        "AHG7111",
+        "SWB8116",
+        "AEL20",
+        "SAC2878D",
+        "SWF1483",
+        "JSS7727",
+        "WVN2168",
+        "KV9679E",
+        "VK8672",
+        "WKN31",
+        "WYK7700",
+        "WXX9799",
+        "ST1507X",
+        "VEJ5140",
+        "SYS860",
+        "JRD2924",
+        "VCL4662",
+        "KV7170D",
+        "DDE9166",
+        "PMD9967",
+        "VD4921",
+        "KEP9850",
+        "QM812K",
+        "VHQ1387",
+        "SS2150W",
+        "BMK824",
+        "PMK930",
+        "NDF4198",
+        "PNL1810",
+        "VDR2788",
+        1168,
+        42131,
+        2183,
+        25442,
+        34679,
+        35434,
+        36389,
+        37809,
+        42025,
+        39795,
+        18836,
+        40348,
+        41629,
+        9872,
+        38129,
+        38980,
+        40351,
+        42293,
+        20035,
+        34796,
+        39374,
+        41105,
+        20054,
+        36923,
+        27043,
+        19995,
+        39889,
+        26974,
+        39701,
+        38092,
+        41642,
+        18799,
+        39734,
+        1740,
+        40531,
+        36804,
+        38580,
+        26805,
+        14675,
+        34334,
+        40629,
+        21248,
+        28915,
+        41586,
+        41148,
+        41139,
+        39738,
+        35016,
+        27715,
+        39435,
+        26309,
+        35073,
+        2038,
+        36791,
+        39062,
+        37948,
+        38875,
+        30729,
+        39692,
+        32406,
+        24942,
+        40221,
+        38458,
+        38202,
+        37568,
+        32750,
+        35103,
+        41550,
+        39269,
+        37792,
+        36274,
+        35383,
+        25601,
+        12864,
+        41012,
+        37433,
+        32621,
+        33630,
+        27474,
+        38553,
+        21778,
+        2497,
+        40593,
+        28185,
+        31155,
+        35009,
+        1167,
+        41172,
+        34700,
+        17005,
+        41974,
+        39461,
+        39439,
+        40705,
+        33820,
+        10983,
+        1266,
+        39774,
+        34695,
+        40850,
+        36282,
+        35342,
+        40760,
+        1166,
+        14683,
+        840,
+        37105,
+        38286,
+        40753,
+        28301,
+        32796,
+        33760,
+        40946,
+        39536,
+        39717,
+        40502,
+        36721,
+        36427,
+        36069,
+        32385,
+        40786,
+        37724,
+        37392,
+        6871,
+        41785,
+        37198,
+        31404,
+        39170,
+        37529,
+        39371,
+        39373,
+        36415,
+        36968,
+        39960,
+        19972,
+        40670,
+        17984,
+        39343,
+        40835,
+        39622,
+        30316,
+        41135,
+        31632,
+        34878,
+        38573,
+        33659,
+        41011,
+        35567,
+        38925,
+        34917,
+        40896,
+        37706,
+        39999,
+        39279,
+        9708,
+        38912,
+        33302,
+        6107,
+        29539,
+        39837,
+        38311,
+        38218,
+        28724,
+        35373,
+        9552,
+        27319,
+        848,
+        28436,
+        6,
+        1,
+        2,
+        3,
+        4,
+        5,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "node:Schedule Trigger1": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2023-08-15T08:14:17.709Z",
+  "versionId": "ef6743db-4904-48e0-94c9-a6e9b575f635"
+}
