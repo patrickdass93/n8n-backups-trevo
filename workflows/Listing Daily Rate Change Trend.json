@@ -1,0 +1,204 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-11-16T03:25:02.233Z",
+  "id": "ZJIKRrHkcgzB6HYH",
+  "name": "Listing Daily Rate Change Trend",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "59e8bbdb-1a44-4c72-bc3e-d57bbd3985b5",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        580,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "19n9Pm12tdUM0S8Chlo8FZCNKvspmP525PFfQi2p9w04",
+          "mode": "list",
+          "cachedResultName": "Listing Daily Rate Change Trend",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19n9Pm12tdUM0S8Chlo8FZCNKvspmP525PFfQi2p9w04/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1677280387,
+          "mode": "list",
+          "cachedResultName": "N8N Read - Raw Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19n9Pm12tdUM0S8Chlo8FZCNKvspmP525PFfQi2p9w04/edit#gid=1677280387"
+        },
+        "options": {}
+      },
+      "id": "7076e7df-dc98-4945-8d8c-7ab6a8365e79",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        800,
+        260
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nwith booking_mult as\n(select distinct b.ref_no, \nb.listing_id,\nl.registration_no,\nb.created_at, \njson_extract_path(json_array_elements(bm.meta->'multiplierPricing'),'price')::text as multiplierprice,\njson_extract_path(json_array_elements(bm.meta->'multiplierPricing'),'multiplier')::text as multiplier,\nbm.meta->>'basePrice' as basePrice\nfrom bookings b \nleft join booking_multipliers bm on b.id = bm.booking_id \nleft join listings l on l.id = b.listing_id\nwhere 1=1\nand b.created_at < $1 --N8N input\nand l.registration_no = $2 --N8N input\nand b.status = 'completed'),\n--\nlatest_booking as(\nselect distinct bm.registration_no, \nmax(bm.created_at) as latest\nfrom booking_mult bm \nwhere bm.multiplier = 'false'\ngroup by 1)\n--\nselect lb.*,\nbm.baseprice as previous_daily_rate, \n$3 as daily_rate_requested --N8N input\nfrom latest_booking lb\nleft join booking_mult bm on lb.registration_no = bm.registration_no and lb.latest = bm.created_at\norder by lb.registration_no\n",
+        "options": {
+          "queryReplacement": "={{ $json.Timestamp }}, {{ $json['Car Registration'] }}, {{ $json['Daily rate requested'] }}"
+        }
+      },
+      "id": "53e48c22-8242-444d-a321-8933e5bc2ece",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1020,
+        260
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "19n9Pm12tdUM0S8Chlo8FZCNKvspmP525PFfQi2p9w04",
+          "mode": "list",
+          "cachedResultName": "Listing Daily Rate Change Trend",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19n9Pm12tdUM0S8Chlo8FZCNKvspmP525PFfQi2p9w04/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 533153695,
+          "mode": "list",
+          "cachedResultName": "N8N Import",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19n9Pm12tdUM0S8Chlo8FZCNKvspmP525PFfQi2p9w04/edit#gid=533153695"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "registration_no"
+          ],
+          "schema": [
+            {
+              "id": "registration_no",
+              "displayName": "registration_no",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "latest",
+              "displayName": "latest",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "previous_daily_rate",
+              "displayName": "previous_daily_rate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "daily_rate_requested",
+              "displayName": "daily_rate_requested",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "2b92c2ee-4c61-4a75-abbb-916c10983466",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1240,
+        260
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-11-16T03:45:39.274Z",
+  "versionId": "76b18208-29f2-4fc4-a842-1187d1e29d5f"
+}
