@@ -1,0 +1,377 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets4": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-05-18T05:36:47.053Z",
+  "id": "75",
+  "name": "[KAVI & JIUN] Supply CRM Sheet",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 6
+            }
+          ]
+        }
+      },
+      "id": "f2d2a711-7b99-4344-9cca-2c398872d1d8",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        640,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect A.*, cp.name as catalyst_pic\nfrom \n(select distinct l.id as listing_id,\nl.user_id as host_id, \nconcat(u.first_name,' ',u.last_name)as host_name,\ncase when ll2.city_id in (1) then 'KV'   \nwhen ll2.city_id in (2,12) then 'PGM' when ll2.city_id in (48) then 'PGI'\nwhen ll2.city_id in (3,19,20,21) then 'KK'   when ll2.city_id in (4) then 'JB' \nwhen ll2.city_id in (5) then 'IP'   when ll2.city_id in (47) then 'NS'\nwhen ll2.city_id in (13) then 'LGK' \nwhen ll2.city_id in (14) then 'PRLS'\nwhen ll2.city_id in (15) then 'MLK'\nwhen ll2.city_id in (16) then 'PHG'\nwhen ll2.city_id in (17) then 'TRGN'\nwhen ll2.city_id in (18) then 'KLT'\nwhen ll2.city_id in (22,23) then 'KCH'\nelse 'Others' end as City,\nto_char(l.created_at, 'YYYY-MM') as created_month,\nto_char(l.created_at, 'IYYY-IW') as created_week,\nl.status,\n        TO_CHAR(l.deleted_at::DATE,'YYYY-MM') as deleted_at,\n        TO_CHAR(l.approved_at::DATE,'YYYY-MM') as approved_at,\n        TO_CHAR(l.first_approved_at::DATE,'YYYY-MM') as first_approved_at,\n        TO_CHAR(cft.cft::DATE,'YYYY-MM') as cft,\n        TO_CHAR(cft.clt::DATE,'YYYY-MM') as clt,\nround((extract(EPOCH FROM cft.clt::timestamp) - EXTRACT(EPOCH FROM cft.cft::timestamp))/86400::integer) as active_age_days,\n(Afr.fuld_booking::numeric/nullif(Afr.special_req,0))*100 as AFR_rate,\nTO_CHAR(l.updated_at::DATE,'YYYY-MM') as updated_at,\ncase when t.name like 'CT -%' or t.name like 'SOFAMCT -%' or t.name like 'SC -%' then t.id else NULL end as tag_id,\ncase when t.name like 'CT -%' or t.name like 'SOFAMCT -%' or t.name like 'SC -%' then t.name else NULL end as name,\nCAST(substring(t.name from '\\[(\\d+)\\]') AS INTEGER) as catalyst_id\nfrom listings l \nleft join tag_taggables tt on tt.taggable_id = l.id \nleft join listing_location ll2 on ll2.listing_id = l.id\nleft join tags t on t.id = tt.tag_id\nleft join users u on u.id = l.user_id\n--cft\nleft join \n        (select b.listing_id, \n        min(b.request_end_at)as cft,\n        max(b.request_end_at)as clt\n        from bookings b \n        where b.status = 'completed'\n        group by 1)cft\n        on cft.listing_id = l.id\n--AFR\nleft join\n                (select distinct l.id,\n                count(distinct case when ((b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')) or (b.status in ('withdrawn','cancelled') and b.reason ~* '(host|owner|avai|car)') or (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null))) then b.id end) as special_req,\n                count(distinct case when b.status in ('accepted', 'waiting_for_inspection', 'start_driving', 'return_car', 'completed') then b.id end) as fuld_booking       \n                from bookings b \n                left join listing_insurance li on li.listing_id = b.listing_id\n                left join (select distinct listing_id, country, city_id, address_line_1, address_line_2,postal_code from listing_location) ll on ll.listing_id = b.listing_id\n                left join listings l on l.id = b.listing_id \n                left join companies c on c.owner_id = l.user_id \n                where ll.country = 'Malaysia'\n                group by 1\n                )Afr \n                on afr.id = l.id\nwhere 1=1\nand (t.name like 'CT -%' \nor t.name like 'SOFAMCT -%' \nor t.name like 'SC -%')\n--and l.status = 'approved'\n--and l.deleted_at is null\nand ll2.country = 'Malaysia')A\n--\nleft join\n(select distinct u.id, u.display_name, t.name\nfrom users u \njoin tag_taggables tt on tt.taggable_id = u.id \njoin tags t on t.id = tt.tag_id \nwhere t.name LIKE 'SC -%'\nand t.category = 'users' \ngroup by 1,2,3)cp\non cp.id = A.catalyst_id",
+        "options": {}
+      },
+      "id": "f40db130-0dea-4fe4-b2f0-ae2a4dfbdddb",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        960,
+        320
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1YFdJb5MhPNS3D95F8db97hAk77-X1K5wHb_3f8OM8F0",
+          "mode": "list",
+          "cachedResultName": "SC & Catalyst Dashboard 2023",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YFdJb5MhPNS3D95F8db97hAk77-X1K5wHb_3f8OM8F0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1819945574,
+          "mode": "list",
+          "cachedResultName": "Raw Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YFdJb5MhPNS3D95F8db97hAk77-X1K5wHb_3f8OM8F0/edit#gid=1819945574"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "listing_id",
+        "options": {
+          "cellFormat": "RAW",
+          "handlingExtraData": "ignoreIt"
+        }
+      },
+      "id": "2b86a2ba-00ad-434c-b26c-910a7c7f9334",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1280,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google Sheets [Pat]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1YFdJb5MhPNS3D95F8db97hAk77-X1K5wHb_3f8OM8F0",
+          "mode": "list",
+          "cachedResultName": "SC & Catalyst Dashboard 2023",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YFdJb5MhPNS3D95F8db97hAk77-X1K5wHb_3f8OM8F0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1819945574,
+          "mode": "list",
+          "cachedResultName": "Raw Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YFdJb5MhPNS3D95F8db97hAk77-X1K5wHb_3f8OM8F0/edit#gid=1819945574"
+        },
+        "clear": "specificRange",
+        "range": "A2:S"
+      },
+      "id": "81c53303-c1a1-46e9-934c-6cb5f44974ca",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        800,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google Sheets [Pat]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nwith withtag as \n(select A.*, cp.name as catalyst_pic\nfrom \n(select distinct l.id as listing_id,\nl.user_id as host_id, \nconcat(u.first_name,' ',u.last_name)as host_name,\ncase when ll2.city_id in (1) then 'KV'   \nwhen ll2.city_id in (2,12) then 'PGM' when ll2.city_id in (48) then 'PGI'\nwhen ll2.city_id in (3,19,20,21) then 'KK'   when ll2.city_id in (4) then 'JB' \nwhen ll2.city_id in (5) then 'IP'   when ll2.city_id in (47) then 'NS'\nwhen ll2.city_id in (13) then 'LGK' \nwhen ll2.city_id in (14) then 'PRLS'\nwhen ll2.city_id in (15) then 'MLK'\nwhen ll2.city_id in (16) then 'PHG'\nwhen ll2.city_id in (17) then 'TRGN'\nwhen ll2.city_id in (18) then 'KLT'\nwhen ll2.city_id in (22,23) then 'KCH'\nelse 'Others' end as City,\nto_char(l.created_at, 'YYYY-MM') as created_month,\nto_char(l.created_at, 'IYYY-IW') as created_week,\nl.status,\n        TO_CHAR(l.deleted_at::DATE,'YYYY-MM') as deleted_at,\n        TO_CHAR(l.approved_at::DATE,'YYYY-MM') as approved_at,\n        TO_CHAR(l.first_approved_at::DATE,'YYYY-MM') as first_approved_at,\n        TO_CHAR(cft.cft::DATE,'YYYY-MM') as cft,\n        TO_CHAR(cft.clt::DATE,'YYYY-MM') as clt,\nround((extract(EPOCH FROM cft.clt::timestamp) - EXTRACT(EPOCH FROM cft.cft::timestamp))/86400::integer) as active_age_days,\n(Afr.fuld_booking::numeric/nullif(Afr.special_req,0))*100 as AFR_rate,\ncase when t.name like 'CT -%' or t.name like 'SC -%' then t.id else NULL end as tag_id,\ncase when t.name like 'CT -%' or t.name like 'SC -%' then t.name else NULL end as name,\nCAST(substring(t.name from '\\[(\\d+)\\]') AS INTEGER) as catalyst_id\nfrom listings l \nleft join tag_taggables tt on tt.taggable_id = l.id \nleft join listing_location ll2 on ll2.listing_id = l.id\nleft join tags t on t.id = tt.tag_id\nleft join users u on u.id = l.user_id\n--cft\nleft join \n        (select b.listing_id, \n        min(b.request_end_at)as cft,\n        max(b.request_end_at)as clt\n        from bookings b \n        where b.status = 'completed'\n        group by 1)cft\n        on cft.listing_id = l.id\n--AFR\nleft join\n                (select distinct l.id,\n                count(distinct case when ((b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')) or (b.status in ('withdrawn','cancelled') and b.reason ~* '(host|owner|avai|car)') or (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null))) then b.id end) as special_req,\n                count(distinct case when b.status in ('accepted', 'waiting_for_inspection', 'start_driving', 'return_car', 'completed') then b.id end) as fuld_booking       \n                from bookings b \n                left join listing_insurance li on li.listing_id = b.listing_id\n                left join (select distinct listing_id, country, city_id, address_line_1, address_line_2,postal_code from listing_location) ll on ll.listing_id = b.listing_id\n                left join listings l on l.id = b.listing_id \n                left join companies c on c.owner_id = l.user_id \n                where ll.country = 'Malaysia'\n                group by 1\n                )Afr \n                on afr.id = l.id\nwhere 1=1\nand t.name like 'CT -%' \nor t.name like 'SC -%'\n--and l.status = 'approved'\n--and l.deleted_at is null\nand ll2.country = 'Malaysia')A\n--\nleft join\n(select distinct u.id, u.display_name, t.name\nfrom users u \njoin tag_taggables tt on tt.taggable_id = u.id \njoin tags t on t.id = tt.tag_id \nwhere t.name LIKE 'SC -%'\nand t.category = 'users' \ngroup by 1,2,3)cp\non cp.id = A.catalyst_id) \n--\n, withouttag as (    SELECT DISTINCT\n        l.id AS listing_id,\n        l.user_id AS host_id,\n        CONCAT(u.first_name, ' ', u.last_name) AS host_name,\ncase when ll2.city_id in (1) then 'KV'   \nwhen ll2.city_id in (2,12) then 'PGM' when ll2.city_id in (48) then 'PGI'\nwhen ll2.city_id in (3,19,20,21) then 'KK'   when ll2.city_id in (4) then 'JB' \nwhen ll2.city_id in (5) then 'IP'   when ll2.city_id in (47) then 'NS'\nwhen ll2.city_id in (13) then 'LGK' \nwhen ll2.city_id in (14) then 'PRLS'\nwhen ll2.city_id in (15) then 'MLK'\nwhen ll2.city_id in (16) then 'PHG'\nwhen ll2.city_id in (17) then 'TRGN'\nwhen ll2.city_id in (18) then 'KLT'\nwhen ll2.city_id in (22,23) then 'KCH'\nelse 'Others' end as City,\n        TO_CHAR(l.created_at, 'YYYY-MM') AS created_month,\n        TO_CHAR(l.created_at, 'IYYY-IW') AS created_week,\n        l.status,\n        TO_CHAR(l.deleted_at::DATE,'YYYY-MM') as deleted_at,\n        TO_CHAR(l.approved_at::DATE,'YYYY-MM') as approved_at,\n        TO_CHAR(l.first_approved_at::DATE,'YYYY-MM') as first_approved_at,\n        TO_CHAR(cft.cft::DATE,'YYYY-MM') as cft,\n        TO_CHAR(cft.clt::DATE,'YYYY-MM') as clt,\n        ROUND((EXTRACT(EPOCH FROM cft.clt::TIMESTAMP) - EXTRACT(EPOCH FROM cft.cft::TIMESTAMP)) / 86400::INTEGER) AS active_age_days,\n        (Afr.fuld_booking::NUMERIC / NULLIF(Afr.special_req, 0)) * 100 AS AFR_rate,\n        TO_CHAR(l.updated_at::DATE,'YYYY-MM') as updated_at,\n        CASE WHEN t.name LIKE 'CT -%' OR t.name LIKE 'SC -%' THEN t.id ELSE NULL END AS tag_id,\n        CASE WHEN t.name LIKE 'CT -%' OR t.name LIKE 'SC -%' THEN t.name ELSE NULL END AS name,\n        CAST(substring(t.name from '\\[(\\d+)\\]') AS INTEGER) AS catalyst_id\n    FROM\n        listings l\n        LEFT JOIN tag_taggables tt ON tt.taggable_id = l.id\n        LEFT JOIN listing_location ll2 ON ll2.listing_id = l.id\n        LEFT JOIN tags t ON t.id = tt.tag_id\n        LEFT JOIN users u ON u.id = l.user_id\n        --cft\n        LEFT JOIN (\n            SELECT\n                b.listing_id,\n                MIN(b.request_end_at) AS cft,\n                MAX(b.request_end_at) AS clt\n            FROM\n                bookings b\n            WHERE\n                b.status = 'completed'\n            GROUP BY\n                1\n        ) cft ON cft.listing_id = l.id\n        --AFR\n        LEFT JOIN (\n            SELECT DISTINCT\n                l.id,\n                COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed', 'start_driving', 'waiting_for_inspection', 'return_car')) OR (b.status IN ('withdrawn', 'cancelled') AND b.reason ~* '(host|owner|avai|car)') OR (b.status = 'rejected' AND (b.reason !~* '(guest)' OR b.reason IS NULL))) THEN b.id END) AS special_req,\n                COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'waiting_for_inspection', 'start_driving', 'return_car', 'completed') THEN b.id END) AS fuld_booking\n            FROM\n                bookings b\n                LEFT JOIN listing_insurance li ON li.listing_id = b.listing_id\n                LEFT JOIN (\n                    SELECT DISTINCT\n                        listing_id,\n                        country,\n                        city_id,\n                        address_line_1,\n                        address_line_2,\n                        postal_code\n                    FROM\n                        listing_location\n                ) ll ON ll.listing_id = b.listing_id\n                LEFT JOIN listings l ON l.id = b.listing_id\n                LEFT JOIN companies c ON c.owner_id = l.user_id\n            WHERE\n                ll.country = 'Malaysia'\n            GROUP BY\n                1\n        ) Afr ON Afr.id = l.id\n    WHERE\n        1 = 1\n        AND (t.name NOT LIKE 'CT -%' OR t.name NOT LIKE 'SC -%')\n        --AND l.status = 'approved'\n        --AND l.deleted_at IS NULL\n        AND ll2.country = 'Malaysia')\n --\n select * from withouttag wot\n where wot.listing_id not in (select listing_id from withtag)",
+        "options": {}
+      },
+      "id": "15c8155c-0042-42cc-acba-bc33d9c0a4b4",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        960,
+        480
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1YFdJb5MhPNS3D95F8db97hAk77-X1K5wHb_3f8OM8F0",
+          "mode": "list",
+          "cachedResultName": "SC & Catalyst Dashboard 2023",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YFdJb5MhPNS3D95F8db97hAk77-X1K5wHb_3f8OM8F0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 965110707,
+          "mode": "list",
+          "cachedResultName": "Raw Data (Organic)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YFdJb5MhPNS3D95F8db97hAk77-X1K5wHb_3f8OM8F0/edit#gid=965110707"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "listing_id",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "4b0b6373-c5fe-4f23-a0cd-0c781a9954a9",
+      "name": "Google Sheets2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1460,
+        840
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "id": "7038b21f-6cf6-42a6-8fd3-6c220de81910",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        1140,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1YFdJb5MhPNS3D95F8db97hAk77-X1K5wHb_3f8OM8F0",
+          "mode": "list",
+          "cachedResultName": "SC & Catalyst Dashboard 2023",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YFdJb5MhPNS3D95F8db97hAk77-X1K5wHb_3f8OM8F0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Tags & Workflow",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YFdJb5MhPNS3D95F8db97hAk77-X1K5wHb_3f8OM8F0/edit#gid=0"
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Updated:",
+              "fieldValue": "={{ $node['Schedule Trigger'].json['Readable date'] }}"
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "6580f216-72bc-4c9d-9dcc-734dc7896b78",
+      "name": "Google Sheets3",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        960,
+        660
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google Sheets [Pat]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1YFdJb5MhPNS3D95F8db97hAk77-X1K5wHb_3f8OM8F0",
+          "mode": "list",
+          "cachedResultName": "SC & Catalyst Dashboard 2023",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YFdJb5MhPNS3D95F8db97hAk77-X1K5wHb_3f8OM8F0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Tags & Workflow",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YFdJb5MhPNS3D95F8db97hAk77-X1K5wHb_3f8OM8F0/edit#gid=0"
+        },
+        "clear": "specificRange",
+        "range": "O66"
+      },
+      "id": "920109a7-eb4b-4367-8785-88f1de4b1417",
+      "name": "Google Sheets4",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        800,
+        660
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google Sheets [Pat]"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 300,
+    "errorWorkflow": "11",
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": [
+        12
+      ]
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-05-12T02:58:32.100Z",
+      "updatedAt": "2023-05-12T02:58:32.100Z",
+      "id": "7",
+      "name": "Host CRM"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-08-08T04:00:00.162Z",
+  "versionId": "9c57dba7-c3ff-463b-a1c3-344a6d7ce8a4"
+}
