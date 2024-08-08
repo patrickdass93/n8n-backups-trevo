@@ -1,0 +1,175 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets15",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets15": {
+      "main": [
+        [
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-04-10T07:38:37.856Z",
+  "id": "59",
+  "name": "[JIUN] [HOST COMMUNITY] [Superhost 3.0 Q2 for Q3] Superhost 3.0 Monthly Progress Update",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "3dac2217-8a80-4374-886d-6d5aa4d2646c",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        340,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\n--Superhost Tracker\nselect A.*, \n(A.fuld_booking::numeric/nullif(A.spec_req,0))*100 as AFR_rate,\nrev.avg_review,\ncomp.comp_bookings,\nlc.listing_count\nfrom\n(select to_char(b.created_at,'YYYY-Q')as quarter,\nl.user_id, \nconcat(u.first_name, ' ',u.last_name)as host_name, \nu.email, \nu.phone_number,\nu.uuid,\ncount(distinct case when b.status not in ('payment_failed') then b.id end) as req_booking,\ncount(distinct case when (\n(b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')) or --fulfilled\n(b.status = 'rejected' AND (b.reason !~* '(guest)' OR b.reason IS NULL) and no.nightowl = 'no') OR --exclude rejected with guest fault reasons and nightowl \n(b.status IN ('withdrawn', 'cancelled') AND b.reason ~* '(host|owner|avai|car)' and no.nightowl = 'no' AND b.reason !~* '(after i read|dont need|extended|rebook|rebooking|wrong date|wrong time|I didnt|manual|I want|I need|sorry|I would|mistake|my own car|wrong|change)') -- withdrawn with host fault reason and not guest fault reason and not nightowl\n) then b.id end) as spec_req,\ncount(distinct case when b.status in ('accepted', 'waiting_for_inspection', 'start_driving', 'return_car', 'completed') then b.id end) as fuld_booking\nfrom listings l \nleft join users u on u.id = l.user_id\nleft join bookings b on b.listing_id = l.id\nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = l.id\nleft join\n\t(select distinct b.ref_no, \n\tcase when \n\t((EXTRACT(HOUR FROM b.created_at) in (23,0,1,2,3,4,5,6,7)) and    \n\t(EXTRACT(HOUR FROM b.request_start_at) in (6,7,8,9)) and\n\t((EXTRACT(EPOCH FROM (b.request_start_at - b.created_at)) / 3600) < 12)) then 'yes' else 'no' end as nightowl\n\tfrom bookings b)no\non no.ref_no = b.ref_no\nleft join\n(select bl.booking_id, bl.amount as del_pickup from booking_lines bl where bl.slug = 'car-pick-up-fee') d1\non b.id = d1.booking_id\nleft join\n(select bl.booking_id, bl.amount as del_dropoff from booking_lines bl where bl.slug = 'car-drop-off-fee') d2\non b.id = d2.booking_id\nleft join\n(select bl.booking_id, bl.amount as del_pickup_disc from booking_lines bl where bl.slug = 'car-pick-up-discount-fee') d3\non b.id = d3.booking_id\nleft join\n(select bl.booking_id, bl.amount as del_dropoff_disc from booking_lines bl where bl.slug = 'car-drop-off-discount-fee') d4\non b.id = d4.booking_id\nwhere l.status = 'approved'\nand l.deleted_at is null \nand ll.country = 'Malaysia'\nand b.created_at between '2024-07-01 00:00' and '2024-09-30 23:59' \ngroup by 1,2,3,4,5,6)A\n--\nleft join \n(select distinct l.user_id,\ncount(distinct b.ref_no)as comp_bookings \nfrom bookings b \nleft join listings l on l.id = b.listing_id \nwhere b.status = 'completed'\nand b.request_end_at between '2024-07-01 00:00' and '2024-09-30 23:59' \ngroup by 1)comp\non comp.user_id = A.user_id\n--\nleft join \n(select distinct l.user_id,\navg(br.rating)as avg_review\nfrom bookings b \nleft join listings l on l.id = b.listing_id \nleft join booking_reviews br on br.booking_id = b.id and br.type = 'renter'\nwhere b.status = 'completed'\nand b.request_end_at between '2024-07-01 00:00' and '2024-09-30 23:59' \ngroup by 1)rev\non rev.user_id = A.user_id\n--\nleft join \n(select distinct l.user_id, \ncount(distinct l.id)as listing_count\nfrom listings l \nwhere l.status = 'approved'\nand l.deleted_at is null\ngroup by 1)lc\non lc.user_id = A.user_id\n--\nwhere 1=1\nand A.user_id in (28,55,196,526,1550,1844,5162,5401,6669,9866,10343,23024,26130,30507,31534,32536,34411,34762,35874,36250,36367,42875,43045,46071,48803,50197,50756,50832,54588,56154,57062,57351,57924,58937,58955,59822,64491,66488,66902,68825,73082,77355,81092,81614,82506,82596,87854,88699,88807,92664,93080,94951,95700,96904,97067,97503,109899,112171,113655,120252,125088,161224,179122,181159,183294,187758,188643,188966,205091,212229,213428,218701,252327,285836,307858,318430,323315,344308,403623,406517,421356,427200,439028,439629,444292,450822,460900,467267,477399,505699,507083,563738,564787,568980,570234,595255,596366,601267,613530,619343,620371,631481,638362,667701,676765,684922,688532,692639,717155,722652,727141,737906,741970,746600,766709,766945,775306,777020,790911,798711,804955,805290,807966,823133,824044,825670,826104,835242,835761,861283,895345,902285,905214,911833,912329,937457,951300,979616,998476,1001065,1018675,1021186,1031674,1042239,1068928,1069986,1070475,1078608,1079167,1081277,1094033,1161113,1186445,1207517,1209944,1224294,1241629,1254662,1265113,1273254,1314368,1337956,1338595,1354759,1358409,1367209,1367626,1382241,1385417,1397015,1405645,1406017,1406705,1418658,1418788,1420719,1422813,1438419,1441283,1469239,1481008,1485162,1488212,1500005,1507757,1509522,1518624,1518633,1524058,1567142,1577581,1592510,1593875,1611212,1618758,1620914,1640431,1644871,1646364,1648096,1651510,1653937,1665033,1667621,1682805,1682913,1683963,1684023,1690220,1702228,1704502,1718035,1726611,1733287,1749435,1754076,1762078,1764240,1773485,1808762,1812014,1814475,1819009,1819576,1819675,1846741,1851184,1858635,1863361,1881625,1907289,1908759,1933097,1943367,1949603,1955080,1964353,1968196,1974368,1990210,2000508,2016545,2032196,2037338,2038108,2040846,2058935,2065696,2079530,2081753,2087093,2094243,2106937,2110633,2135690,2136505,2157031,2162882,2174421,2190875,2207120,2211621,2229128,2240419,2244435,2250408,2254150,2281617,2284044,2288850,2294936,2337193,2343689,2374221,2392759,2412196,2419598,2424570,2424682,2441518,2447946,2452351,2455516,2458413,2479842,2481070,2489979,2498686,2503547,2518932,2533753,2542545,2548784,2554894,2586842,2600351,2631758,2635973,2643810,2644307,2652343,2658445,2663213,2683720,2684843,2695365,2696052,2714023,2715905,2724853,2726482,2733703,2743975,2746067,2750636,2758495,2765930,2766533,2767862,2795946,2812208,2841983,2855835,2866826,2880987,2884081,2890362,2901615,2907781,2912387,2986174,3005568,3016023,3022713,3025063,3041885,3046853,3053680,3057610,3060108,3069852,3121126,3196616,3197703)\n--and rev.avg_review >= '4.8'\n--and comp.comp_bookings >= '10'\n--and A.user_id = '5162'\ngroup by 1,2,3,4,5,6,7,8,9,10,11,12,13\n--having (A.fuld_booking::numeric/nullif(A.spec_req,0))*100 >= '95'",
+        "additionalFields": {}
+      },
+      "id": "a20c2747-06b7-47c4-94a2-07bf3d7062ef",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        740,
+        440
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1fqAhIWp4Cw_j3z8QADoSq9S2OAn84T4oCcbcaXGDmL8",
+          "mode": "list",
+          "cachedResultName": "Superhost 3.0 Q2 for Q3 2024",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fqAhIWp4Cw_j3z8QADoSq9S2OAn84T4oCcbcaXGDmL8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 536646792,
+          "mode": "list",
+          "cachedResultName": "(N8N Import Update) Q3 Performance",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fqAhIWp4Cw_j3z8QADoSq9S2OAn84T4oCcbcaXGDmL8/edit#gid=536646792"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "quarter",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "ce610086-d0a8-4aa0-80c9-e151b3cd0a33",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        940,
+        440
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1fqAhIWp4Cw_j3z8QADoSq9S2OAn84T4oCcbcaXGDmL8",
+          "mode": "list",
+          "cachedResultName": "Superhost 3.0 Q2 for Q3 2024",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fqAhIWp4Cw_j3z8QADoSq9S2OAn84T4oCcbcaXGDmL8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 536646792,
+          "mode": "list",
+          "cachedResultName": "(N8N Import Update) Q3 Performance",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fqAhIWp4Cw_j3z8QADoSq9S2OAn84T4oCcbcaXGDmL8/edit#gid=536646792"
+        },
+        "clear": "specificRange",
+        "range": "A2:Z"
+      },
+      "id": "a694d08a-6039-4cc8-bb84-d1d70966f867",
+      "name": "Google Sheets15",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        540,
+        440
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-07-04T07:11:24.593Z",
+  "versionId": "294d3a6a-e2d4-42bf-bdb2-aef412f26a84"
+}
