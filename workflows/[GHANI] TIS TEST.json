@@ -1,0 +1,354 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Engine On",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Booking + Availabilities v2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Engine On": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Google Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Engine On1": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Booking + Availabilities v2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-06-28T14:13:13.852Z",
+  "id": "3nccoCJ5uDNi3jb1",
+  "name": "[GHANI] TIS TEST",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "af51347e-7ad2-4723-b5e8-b16fb9b0fd80",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n\"listingId\" as listing_id\n,\"createdAt\" + interval '16' hour as engine_on_at \nFROM \nCSA_LATEST\nwhere \"engine\" = 'ON'\nand \"distance_from_zone\" > 5\nand \"zone_id\" not in ('0889a4bb-da40-47df-9578-651dc9743e80', --SOCAR Police Custody\n'24ba02c2-58b3-4871-8ba9-50eedcd730d8', --TARUC PG(only for Students & Staffs)\n'255432ae-a38d-4a86-a588-431a9eb878f2', --KV Disposal Car\n'36f591ff-2270-4ed4-aa48-c39224d3298b', --KV Branch Office\n'5e58a338-0c68-4582-9e58-efaaeafeebb6', --Socar KK Branch Office (Ops Car)\n'5f83fd87-99ec-4366-b57f-ffe5172955c0', --5f83fd87-99ec-4366-b57f-ffe5172955c0\n'6db8fdf8-1750-4d76-84c1-84e0cbf8856f', --TREVO OpsCars\n'74409b47-1c27-464e-bb79-270fdea42066', --JB Disposal Car\n'823b0407-6204-4c08-85f5-b4a26b5d57fd', --SOCAR rehab center KV\n'82a7f4e5-69c3-429a-87f3-c5a7f395dc15', --KV Disposal Car (2nd Batch)\n'885da675-855f-4a70-9110-85ee6b4dc68d', --JB Monthly\n'8d8be95e-834b-4d10-ba0b-df7f02b6fcbc', --SOCAR Hospital KV (For Accident)\n'94414ee7-84b5-488b-b71c-45d111a7ee43', --KV Branch Office (Ops Car)\n'9ff5ee12-adc4-4b48-a46e-d0c346f73206', --SOCAR PG Branch Office (Ops Car)\n'ae60d839-7993-4dc9-bb4c-0719f85170a0', --Riuh X SOCAR (Event zone)\n'febf407d-4ff4-4141-99f5-08a51e7e903e', --SOCAR JB Branch Office (Ops Car)\n'7407556c-7642-4f73-ac48-c5522aada9a6', --KV Disposal Car - TPP\n'5cbbd8f4-4983-4cb2-aa38-bf350698f81c', --2024 Disposal \n'8efa8103-1170-492f-9ec4-1395bc71dba6', --PG Disposal car (bayan lepas)\n'71b23687-053a-48b0-b0bc-479fc4ad34e2', --trevo fleet\n'1553e454-e0d4-4ff0-b56c-afb6d6cfb690', --socar monthly package\n'ccde4e6e-2cc2-455c-9201-52db08748882' --SOCAR Hospital KK (For Accident) \n) \nand age(now() + interval '8' hour, \"createdAt\" + interval '16' hour) < '5 minutes'",
+        "options": {}
+      },
+      "id": "27960196-e9e4-4b27-b774-4bd5986eb3a1",
+      "name": "Engine On",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1060,
+        180
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "33",
+          "name": "CSA DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "listing_id",
+              "field2": "listing_id"
+            }
+          ]
+        },
+        "joinMode": "enrichInput1",
+        "options": {}
+      },
+      "id": "35159456-7dff-4fdb-9dfe-9a942a282f3f",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        1280,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.type }}",
+              "operation": "isEmpty"
+            }
+          ]
+        },
+        "combineConditions": "=AND"
+      },
+      "id": "7ae28bbd-fd97-49da-9ea9-97b682c3e34d",
+      "name": "Filter",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAATj8p7FQ",
+        "messageUi": {
+          "text": "=SOCAR Movement without Booking and Issue tix and 5km Away from Zone:\n\nListing ID:  {{ $json.listing_id }}\nEngine On:  {{ $json.engine_on_at }}"
+        },
+        "additionalFields": {}
+      },
+      "id": "cd789f84-a707-4493-8059-66cc4e9c46df",
+      "name": "Google Chat",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        1720,
+        280
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "uG43faODqhEUgaUx",
+          "name": "[TIS] GHANI n8n"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "(\n              --d2d\n                select\n                    listing_id\n                    ,(meta::JSON->>'bookingId') as reservation_id\n                    , type\n                    , start_at + interval '8 hours' as start_at\n                    , end_at + interval '8 hours' as end_at\n                    from\n                    availabilities\n                    where deleted_at is null and ( start_at between now() -interval '60 minutes' and now())\n                    and type in ('d2d-import','d2d-export')\n                    union\n                    --not d2d\n                    select\n                    listing_id\n                    ,(meta::JSON->>'bookingId') as reservation_id\n                    , type\n                    , start_at + interval '8 hours' as start_at\n                    , end_at + interval '8 hours' as end_at\n                    from\n                    availabilities\n                    where deleted_at is null and (start_at <= now() and end_at >= now())\n                    and type not in ('d2d-import','d2d-export')\n              )\n              union\n              (\n              select\n              listing_id\n              , cast (id as text) as reservation_id\n              , 'booking' as type\n              , booking_start_at + interval '8 hours' as start_at\n              , booking_end_at + interval '8 hours' as end_at\n              from\n              bookings\n              where\n              status = 'in-use'\n              )",
+        "options": {}
+      },
+      "id": "5f5cd008-5d11-41de-a1d5-72d24f3aeb32",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        140,
+        80
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "32",
+          "name": "Booking DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \nreference_id as reservation_id\n,type \n, start_at + interval '8 hours' as start_at\n,completed_at + interval '8 hours' as end_at --change here to completed_at instead \nfrom \ntasks\nwhere \nstatus in ('assigned','completed','active')\nand type in ('d2d-export', 'd2d-import')\nand start_at between now()- interval '5 hours' and now()",
+        "options": {}
+      },
+      "id": "0b41be30-9cd6-4887-bf4e-36f9ab024b98",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        140,
+        540
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "31",
+          "name": "Dash DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "id": "553ca430-4aee-4d77-aac4-b722f4e59b35",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "listing_id",
+              "field2": "listing_id"
+            }
+          ]
+        },
+        "joinMode": "enrichInput1",
+        "options": {}
+      },
+      "id": "6b6967c6-baef-4ac1-bbad-b5d4aa5cac30",
+      "name": "Merge2",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        420,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n\"listingId\" as listing_id\n,\"createdAt\" + interval '16' hour as engine_on_at \nFROM \nCSA_LATEST\nwhere \"engine\" = 'ON'\nand \"distance_from_zone\" > 5\nand \"zone_id\" not in ('0889a4bb-da40-47df-9578-651dc9743e80', --SOCAR Police Custody\n'24ba02c2-58b3-4871-8ba9-50eedcd730d8', --TARUC PG(only for Students & Staffs)\n'255432ae-a38d-4a86-a588-431a9eb878f2', --KV Disposal Car\n'36f591ff-2270-4ed4-aa48-c39224d3298b', --KV Branch Office\n'5e58a338-0c68-4582-9e58-efaaeafeebb6', --Socar KK Branch Office (Ops Car)\n'5f83fd87-99ec-4366-b57f-ffe5172955c0', --5f83fd87-99ec-4366-b57f-ffe5172955c0\n'6db8fdf8-1750-4d76-84c1-84e0cbf8856f', --TREVO OpsCars\n'74409b47-1c27-464e-bb79-270fdea42066', --JB Disposal Car\n'823b0407-6204-4c08-85f5-b4a26b5d57fd', --SOCAR rehab center KV\n'82a7f4e5-69c3-429a-87f3-c5a7f395dc15', --KV Disposal Car (2nd Batch)\n'885da675-855f-4a70-9110-85ee6b4dc68d', --JB Monthly\n'8d8be95e-834b-4d10-ba0b-df7f02b6fcbc', --SOCAR Hospital KV (For Accident)\n'94414ee7-84b5-488b-b71c-45d111a7ee43', --KV Branch Office (Ops Car)\n'9ff5ee12-adc4-4b48-a46e-d0c346f73206', --SOCAR PG Branch Office (Ops Car)\n'ae60d839-7993-4dc9-bb4c-0719f85170a0', --Riuh X SOCAR (Event zone)\n'febf407d-4ff4-4141-99f5-08a51e7e903e', --SOCAR JB Branch Office (Ops Car)\n'7407556c-7642-4f73-ac48-c5522aada9a6', --KV Disposal Car - TPP\n'5cbbd8f4-4983-4cb2-aa38-bf350698f81c', --2024 Disposal \n'8efa8103-1170-492f-9ec4-1395bc71dba6' --PG Disposal car (bayan lepas)\n) \nand age(now() + interval '8' hour, \"createdAt\" + interval '16' hour) < '15 minutes'",
+        "options": {}
+      },
+      "id": "1f51bdf5-7662-4ca9-8c13-a3598a50cd70",
+      "name": "Engine On1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        140,
+        -120
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "33",
+          "name": "CSA DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "with base as (\n              (\n              select\n              a.listing_id\n              , a.type\n              , a.start_at\n              , a.end_at\n              from\n                    (\n                    select\n                    listing_id\n                    , type\n                    , start_at + interval '8 hours' as start_at\n                    , end_at + interval '8 hours' as end_at\n                    , case when ( start_at <= now()) and (end_at >= now())\n                    then 'yes' else 'no' end as asem\n                    from\n                    availabilities\n                    where deleted_at is null\n                    ) as a\n              where a.asem = 'yes'\n              )\n              union\n              (\n              select\n              listing_id\n              , 'booking' as type\n              , booking_start_at + interval '8 hours' as start_at\n              , booking_end_at + interval '8 hours' as end_at\n              from\n              bookings\n              where\n              status = 'in-use'\n              )\n)\nselect \n*\n-- , case when listing_id in ('{{ $json.listing_id }}') then 1 else 0 end as check \nfrom \nbase \n-- where listing_id not in ('{{ $json.listing_id }}')\n-- where listing_id not it \norder by 1 desc \n",
+        "options": {}
+      },
+      "id": "1240c5d1-70ba-468e-ab75-d3d08bc0568d",
+      "name": "Booking + Availabilities",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        420,
+        340
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "32",
+          "name": "Booking DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "(\n              --d2d\n                select\n                    listing_id\n                    ,(meta::JSON->>'bookingId') as reservation_id\n                    , type\n                    , start_at + interval '8 hours' as start_at\n                    , end_at + interval '8 hours' as end_at\n                    from\n                    availabilities\n                    where deleted_at is null and ( start_at between now() -interval '60 minutes' and now())\n                    and type in ('d2d-import','d2d-export')\n                    union\n                    --not d2d\n                    select\n                    listing_id\n                    ,(meta::JSON->>'bookingId') as reservation_id\n                    , type\n                    , start_at + interval '8 hours' as start_at\n                    , end_at + interval '8 hours' as end_at\n                    from\n                    availabilities\n                    where deleted_at is null and (start_at <= now() and end_at >= now())\n                    and type not in ('d2d-import','d2d-export')\n              )\n              union\n              (\n              select\n              listing_id\n              , cast (id as text) as reservation_id\n              , 'booking' as type\n              , booking_start_at + interval '8 hours' as start_at\n              , booking_end_at + interval '8 hours' as end_at\n              from\n              bookings\n              where\n              status = 'in-use'\n              )",
+        "options": {}
+      },
+      "id": "497f2701-4202-4f28-abdf-7d77fde3e6ed",
+      "name": "Booking + Availabilities v2",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1060,
+        380
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "32",
+          "name": "Booking DB"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-07-22T09:47:59.474Z",
+  "versionId": "2886493a-7119-4146-8a06-4d4b6c1c29b9"
+}
