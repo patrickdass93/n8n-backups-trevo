@@ -1,0 +1,133 @@
+{
+  "active": true,
+  "connections": {
+    "Host with < 3 days available": {
+      "main": [
+        [
+          {
+            "node": "Send PN - Add User to Campaign",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cron every Sun, Tue, Thu @ 7pm": {
+      "main": [
+        [
+          {
+            "node": "Host with < 3 days available",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2022-12-07T08:52:23.047Z",
+  "id": "4",
+  "name": "TREVO Supply | Availability Reminder",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "0ba13d35-7257-4196-91db-4b7d169bb25b",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        -1280,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "content": "Active user status\nApproved listings\nLess than 3 days available for current week",
+        "height": 80,
+        "width": 428.4251968503936
+      },
+      "name": "Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1280,
+        -160
+      ],
+      "id": "4f2d2604-3a6a-4216-983d-e83792554096"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=WITH\n    time_frame AS (\n        SELECT \n            GENERATE_SERIES(\n                TIMESTAMP '2022-12-05'::DATE\n                , NOW()::DATE + INTERVAL '90 day'\n                , INTERVAL '1 day'\n            ) date_series\n    )\n    \n    , my_hosts AS (\n        SELECT DISTINCT ON (u.id)\n            u.id as user_id\n            , u.uuid\n            , u.email\n            , CONCAT(u.phone_country_code, u.phone_number) as phone_number\n    \n        FROM users u\n        LEFT JOIN user_attributions ua ON ua.user_id = u.id\n        \n        WHERE 1=1\n            AND u.status = 'active'\n            AND ((ua.key = 'current-country' AND ua.value IN ('MY','others'))\n                OR (ua.key = 'signup-country' AND ua.value IN ('MY','others')))\n    )\n    \n    , availability_series AS (\n        SELECT DISTINCT ON (l.id) \n            l.id as listing_id\n            , date_trunc('week', DATE(tf.date_series))::DATE as week\n            , COUNT(DATE(tf.date_series)) as available_days\n            , h.uuid as host_uuid\n            , h.user_id AS host_id\n        \n        FROM listings l\n        LEFT JOIN listing_availability la on la.listing_id = l.id\n        JOIN listing_location ll ON ll.listing_id = la.listing_id \n            AND ll.country ~* 'Malaysia'\n        JOIN my_hosts h ON h.user_id = l.user_id\n        LEFT JOIN time_frame tf ON date_series >= la.start_date AND date_series <= la.end_date\n    \n        WHERE 1=1\n            AND l.status = 'approved'\n            AND l.deleted_at IS NULL\n            \n        GROUP BY 1,2,4,5\n    )\n    \nSELECT DISTINCT host_uuid \nFROM availability_series\nWHERE 1=1\n    AND (week = DATE_TRUNC('week', NOW() AT TIME ZONE 'Asia/Kuala_Lumpur') OR week IS NULL)\n    AND available_days < 3\n    AND host_uuid IS NOT NULL\n    --AND host_id IN (6,37221,23237,27722,28724,20035,29759)\n    \nGROUP BY 1",
+        "additionalFields": {}
+      },
+      "name": "Host with < 3 days available",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        -1080,
+        100
+      ],
+      "id": "9d20b164-dad7-4293-a4fd-e6b8563d11f9",
+      "notesInFlow": false,
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      },
+      "notes": "Active user status\nApproved listings\nLess than 3 days available for current week"
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.leanplum.com/api?action=startCampaign",
+        "jsonParameters": true,
+        "options": {
+          "batchInterval": 500
+        },
+        "bodyParametersJson": "={ \"appId\" : \"app_BXrjE7dc15VWXDLRfh77tActhBhSkCHeQhETDE1mXfQ\", \"clientKey\" : \"dev_L9yBjOmwfR3fNiVjL9woIYfWzsy5hMcGDx0og8isAFw\", \"apiVersion\" : \"1.0.6\", \"userId\":\"{{ $json[\"host_uuid\"] }}\", \"campaignId\":\"5357885331668992\", \"createDisposition\" : \"CreateNever\"}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "Send PN - Add User to Campaign",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        -880,
+        100
+      ],
+      "id": "ad7ab490-ce8f-43b0-948e-1c76dc75854a"
+    },
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "custom",
+              "cronExpression": "0 19 * * Sun,Tue,Thu"
+            }
+          ]
+        }
+      },
+      "name": "Cron every Sun, Tue, Thu @ 7pm",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        -1280,
+        100
+      ],
+      "id": "8a042df1-22c8-482d-9332-a1ccd310d28d"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "any",
+    "executionTimeout": 3600,
+    "saveDataSuccessExecution": "all"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-07-11T03:59:13.994Z",
+  "versionId": "244d6ded-a885-4253-a780-0e5b39fd6bde"
+}
