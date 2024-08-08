@@ -1,0 +1,1268 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Clear Sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weekly Raw Data Dump": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear Sheet": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Weekly Raw Data Dump",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Weekly Raw Data Dump": {
+      "main": [
+        [
+          {
+            "node": "Weekly Raw Data Dump",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Weekly Sheet": {
+      "main": [
+        [
+          {
+            "node": "SendInBlue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Weekly Sheet1": {
+      "main": [
+        [
+          {
+            "node": "SendInBlue1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SendInBlue1": {
+      "main": [
+        [
+          {
+            "node": "Read Weekly Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Read Weekly Sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SendInBlue": {
+      "main": [
+        [
+          {
+            "node": "SIB API3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weekly Raw Data Dump1": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Read Weekly Sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear Sheet1": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Weekly Raw Data Dump4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Weekly Raw Data Dump4": {
+      "main": [
+        [
+          {
+            "node": "Weekly Raw Data Dump1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Weekly Sheet2": {
+      "main": [
+        [
+          {
+            "node": "SendInBlue3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SendInBlue3": {
+      "main": [
+        [
+          {
+            "node": "SIB API4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-01-05T07:59:23.213Z",
+  "id": "17",
+  "name": "[KAVI] [HOST COMMUNITY] - MY Host Weekly Statement",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                3
+              ],
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "fc988d8e-331b-493a-9ebc-75639c38524a",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        540,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg",
+          "mode": "list",
+          "cachedResultName": "2023 - Host Weekly Statement [N8N]",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1148559864,
+          "mode": "list",
+          "cachedResultName": "RAW",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gDedi2SnusO3F33VJnb89rvbKOf8UfUari4ePlR1Hfc/edit#gid=1148559864"
+        },
+        "dataMode": "autoMapInputData",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "cb1d3935-510f-41f5-9803-2c834a5a46cf",
+      "name": "Weekly Raw Data Dump",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        880,
+        20
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google Sheets [Pat]"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "amount": 15,
+        "unit": "seconds"
+      },
+      "id": "cc305ebd-562b-4763-a02f-1f751b7c721f",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        20
+      ],
+      "webhookId": "ae096ec2-3e07-4ba9-809e-75e4bffb76b1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg",
+          "mode": "list",
+          "cachedResultName": "2023 - Host Weekly Statement [N8N]",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1148559864,
+          "mode": "list",
+          "cachedResultName": "RAW",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg/edit#gid=1148559864"
+        },
+        "clear": "specificRange",
+        "range": "A2:X"
+      },
+      "id": "dce235d7-b9a5-4507-8975-163e0d390a48",
+      "name": "Clear Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        520,
+        20
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google Sheets [Pat]"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\nWITH \n    unique_users AS (\n            SELECT \n                u.uuid\n                , u.id AS user_id\n                , u.email\n                , CASE WHEN u.display_name IS NOT NULL THEN u.display_name ELSE concat(u.first_name,' ',u.last_name) END AS user_name\n            FROM users u\n            LEFT JOIN user_attributions ua ON ua.user_id = u.id\n            \n            WHERE 1=1   \n                AND u.status = 'active'\n                AND ((ua.key = 'current-country' AND ua.value = 'MY' AND u.dob > '1900-01-01')\n                    OR (ua.key = 'signup-country' AND ua.value = 'MY' AND u.dob > '1900-01-01'))\n                OR u.phone_country_code IN ('+60')\n        )\n    \n    , approved_listings AS (\n            SELECT\n                l.id AS listing_id\n                , l.registration_no as plate_no\n                , l.url\n                , l.user_id as host_id\n                , case when lcc.id in ('1','8') then 'Shield 25' else cc.name end as insurance\n            FROM listings l\n            LEFT JOIN listing_location ll on ll.listing_id = l.id\n            left join listing_commission_class lcc on lcc.listing_id = l.id \n            left join commission_class cc on cc.id = lcc.commission_id\n            left join companies c on c.owner_id = l.user_id\n            \n            WHERE 1=1\n                AND l.status IN ('approved')\n                AND ll.country IN ('Malaysia')\n                AND l.deleted_at IS null\n                and c.owner_id is null\n        )\n    \n    , all_bookings AS (\n            SELECT DISTINCT ON (b.id)\n                -- Booking Details\n                b.id AS booking_id\n                , b.listing_id\n                , l.host_id\n                , u.uuid\n                , u.user_name\n                , u.email\n                , l.plate_no\n                , l.url\n                , b.ref_no AS booking_ref\n                , CASE \n                    WHEN b.reason ~~* '%test%' THEN 'test'\n                    WHEN b.status IN ('cancelled','withdrawn') \n                        AND (\n                            b.reason ~~* '%host%'\n                            OR b.reason ~~* '%owner%'\n                            OR b.reason ~~* '%available%'\n                            OR b.reason ~~* '%car%'\n                        ) THEN 'rejected'\n                    WHEN b.status IN ('rejected') \n                        AND (\n                            b.reason ~~* '%guest%'\n                        ) THEN 'withdrawn'\n                    ELSE b.status END AS booking_status\n                , b.created_at AT TIME ZONE 'Asia/Jakarta' AS booking_request_ts\n                , DATE_TRUNC('month', b.created_at AT TIME ZONE 'Asia/Kuala_Lumpur')::DATE AS booking_request_month\n                , DATE_TRUNC('week', b.created_at AT TIME ZONE 'Asia/Kuala_Lumpur')::DATE AS booking_request_week\n                , DATE_TRUNC('month', b.request_end_at AT TIME ZONE 'Asia/Kuala_Lumpur')::DATE AS booking_end_month\n                , DATE_TRUNC('week', b.request_end_at AT TIME ZONE 'Asia/Kuala_Lumpur')::DATE AS booking_end_week\n                , case when b.status in ('accepted', 'waiting_for_inspection', 'start_driving', 'return_car', 'completed') then (case when bl.pricing_id = '3' then 0.5\nwhen (extract(EPOCH from b.request_end_at)::int - extract(EPOCH from b.request_start_at)::int)%86400 < 2160 then\nfloor((extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400)\nelse ceil((extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400) end)end AS booking_dur_days\n                -- Booking Value\n                , CASE WHEN hp.booking_id IS NULL THEN CEIL(b.gross_amount*(100-cc.percent)/100) ELSE hp.amount END AS payout_amount\n                , case WHEN sum(A.multipliercontr) < 0 THEN 0 ELSE MAX(A.multipliercontr) end as multiplier\n                , MAX(l.insurance) as insurance\n                , A.amount*(cc.percent/100) as rate\n\n            FROM bookings b\n            left join booking_lines bl on bl.booking_id = b.id and bl.slug = 'rental-fee'\n            left join \n\t\t(select distinct A.id, A.ref_no, A.status, A.registration_no, A.dur, \n\t\tcase \n\t\t\twhen cast(A.rentalFee as numeric)-(cast(A.basePrice as numeric)*A.dur) < 0 then\n\t\t\t(case when A.dur >= 30 then (cast(A.basePrice as numeric)*A.dur)*.70\n\t\t\tWHEN A.dur BETWEEN 7 AND 29 THEN (cast(A.basePrice as numeric)*A.dur)*.75 end)\n\t\t\telse cast(A.basePrice as numeric)*A.dur\n\t\t\tend as beforemultiplier,\n\t\tCASE \n\t\t\twhen cast(A.rentalFee as numeric)-(cast(A.basePrice as numeric)*A.dur) < 0 then \n\t\t    (case WHEN A.dur >= 30 THEN (cast(A.rentalFee as numeric) - (cast(A.basePrice as numeric)*A.dur)*.70)\n\t\t    WHEN A.dur BETWEEN 7 AND 29 THEN (cast(A.rentalFee as numeric) - (cast(A.basePrice as numeric)*A.dur)*.75) end)\n\t\t    ELSE cast(A.rentalFee as numeric)-(cast(A.basePrice as numeric)*A.dur)\n\t\tEND as multipliercontr, \n\t\tA.rentalFee, A.gross_amount, A.amount\n\t\tfrom\n\t\t\t(select distinct b.id, b.ref_no, b.status,\n\t\t\tl.id as listing_id, \n\t\t\tl.registration_no, \n\t\t\tbm.meta->>'currency' as currency,\n\t\t\tbm.meta->>'basePrice' as basePrice,\n\t\t\tbm.meta->>'rentalFee' as rentalFee,\n\t\t\tbl.amount,\n\t\t\tb.gross_amount,\n\t\t\tb.net_amount,\n\t\t\tbm.meta->>'listingLocation' as listingLocation,\n\t\t\tcase when bl.pricing_id = '3' then 0.5\n\t\t\twhen (extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400 < 1 then 1\n\t\t\twhen (extract(EPOCH from b.request_end_at)::int - extract(EPOCH from b.request_start_at)::int)%86400 < 2160 then\n\t\t\tfloor((extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400)\n\t\t\telse ceil((extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400) end as dur\n\t\t\tFROM bookings b\n\t\t\t\tleft join booking_multipliers bm on bm.booking_id = b.id\n\t\t\t    left join listings l on l.id = b.listing_id \n\t\t\t    left JOIN listing_location ll on b.listing_id = ll.listing_id\n\t\t\t    left join booking_lines bl on bl.booking_id = b.id and bl.slug = 'rental-fee'\n\t\t\t    WHERE country = 'Malaysia'\n\t\t\t    and b.status = 'completed'\n\t\t\t    group by 1,2,3,4,5,6,7,8,9,10,11,12,13\n\t\t\t\torder by 1 desc) A) A on A.id = b.id\n            LEFT JOIN approved_listings l ON l.listing_id = b.listing_id\n            LEFT JOIN unique_users u on u.user_id = l.host_id\n            LEFT JOIN listing_commission_class lc ON lc.listing_id = b.listing_id\n            LEFT JOIN commission_class cc ON cc.id = lc.commission_id\n            LEFT JOIN payouts hp ON hp.booking_id = b.id\n            left join companies c on c.owner_id = l.host_id\n                AND hp.country ~* 'MY'\n            \n            WHERE b.currency = 'myr'\n            and c.owner_id is null\n            group by 1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,20\n        )\n    \n    , bookings_data AS (\n            SELECT \n                b.host_id\n                , b.uuid\n                , b.email\n                , b.user_name\n                , b.booking_end_week\n                , b.listing_id\n                , b.plate_no\n                , b.url\n                , case when b.insurance in ('Shield 25') then 'Shield 75'\n                \t\twhen b.insurance in ('Shield 30') then 'Shield 70'\n                \t\twhen b.insurance in ('Shield 35') then 'Shield 65'\n                \t\twhen b.insurance in ('Shield 40') then 'Shield 60' else NULL end as insurance\n                , SUM(CASE WHEN b.booking_status IN ('completed','start_driving','waiting_for_inspection','return_car') THEN b.rate ELSE 0 END) as comrate\n                , to_char((date_trunc('week', current_date) - INTERVAL '2 weeks')::date, 'YYYY-MM-DD') AS start_date\n\t\t\t\t, to_char((date_trunc('week', current_date) - INTERVAL '8 days')::date, 'YYYY-MM-DD') AS end_date\n\t\t\t\t, to_char((date_trunc('week', current_date) + INTERVAL '1 days')::date, 'YYYY-MM-DD') AS payoutdate_start\n\t\t\t\t, to_char((date_trunc('week', current_date) + INTERVAL '4 days')::date, 'YYYY-MM-DD') AS payoutdate_end\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car','cancelled','rejected','requested') THEN b.booking_id ELSE NULL END) AS received_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_id ELSE NULL END) AS fulfiled_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_id ELSE NULL END) AS completed_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('rejected') THEN b.booking_id ELSE NULL END) AS rejected_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_id ELSE NULL END)::decimal /\n                    NULLIF(COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car','rejected','requested') THEN b.booking_id ELSE NULL END),0)::decimal AS fr\n                , SUM(CASE WHEN b.booking_status IN ('completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_dur_days ELSE 0 END) AS booking_dur_days\n                , SUM(CASE WHEN b.booking_status IN ('completed','start_driving','waiting_for_inspection','return_car') THEN b.payout_amount ELSE 0 END) AS est_payout\n                , SUM(CASE WHEN b.booking_status IN ('rejected') THEN b.payout_amount ELSE 0 END) AS est_loss\n                , sum(case when b.booking_status in ('completed') then b.multiplier end) as multiplier\n                , SUM(CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car') THEN b.rate ELSE 0 END)*0.06 as SST\n            FROM all_bookings b\n            WHERE \nbooking_end_week BETWEEN '2024-06-03' and '2024-06-09'\n--booking_end_week BETWEEN (CURRENT_DATE - INTERVAL '16 DAYS') AND (CURRENT_DATE - INTERVAL '10 DAYS')\n            GROUP BY 1,2,3,4,5,6,7,8,9\n        )\n        \nSELECT *\nFROM bookings_data\nWHERE 1=1\n    AND received_booking > 0\n    and insurance in ('Shield 75',\n--'Shield 70',\n'Shield 65',\n'Shield 60')\nand email !~* 'icloud'\nAND host_id IN ('5162') --Jiun\n--'34411') --Kenny\n--'65123') --Nani*/\n\nORDER BY 1,15 DESC",
+        "additionalFields": {}
+      },
+      "id": "d66382e8-bca1-403a-8014-deba4f39fd22",
+      "name": "Postgres - Weekly Raw Data Dump",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        700,
+        20
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "16",
+          "name": "trevodb_recreated"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg",
+          "mode": "list",
+          "cachedResultName": "2023 - Host Weekly Statement [N8N]",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2030623506,
+          "mode": "list",
+          "cachedResultName": "Final",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg/edit#gid=2030623506"
+        },
+        "options": {
+          "outputFormatting": {
+            "values": {
+              "general": "FORMATTED_VALUE",
+              "date": "FORMATTED_STRING"
+            }
+          }
+        }
+      },
+      "id": "50ee6c80-dacf-4e8d-abc5-20c328713371",
+      "name": "Read Weekly Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1600,
+        20
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google Sheets [Pat]"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg",
+          "mode": "list",
+          "cachedResultName": "2023 - Host Weekly Statement [N8N]",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1520045667,
+          "mode": "list",
+          "cachedResultName": "Tracking",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg/edit#gid=1520045667"
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "SIB",
+              "fieldValue": "={{ $json.messageId }}"
+            },
+            {
+              "fieldId": "Date",
+              "fieldValue": "={{ $node[\"Schedule Trigger\"].json[\"Readable date\"] }}"
+            },
+            {
+              "fieldId": "Host",
+              "fieldValue": "={{ $node[\"Read Weekly Sheet\"].json.EMAIL }}"
+            },
+            {
+              "fieldId": "Timestamp",
+              "fieldValue": "={{ $node[\"Schedule Trigger\"].json.timestamp }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a53b0fac-a2e8-4796-96df-92410975e128",
+      "name": "Google Sheets - Tracking",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        2620,
+        320
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google Sheets [Pat]"
+        }
+      },
+      "disabled": true,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "update",
+        "identifier": "={{ $json.EMAIL }}",
+        "updateAttributes": {
+          "updateAttributesValues": [
+            {
+              "fieldName": "WSTARTDATE",
+              "fieldValue": "={{ $json.STARTDATE }}"
+            },
+            {
+              "fieldName": "WENDDATE",
+              "fieldValue": "={{ $json.ENDDATE }}"
+            },
+            {
+              "fieldName": "WHOSTNAME",
+              "fieldValue": "={{ $json.HOSTNAME }}"
+            },
+            {
+              "fieldName": "WCOMPBOOKING",
+              "fieldValue": "={{ $json.COMPBOOKING }}"
+            },
+            {
+              "fieldName": "WESTPAYOUT",
+              "fieldValue": "={{ $json.ESTPAYOUT }}"
+            },
+            {
+              "fieldName": "WCOMPDAYS",
+              "fieldValue": "={{ $json.COMPDAYS }}"
+            },
+            {
+              "fieldName": "WCOMRATE",
+              "fieldValue": "={{ $json.COMRATE }}"
+            },
+            {
+              "fieldName": "WPRICESURGE",
+              "fieldValue": "={{ $json.PRICESURGE }}"
+            },
+            {
+              "fieldName": "WSST",
+              "fieldValue": "={{ $json.SST }}"
+            },
+            {
+              "fieldName": "WPAYOUTSTART",
+              "fieldValue": "={{ $json.PAYOUTSTART }}"
+            },
+            {
+              "fieldName": "WPAYOUTEND",
+              "fieldValue": "={{ $json.PAYOUTEND }}"
+            },
+            {
+              "fieldName": "C1PLATE",
+              "fieldValue": "={{ $json.C1PLATE }}"
+            },
+            {
+              "fieldName": "C1ACCEPTRATE",
+              "fieldValue": "={{ $json.C1ACCEPTRATE }}"
+            },
+            {
+              "fieldName": "C1COMPBOOK",
+              "fieldValue": "={{ $json.C1COMPBOOK }}"
+            },
+            {
+              "fieldName": "C1REJECTBOOK",
+              "fieldValue": "={{ $json.C1REJECTBOOK }}"
+            },
+            {
+              "fieldName": "C1ESTLOSS",
+              "fieldValue": "={{ $json.C1ESTLOSS }}"
+            },
+            {
+              "fieldName": "C1PLATFORMCOMM",
+              "fieldValue": "={{ $json.C1PLATFORMCOMM }}"
+            },
+            {
+              "fieldName": "C1SST",
+              "fieldValue": "={{ $json.C1SST }}"
+            },
+            {
+              "fieldName": "C1ESTPAYOUT",
+              "fieldValue": "={{ $json.C1ESTPAYOUT }}"
+            },
+            {
+              "fieldName": "C2PLATE",
+              "fieldValue": "={{ $json.C2PLATE }}"
+            },
+            {
+              "fieldName": "C2ACCEPTRATE",
+              "fieldValue": "={{ $json.C2ACCEPTRATE }}"
+            },
+            {
+              "fieldName": "C2COMPBOOK",
+              "fieldValue": "={{ $json.C2COMPBOOK }}"
+            },
+            {
+              "fieldName": "C2REJECTBOOK",
+              "fieldValue": "={{ $json.C2REJECTBOOK }}"
+            },
+            {
+              "fieldName": "C2ESTLOSS",
+              "fieldValue": "={{ $json.C2ESTLOSS }}"
+            },
+            {
+              "fieldName": "C2PLATFORMCOMM",
+              "fieldValue": "={{ $json.C2PLATFORMCOMM }}"
+            },
+            {
+              "fieldName": "C2SST",
+              "fieldValue": "={{ $json.C2SST }}"
+            },
+            {
+              "fieldName": "C2ESTPAYOUT",
+              "fieldValue": "={{ $json.C2ESTPAYOUT }}"
+            },
+            {
+              "fieldName": "C3PLATE",
+              "fieldValue": "={{ $json.C3PLATE }}"
+            },
+            {
+              "fieldName": "C3ACCEPTRATE",
+              "fieldValue": "={{ $json.C3ACCEPTRATE }}"
+            },
+            {
+              "fieldName": "C3COMPBOOK",
+              "fieldValue": "={{ $json.C3COMPBOOK }}"
+            },
+            {
+              "fieldName": "C3REJECTBOOK",
+              "fieldValue": "={{ $json.C3REJECTBOOK }}"
+            },
+            {
+              "fieldName": "C3ESTLOSS",
+              "fieldValue": "={{ $json.C3ESTLOSS }}"
+            },
+            {
+              "fieldName": "C3PLATFORMCOMM",
+              "fieldValue": "={{ $json.C3PLATFORMCOMM }}"
+            },
+            {
+              "fieldName": "C3SST",
+              "fieldValue": "={{ $json.C3SST }}"
+            },
+            {
+              "fieldName": "C3ESTPAYOUT",
+              "fieldValue": "={{ $json.C3ESTPAYOUT }}"
+            },
+            {
+              "fieldName": "C4PLATE",
+              "fieldValue": "={{ $json.C4PLATE }}"
+            },
+            {
+              "fieldName": "C4ACCEPTRATE",
+              "fieldValue": "={{ $json.C4ACCEPTRATE }}"
+            },
+            {
+              "fieldName": "C4COMPBOOK",
+              "fieldValue": "={{ $json.C4COMPBOOK }}"
+            },
+            {
+              "fieldName": "C4REJECTBOOK",
+              "fieldValue": "={{ $json.C4REJECTBOOK }}"
+            },
+            {
+              "fieldName": "C4ESTLOSS",
+              "fieldValue": "={{ $json.C4ESTLOSS }}"
+            },
+            {
+              "fieldName": "C4PLATFORMCOMM",
+              "fieldValue": "={{ $json.C4PLATFORMCOMM }}"
+            },
+            {
+              "fieldName": "C4SST",
+              "fieldValue": "={{ $json.C4SST }}"
+            },
+            {
+              "fieldName": "C4ESTPAYOUT",
+              "fieldValue": "={{ $json.C4ESTPAYOUT }}"
+            },
+            {
+              "fieldName": "C5PLATE",
+              "fieldValue": "={{ $json.C5PLATE }}"
+            },
+            {
+              "fieldName": "C5ACCEPTRATE",
+              "fieldValue": "={{ $json.C5ACCEPTRATE }}"
+            },
+            {
+              "fieldName": "C5COMPBOOK",
+              "fieldValue": "={{ $json.C5COMPBOOK }}"
+            },
+            {
+              "fieldName": "C5REJECTBOOK",
+              "fieldValue": "={{ $json.C5REJECTBOOK }}"
+            },
+            {
+              "fieldName": "C5ESTLOSS",
+              "fieldValue": "={{ $json.C5ESTLOSS }}"
+            },
+            {
+              "fieldName": "C5PLATFORMCOMM",
+              "fieldValue": "={{ $json.C5PLATFORMCOMM }}"
+            },
+            {
+              "fieldName": "C5SST",
+              "fieldValue": "={{ $json.C5SST }}"
+            },
+            {
+              "fieldName": "C5ESTPAYOUT",
+              "fieldValue": "={{ $json.C5ESTPAYOUT }}"
+            },
+            {
+              "fieldName": "C6PLATE",
+              "fieldValue": "={{ $json.C6PLATE }}"
+            },
+            {
+              "fieldName": "C6ACCEPTRATE",
+              "fieldValue": "={{ $json.C6ACCEPTRATE }}"
+            },
+            {
+              "fieldName": "C6COMPBOOK",
+              "fieldValue": "={{ $json.C6COMPBOOK }}"
+            },
+            {
+              "fieldName": "C6REJECTBOOK",
+              "fieldValue": "={{ $json.C6REJECTBOOK }}"
+            },
+            {
+              "fieldName": "C6ESTLOSS",
+              "fieldValue": "={{ $json.C6ESTLOSS }}"
+            },
+            {
+              "fieldName": "C6PLATFORMCOMM",
+              "fieldValue": "={{ $json.C6PLATFORMCOMM }}"
+            },
+            {
+              "fieldName": "C6SST",
+              "fieldValue": "={{ $json.C6SST }}"
+            },
+            {
+              "fieldName": "C6ESTPAYOUT",
+              "fieldValue": "={{ $json.C6ESTPAYOUT }}"
+            },
+            {
+              "fieldName": "WTRACKFEE",
+              "fieldValue": "={{ $json.GPS }}"
+            },
+            {
+              "fieldName": "WCANPENAL",
+              "fieldValue": "={{ $json['Host LMC Penalty'] }}"
+            },
+            {
+              "fieldName": "WMISCFEE",
+              "fieldValue": "={{ $json.Miscellaneous }}"
+            },
+            {
+              "fieldName": "WREMARKS",
+              "fieldValue": "={{ $json['Concat Remark'] }}"
+            }
+          ]
+        }
+      },
+      "id": "f58c31a8-d4b8-4538-a873-2ec5be829567",
+      "name": "SendInBlue",
+      "type": "n8n-nodes-base.sendInBlue",
+      "typeVersion": 1,
+      "position": [
+        1780,
+        20
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "Fix:\n\n- Dates (fixed)\n- Add update contact (Fixed)"
+      },
+      "id": "da1795d3-9de5-4955-81a1-297cdcea3118",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2740,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg",
+          "mode": "list",
+          "cachedResultName": "2023 - Host Weekly Statement [N8N]",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2030623506,
+          "mode": "list",
+          "cachedResultName": "Final",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg/edit#gid=2030623506"
+        },
+        "options": {
+          "outputFormatting": {
+            "values": {
+              "general": "FORMATTED_VALUE",
+              "date": "FORMATTED_STRING"
+            }
+          }
+        }
+      },
+      "id": "eaa10ac3-653e-4eba-a439-c5e0d0b63819",
+      "name": "Read Weekly Sheet1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1240,
+        20
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google Sheets [Pat]"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "upsert",
+        "email": "={{ $json.EMAIL }}"
+      },
+      "id": "633df096-4a8f-4c5a-bd55-7d0db35b0a16",
+      "name": "SendInBlue1",
+      "type": "n8n-nodes-base.sendInBlue",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        20
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\"to\":\n [\n  {\"email\":\"{{ $node[\"Read Weekly Sheet\"].json[\"EMAIL\"] }}\",\n   \"name\":\"{{ $node[\"Read Weekly Sheet\"].json[\"HOSTNAME\"] }}\"}\n ],\n \"templateId\":455}\n",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1960,
+        20
+      ],
+      "id": "f04d2bf7-0e72-41c5-ad6b-470ba3223897",
+      "retryOnFail": false,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg",
+          "mode": "list",
+          "cachedResultName": "2023 - Host Weekly Statement [N8N]",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1148559864,
+          "mode": "list",
+          "cachedResultName": "RAW",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gDedi2SnusO3F33VJnb89rvbKOf8UfUari4ePlR1Hfc/edit#gid=1148559864"
+        },
+        "dataMode": "autoMapInputData",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "0495fae1-3f5a-4546-8ad6-c3117b968079",
+      "name": "Weekly Raw Data Dump1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1080,
+        360
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google Sheets [Pat]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 15,
+        "unit": "seconds"
+      },
+      "id": "0b4da88d-7818-485f-b3c3-4212ffca07b0",
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        360
+      ],
+      "webhookId": "ae096ec2-3e07-4ba9-809e-75e4bffb76b1"
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg",
+          "mode": "list",
+          "cachedResultName": "2023 - Host Weekly Statement [N8N]",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1148559864,
+          "mode": "list",
+          "cachedResultName": "RAW",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg/edit#gid=1148559864"
+        },
+        "clear": "specificRange",
+        "range": "A2:X"
+      },
+      "id": "0edb22cb-8a77-4394-82be-51e39463aae1",
+      "name": "Clear Sheet1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        720,
+        360
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google Sheets [Pat]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\nWITH \n    unique_users AS (\n            SELECT \n                distinct u.uuid\n                , u.id AS user_id\n                , u.email\n                , concat(u.first_name,' ',u.last_name) AS user_name\n\n            FROM users u\n            LEFT JOIN user_attributions ua ON ua.user_id = u.id\n            \n            WHERE 1=1   \n                AND u.status = 'active'\n                AND ((ua.key = 'current-country' AND ua.value = 'MY' AND u.dob > '1900-01-01')\n                    OR (ua.key = 'signup-country' AND ua.value = 'MY' AND u.dob > '1900-01-01'))\n                OR u.phone_country_code IN ('+60')\n        )\n    \n    , approved_listings AS (\n            SELECT\n                l.id AS listing_id\n                , l.registration_no as plate_no\n                , l.url\n                , l.user_id as host_id\n                , case when lcc.id in ('1','8') then 'Shield 25' else cc.name end as insurance\n            FROM listings l\n            LEFT JOIN listing_location ll on ll.listing_id = l.id\n            left join listing_commission_class lcc on lcc.listing_id = l.id \n            left join commission_class cc on cc.id = lcc.commission_id\n            left join companies c on c.owner_id = l.user_id\n            \n            WHERE 1=1\n                AND l.status IN ('approved')\n                AND ll.country IN ('Malaysia')\n                AND l.deleted_at IS null\n                and c.owner_id is null\n        )\n    \n    , all_bookings AS (\n            SELECT DISTINCT ON (b.id)\n                -- Booking Details\n                b.id AS booking_id\n                , b.listing_id\n                , l.host_id\n                , u.uuid\n                , u.user_name\n                , u.email\n                , l.plate_no\n                , l.url\n                , b.ref_no AS booking_ref\n                , CASE \n                    WHEN b.reason ~~* '%test%' THEN 'test'\n                    WHEN b.status IN ('cancelled','withdrawn') \n                        AND (\n                            b.reason ~~* '%host%'\n                            OR b.reason ~~* '%owner%'\n                            OR b.reason ~~* '%available%'\n                            OR b.reason ~~* '%car%'\n                        ) THEN 'rejected'\n                    WHEN b.status IN ('rejected') \n                        AND (\n                            b.reason ~~* '%guest%'\n                        ) THEN 'withdrawn'\n                    ELSE b.status END AS booking_status\n                , b.created_at AT TIME ZONE 'Asia/Jakarta' AS booking_request_ts\n                , DATE_TRUNC('month', b.created_at AT TIME ZONE 'Asia/Kuala_Lumpur')::DATE AS booking_request_month\n                , DATE_TRUNC('week', b.created_at AT TIME ZONE 'Asia/Kuala_Lumpur')::DATE AS booking_request_week\n                , DATE_TRUNC('month', b.request_end_at AT TIME ZONE 'Asia/Kuala_Lumpur')::DATE AS booking_end_month\n                , DATE_TRUNC('week', b.request_end_at AT TIME ZONE 'Asia/Kuala_Lumpur')::DATE AS booking_end_week\n                , case when b.status in ('accepted', 'waiting_for_inspection', 'start_driving', 'return_car', 'completed') then (case when bl.pricing_id = '3' then 0.5\nwhen (extract(EPOCH from b.request_end_at)::int - extract(EPOCH from b.request_start_at)::int)%86400 < 2160 then\nfloor((extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400)\nelse ceil((extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400) end)end AS booking_dur_days\n                -- Booking Value\n                , CASE WHEN hp.booking_id IS NULL THEN CEIL(b.gross_amount*(100-cc.percent)/100) ELSE hp.amount END AS payout_amount\n                , case WHEN sum(A.multipliercontr) < 0 THEN 0 ELSE MAX(A.multipliercontr) end as multiplier\n                , MAX(l.insurance) as insurance\n                , A.amount*(cc.percent/100) as rate\n\n            FROM bookings b\n            left join booking_lines bl on bl.booking_id = b.id and bl.slug = 'rental-fee'\n            left join \n\t\t(select distinct A.id, A.ref_no, A.status, A.registration_no, A.dur, \n\t\tcase \n\t\t\twhen cast(A.rentalFee as numeric)-(cast(A.basePrice as numeric)*A.dur) < 0 then\n\t\t\t(case when A.dur >= 30 then (cast(A.basePrice as numeric)*A.dur)*.70\n\t\t\tWHEN A.dur BETWEEN 7 AND 29 THEN (cast(A.basePrice as numeric)*A.dur)*.75 end)\n\t\t\telse cast(A.basePrice as numeric)*A.dur\n\t\t\tend as beforemultiplier,\n\t\tCASE \n\t\t\twhen cast(A.rentalFee as numeric)-(cast(A.basePrice as numeric)*A.dur) < 0 then \n\t\t    (case WHEN A.dur >= 30 THEN (cast(A.rentalFee as numeric) - (cast(A.basePrice as numeric)*A.dur)*.70)\n\t\t    WHEN A.dur BETWEEN 7 AND 29 THEN (cast(A.rentalFee as numeric) - (cast(A.basePrice as numeric)*A.dur)*.75) end)\n\t\t    ELSE cast(A.rentalFee as numeric)-(cast(A.basePrice as numeric)*A.dur)\n\t\tEND as multipliercontr, \n\t\tA.rentalFee, A.gross_amount, A.amount\n\t\tfrom\n\t\t\t(select distinct b.id, b.ref_no, b.status,\n\t\t\tl.id as listing_id, \n\t\t\tl.registration_no, \n\t\t\tbm.meta->>'currency' as currency,\n\t\t\tbm.meta->>'basePrice' as basePrice,\n\t\t\tbm.meta->>'rentalFee' as rentalFee,\n\t\t\tbl.amount,\n\t\t\tb.gross_amount,\n\t\t\tb.net_amount,\n\t\t\tbm.meta->>'listingLocation' as listingLocation,\n\t\t\tcase when bl.pricing_id = '3' then 0.5\n\t\t\twhen (extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400 < 1 then 1\n\t\t\twhen (extract(EPOCH from b.request_end_at)::int - extract(EPOCH from b.request_start_at)::int)%86400 < 2160 then\n\t\t\tfloor((extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400)\n\t\t\telse ceil((extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400) end as dur\n\t\t\tFROM bookings b\n\t\t\t\tleft join booking_multipliers bm on bm.booking_id = b.id\n\t\t\t    left join listings l on l.id = b.listing_id \n\t\t\t    left JOIN listing_location ll on b.listing_id = ll.listing_id\n\t\t\t    left join booking_lines bl on bl.booking_id = b.id and bl.slug = 'rental-fee'\n\t\t\t    WHERE country = 'Malaysia'\n\t\t\t    and b.status = 'completed'\n\t\t\t    group by 1,2,3,4,5,6,7,8,9,10,11,12,13\n\t\t\t\torder by 1 desc) A) A on A.id = b.id\n            LEFT JOIN approved_listings l ON l.listing_id = b.listing_id\n            LEFT JOIN unique_users u on u.user_id = l.host_id\n            LEFT JOIN listing_commission_class lc ON lc.listing_id = b.listing_id\n            LEFT JOIN commission_class cc ON cc.id = lc.commission_id\n            LEFT JOIN payouts hp ON hp.booking_id = b.id\n            left join companies c on c.owner_id = l.host_id\n                AND hp.country ~* 'MY'\n            \n            WHERE b.currency = 'myr'\n            and c.owner_id is null\n            group by 1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,20\n        )\n    \n    , bookings_data AS (\n            SELECT \n                b.host_id\n                , b.uuid\n                , b.email\n                , b.user_name\n                , b.booking_end_week\n                , b.listing_id\n                , b.plate_no\n                , b.url\n                , case when b.insurance in ('Shield 25') then 'Shield 75'\n                \t\twhen b.insurance in ('Shield 30') then 'Shield 70'\n                \t\twhen b.insurance in ('Shield 35') then 'Shield 65'\n                \t\twhen b.insurance in ('Shield 40') then 'Shield 60' else NULL end as insurance\n                , SUM(CASE WHEN b.booking_status IN ('completed','start_driving','waiting_for_inspection','return_car') THEN b.rate ELSE 0 END) as comrate\n                , to_char((date_trunc('week', current_date) - INTERVAL '2 weeks')::date, 'YYYY-MM-DD') AS start_date\n\t\t\t\t, to_char((date_trunc('week', current_date) - INTERVAL '8 days')::date, 'YYYY-MM-DD') AS end_date\n\t\t\t\t, to_char((date_trunc('week', current_date) + INTERVAL '1 days')::date, 'YYYY-MM-DD') AS payoutdate_start\n\t\t\t\t, to_char((date_trunc('week', current_date) + INTERVAL '4 days')::date, 'YYYY-MM-DD') AS payoutdate_end\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car','cancelled','rejected','requested') THEN b.booking_id ELSE NULL END) AS received_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_id ELSE NULL END) AS fulfiled_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_id ELSE NULL END) AS completed_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('rejected') THEN b.booking_id ELSE NULL END) AS rejected_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_id ELSE NULL END)::decimal /\n                    NULLIF(COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car','rejected','requested') THEN b.booking_id ELSE NULL END),0)::decimal AS fr\n                , SUM(CASE WHEN b.booking_status IN ('completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_dur_days ELSE 0 END) AS booking_dur_days\n                , SUM(CASE WHEN b.booking_status IN ('completed','start_driving','waiting_for_inspection','return_car') THEN b.payout_amount ELSE 0 END) AS est_payout\n                , SUM(CASE WHEN b.booking_status IN ('rejected') THEN b.payout_amount ELSE 0 END) AS est_loss\n                , sum(case when b.booking_status in ('completed') then b.multiplier end) as multiplier\n                , SUM(CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car') THEN b.rate ELSE 0 END)*0.06 as SST\n            FROM all_bookings b\n            WHERE \n--booking_end_week BETWEEN '2024-06-10' and '2024-06-16'\nbooking_end_week BETWEEN (CURRENT_DATE - INTERVAL '16 DAYS') AND (CURRENT_DATE - INTERVAL '10 DAYS')\n            GROUP BY 1,2,3,4,5,6,7,8,9\n        )\n        \nSELECT *\nFROM bookings_data\nWHERE 1=1\n    AND received_booking > 0\n    and insurance in ('Shield 75',\n--'Shield 70',\n'Shield 65',\n'Shield 60')\nand email !~* 'icloud'\n--AND host_id IN ('1050095')\n--'34411') --Kenny\n--'65123') --Nani*/\n\nORDER BY 1,15 DESC",
+        "additionalFields": {}
+      },
+      "id": "4b649752-75df-4481-b5f7-71810dc76479",
+      "name": "Postgres - Weekly Raw Data Dump4",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        900,
+        360
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "postgres": {
+          "id": "16",
+          "name": "trevodb_recreated"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg",
+          "mode": "list",
+          "cachedResultName": "2023 - Host Weekly Statement [N8N]",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2030623506,
+          "mode": "list",
+          "cachedResultName": "Final",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg/edit#gid=2030623506"
+        },
+        "options": {
+          "outputFormatting": {
+            "values": {
+              "general": "FORMATTED_VALUE",
+              "date": "FORMATTED_STRING"
+            }
+          }
+        }
+      },
+      "id": "6ad26391-ac54-48dc-bc09-effd814afc34",
+      "name": "Read Weekly Sheet2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1440,
+        360
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google Sheets [Pat]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\"to\":\n [\n  {\"email\":\"{{ $node[\"Read Weekly Sheet2\"].json[\"EMAIL\"] }}\",\n   \"name\":\"{{ $node[\"Read Weekly Sheet2\"].json[\"HOSTNAME\"] }}\"}\n ],\n \"templateId\":455}\n",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API4",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1800,
+        360
+      ],
+      "id": "62cb8ad9-a14e-4942-9376-48b23db38255",
+      "retryOnFail": true,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "upsert",
+        "email": "={{ $json.EMAIL }}",
+        "upsertAttributes": {
+          "upsertAttributesValues": [
+            {
+              "fieldName": "WSTARTDATE",
+              "fieldValue": "={{ $json.STARTDATE }}"
+            },
+            {
+              "fieldName": "WENDDATE",
+              "fieldValue": "={{ $json.ENDDATE }}"
+            },
+            {
+              "fieldName": "WHOSTNAME",
+              "fieldValue": "={{ $json.HOSTNAME }}"
+            },
+            {
+              "fieldName": "WCOMPBOOKING",
+              "fieldValue": "={{ $json.COMPBOOKING }}"
+            },
+            {
+              "fieldName": "WESTPAYOUT",
+              "fieldValue": "={{ $json.ESTPAYOUT }}"
+            },
+            {
+              "fieldName": "WCOMPDAYS",
+              "fieldValue": "={{ $json.COMPDAYS }}"
+            },
+            {
+              "fieldName": "WCOMRATE",
+              "fieldValue": "={{ $json.COMRATE }}"
+            },
+            {
+              "fieldName": "WPRICESURGE",
+              "fieldValue": "={{ $json.PRICESURGE }}"
+            },
+            {
+              "fieldName": "WSST",
+              "fieldValue": "={{ $json.SST }}"
+            },
+            {
+              "fieldName": "WPAYOUTSTART",
+              "fieldValue": "={{ $json.PAYOUTSTART }}"
+            },
+            {
+              "fieldName": "WPAYOUTEND",
+              "fieldValue": "={{ $json.ENDDATE }}"
+            },
+            {
+              "fieldName": "C1PLATE",
+              "fieldValue": "={{ $json.C1PLATE }}"
+            },
+            {
+              "fieldName": "C1ACCEPTRATE",
+              "fieldValue": "={{ $json.C1ACCEPTRATE }}"
+            },
+            {
+              "fieldName": "C1COMPBOOK",
+              "fieldValue": "={{ $json.C1COMPBOOK }}"
+            },
+            {
+              "fieldName": "C1REJECTBOOK",
+              "fieldValue": "={{ $json.C2REJECTBOOK }}"
+            },
+            {
+              "fieldName": "C1ESTLOSS",
+              "fieldValue": "={{ $json.C1ESTLOSS }}"
+            },
+            {
+              "fieldName": "C1PLATFORMCOMM",
+              "fieldValue": "={{ $json.C1PLATFORMCOMM }}"
+            },
+            {
+              "fieldName": "C1SST",
+              "fieldValue": "={{ $json.C1SST }}"
+            },
+            {
+              "fieldName": "C1ESTPAYOUT",
+              "fieldValue": "={{ $json.C1ESTPAYOUT }}"
+            },
+            {
+              "fieldName": "C2PLATE",
+              "fieldValue": "={{ $json.C2PLATE }}"
+            },
+            {
+              "fieldName": "C2ACCEPTRATE",
+              "fieldValue": "={{ $json.C2ACCEPTRATE }}"
+            },
+            {
+              "fieldName": "C2COMPBOOK",
+              "fieldValue": "={{ $json.C2COMPBOOK }}"
+            },
+            {
+              "fieldName": "C2REJECTBOOK",
+              "fieldValue": "={{ $json.C2REJECTBOOK }}"
+            },
+            {
+              "fieldName": "C2ESTLOSS",
+              "fieldValue": "={{ $json.C2ESTLOSS }}"
+            },
+            {
+              "fieldName": "C2PLATFORMCOMM",
+              "fieldValue": "={{ $json.C2PLATFORMCOMM }}"
+            },
+            {
+              "fieldName": "C2SST",
+              "fieldValue": "={{ $json.C2SST }}"
+            },
+            {
+              "fieldName": "C2ESTPAYOUT",
+              "fieldValue": "={{ $json.C2ESTPAYOUT }}"
+            },
+            {
+              "fieldName": "C3PLATE",
+              "fieldValue": "={{ $json.C3PLATE }}"
+            },
+            {
+              "fieldName": "C3ACCEPTRATE",
+              "fieldValue": "={{ $json.C3ACCEPTRATE }}"
+            },
+            {
+              "fieldName": "C3COMPBOOK",
+              "fieldValue": "={{ $json.C3COMPBOOK }}"
+            },
+            {
+              "fieldName": "C3REJECTBOOK",
+              "fieldValue": "={{ $json.C3REJECTBOOK }}"
+            },
+            {
+              "fieldName": "C3ESTLOSS",
+              "fieldValue": "={{ $json.C3ESTLOSS }}"
+            },
+            {
+              "fieldName": "C3PLATFORMCOMM",
+              "fieldValue": "={{ $json.C3PLATFORMCOMM }}"
+            },
+            {
+              "fieldName": "C3SST",
+              "fieldValue": "={{ $json.C3SST }}"
+            },
+            {
+              "fieldName": "C3ESTPAYOUT",
+              "fieldValue": "={{ $json.C3ESTPAYOUT }}"
+            },
+            {
+              "fieldName": "C4PLATE",
+              "fieldValue": "={{ $json.C4PLATE }}"
+            },
+            {
+              "fieldName": "C4ACCEPTRATE",
+              "fieldValue": "={{ $json.C4ACCEPTRATE }}"
+            },
+            {
+              "fieldName": "C4COMPBOOK",
+              "fieldValue": "={{ $json.C4COMPBOOK }}"
+            },
+            {
+              "fieldName": "C4REJECTBOOK",
+              "fieldValue": "={{ $json.C4REJECTBOOK }}"
+            },
+            {
+              "fieldName": "C4ESTLOSS",
+              "fieldValue": "={{ $json.C4ESTLOSS }}"
+            },
+            {
+              "fieldName": "C4PLATFORMCOMM",
+              "fieldValue": "={{ $json.C4PLATFORMCOMM }}"
+            },
+            {
+              "fieldName": "C4SST",
+              "fieldValue": "={{ $json.C4SST }}"
+            },
+            {
+              "fieldName": "C4ESTPAYOUT",
+              "fieldValue": "={{ $json.C4ESTPAYOUT }}"
+            },
+            {
+              "fieldName": "C5PLATE",
+              "fieldValue": "={{ $json.C5PLATE }}"
+            },
+            {
+              "fieldName": "C5ACCEPTRATE",
+              "fieldValue": "={{ $json.C5ACCEPTRATE }}"
+            },
+            {
+              "fieldName": "C5COMPBOOK",
+              "fieldValue": "={{ $json.C5COMPBOOK }}"
+            },
+            {
+              "fieldName": "C5REJECTBOOK",
+              "fieldValue": "={{ $json.C5REJECTBOOK }}"
+            },
+            {
+              "fieldName": "C5ESTLOSS",
+              "fieldValue": "={{ $json.C5ESTLOSS }}"
+            },
+            {
+              "fieldName": "C5PLATFORMCOMM",
+              "fieldValue": "={{ $json.C5PLATFORMCOMM }}"
+            },
+            {
+              "fieldName": "C5SST",
+              "fieldValue": "={{ $json.C5SST }}"
+            },
+            {
+              "fieldName": "C5ESTPAYOUT",
+              "fieldValue": "={{ $json.C5ESTPAYOUT }}"
+            },
+            {
+              "fieldName": "C6PLATE",
+              "fieldValue": "={{ $json.C6PLATE }}"
+            },
+            {
+              "fieldName": "C6ACCEPTRATE",
+              "fieldValue": "={{ $json.C6ACCEPTRATE }}"
+            },
+            {
+              "fieldName": "C6COMPBOOK",
+              "fieldValue": "={{ $json.C6COMPBOOK }}"
+            },
+            {
+              "fieldName": "C6REJECTBOOK",
+              "fieldValue": "={{ $json.C6REJECTBOOK }}"
+            },
+            {
+              "fieldName": "C6ESTLOSS",
+              "fieldValue": "={{ $json.C6ESTLOSS }}"
+            },
+            {
+              "fieldName": "C6PLATFORMCOMM",
+              "fieldValue": "={{ $json.C6PLATFORMCOMM }}"
+            },
+            {
+              "fieldName": "C6SST",
+              "fieldValue": "={{ $json.C6SST }}"
+            },
+            {
+              "fieldName": "C6ESTPAYOUT",
+              "fieldValue": "={{ $json.C6ESTPAYOUT }}"
+            },
+            {
+              "fieldName": "WTRACKFEE",
+              "fieldValue": "={{ $json.GPS }}"
+            },
+            {
+              "fieldName": "WCANPENAL",
+              "fieldValue": "={{ $json['Host LMC Penalty'] }}"
+            },
+            {
+              "fieldName": "WMISCFEE",
+              "fieldValue": "={{ $json.Miscellaneous }}"
+            },
+            {
+              "fieldName": "WREMARKS",
+              "fieldValue": "={{ $json['Concat Remark'] }}"
+            }
+          ]
+        }
+      },
+      "id": "4cb8c708-7079-4a9e-93fb-a151385d16f0",
+      "name": "SendInBlue3",
+      "type": "n8n-nodes-base.sendInBlue",
+      "typeVersion": 1,
+      "position": [
+        1620,
+        360
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "errorWorkflow": "11",
+    "saveDataSuccessExecution": "all",
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-08-07T03:05:28.999Z",
+  "versionId": "f3901dfe-1dd0-41cf-95e3-4f15c9ad6bea"
+}
