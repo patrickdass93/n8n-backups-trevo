@@ -1,0 +1,132 @@
+{
+  "active": false,
+  "connections": {
+    "Cron every Sun, Tue, Thu @ 7pm": {
+      "main": [
+        [
+          {
+            "node": "Hosts with listing age = 9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hosts with listing age = 9": {
+      "main": [
+        [
+          {
+            "node": "Send PN - Add User to Campaign",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2022-12-13T07:35:05.152Z",
+  "id": "6",
+  "name": "[KAVI] Old Listings Workflow Kavi",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "6628d05e-700f-4cd8-bcc7-01b007630940",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        -1280,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "content": "Active user status\nApproved listings\nLess than 3 days available for current week\n\n0 0 19 * * SUN,TUE,THU *",
+        "height": 150.755905511811,
+        "width": 428.4251968503936
+      },
+      "name": "Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1280,
+        -220
+      ],
+      "id": "7e08fe5c-0938-4e3a-a2d9-96e0399ea317"
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.leanplum.com/api?action=startCampaign",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={ \"appId\" : \"app_BXrjE7dc15VWXDLRfh77tActhBhSkCHeQhETDE1mXfQ\", \"clientKey\" : \"dev_L9yBjOmwfR3fNiVjL9woIYfWzsy5hMcGDx0og8isAFw\", \"apiVersion\" : \"1.0.6\", \"userId\":\"{{ $json[\"host_uuid\"] }}\", \"campaignId\":\"5357885331668992\", \"createDisposition\" : \"CreateNever\"}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "Send PN - Add User to Campaign",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        -880,
+        100
+      ],
+      "id": "6b6ba75d-9c80-4a46-a774-0ecc615cac14"
+    },
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "custom",
+              "cronExpression": "0 0 19 * * SUN,TUE,THU *"
+            }
+          ]
+        }
+      },
+      "name": "Cron every Sun, Tue, Thu @ 7pm",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        -1280,
+        100
+      ],
+      "id": "1f4e0f31-87d1-48a9-9661-ce9e3d4d2f4c"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT DISTINCT u.id as user_id\n            , u.uuid\n            , u.email\n            , CONCAT(u.phone_country_code, u.phone_number) as phone_number\n            , m.year\nfrom users u \nleft join listings l on l.user_id = u.id \nleft join listing_location ll on ll.listing_id = l.id\nleft join models m on m.id = l.model_id\nleft join brands b on b.id = m.brand_id\nleft join listing_availability la on la.listing_id = l.id\nwhere l.status in ('approved')\nand ll.country in ('Malaysia')\nand l.deleted_at is null\ngroup by 1,2,3,4,5\nhaving cast(to_char(CURRENT_DATE, 'yyyy') AS NUMERIC) - m.year = 9",
+        "additionalFields": {}
+      },
+      "name": "Hosts with listing age = 9",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        -1080,
+        100
+      ],
+      "id": "d71c2eed-5ebb-41af-b3e3-42a1c00b2de4",
+      "notesInFlow": false,
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "trevodb"
+        }
+      },
+      "notes": "Active user status\nApproved listings\nLess than 3 days available for current week"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveExecutionProgress": "DEFAULT",
+    "saveManualExecutions": false,
+    "callerPolicy": "any",
+    "executionTimeout": 3600,
+    "saveDataSuccessExecution": "all"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2022-12-13T13:00:34.071Z",
+  "versionId": "69e9982d-64bc-4b9a-979b-a4355e649ef1"
+}
