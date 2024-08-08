@@ -1,0 +1,17 @@
+{
+  "active": false,
+  "connections": {},
+  "createdAt": "2024-02-20T05:27:44.072Z",
+  "id": "1o0yK5s9mxaWGQyl",
+  "name": "[KAVI][CX/CS] Test",
+  "nodes": [],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-02-20T05:27:44.072Z",
+  "versionId": "15c5280d-afdd-42c3-a1cc-5d57e0a7bc3a"
+}
