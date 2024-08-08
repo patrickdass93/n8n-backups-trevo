@@ -1,0 +1,536 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Clear Sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Update Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear Sheet": {
+      "main": [
+        [
+          {
+            "node": "Append Timestamp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-01-15T08:02:20.414Z",
+  "id": "PP8ILj5D3Az2pEUQ",
+  "name": "[TREVO] [Strategy] Business Performance",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "44326e86-2ac0-498e-ac5d-27f1d4c5fc26",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -200,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH \n  time_frame AS (\n    SELECT \n      GENERATE_SERIES(\n          TIMESTAMP '2023-01-01'::DATE\n          , '2024-12-31'::DATE\n          , INTERVAL '1 month'\n        ) month_series\n      , GENERATE_SERIES(\n          TIMESTAMP '2023-01-01'::DATE\n          , '2024-12-31'::DATE\n          , INTERVAL '1 day'\n      ) date_series\n  )\n    \n  , my_listings AS (\n      SELECT \n          DATE_TRUNC('MONTH', A.date) as month\n          , date_trunc('month', coalesce(A.date, B.date))::date as date\n          , count(distinct A.lid) - count(distinct B.lid) as listed_cars\n      FROM\n          (\n          SELECT distinct l.id as lid, dates.ymd as date\n          FROM listings l\n          JOIN\n              (\n                SELECT \n                  generate_series(timestamp '2023-01-01'\n                  , NOW(), interval '1 day')::date ymd) dates \n                  on dates.ymd between coalesce(l.approved_at, l.created_at)::date and NOW()::date\n                LEFT JOIN listing_location ll on ll.listing_id = l.id\n                WHERE l.status = 'approved' and ll.country = 'Malaysia'\n              ) A\n          FULL JOIN \n              (\n                SELECT distinct l.id as lid, dates.ymd as date\n                FROM listings l\n                JOIN (SELECT generate_series(timestamp '2023-01-01', NOW()\n                              , interval '1 day')::date ymd) dates \n                ON dates.ymd between l.deleted_at::date and NOW()::date\n                LEFT JOIN listing_location ll on ll.listing_id = l.id\n                WHERE l.status = 'approved' and ll.country = 'Malaysia'\n              ) B on A.lid = B.lid and A.date = B.date\n          GROUP BY 1,2\n  )\n  \n  , my_listing_available AS (\n      SELECT \n          l.id as listing_id\n      FROM listings l \n      JOIN listing_location ll ON ll.listing_id = l.id \n          AND country = 'Malaysia'\n      WHERE 1=1\n          AND l.deleted_at IS null\n          AND l.status = 'approved' \n  )\n  \n  , availability_series AS (\n      SELECT DISTINCT\n          la.listing_id\n          ,DATE(tf.date_series) available_date\n      FROM listing_availability la\n      JOIN my_listing_available l on l.listing_id = la.listing_id\n      JOIN time_frame tf ON date_series >= la.start_date AND date_series <= la.end_date\n  )\n  \n  , available_days_table AS (\n      SELECT \n          DATE_TRUNC('MONTH', a.available_date) as month\n          , COUNT(available_date) as available_days\n          , COUNT(DISTINCT listing_id) as available_cars\n      FROM availability_series a\n      GROUP BY 1\n  )\n  \n  , my_bookings_raw AS (\n      SELECT DISTINCT on (b.id)\n          CASE \n            WHEN be.new_request_end_at IS NULL THEN \n                 DATE_TRUNC('month', b.request_end_at AT TIME ZONE 'Asia/Kuala_Lumpur')::DATE \n            ELSE DATE_TRUNC('month', be.new_request_end_at AT TIME ZONE 'Asia/Kuala_Lumpur')::DATE \n            END AS month\n          , b.id as booking_id\n          , CEIL(EXTRACT(EPOCH FROM b.request_end_at - b.request_start_at)/86400)::integer AS booking_days\n          , b.user_id\n          , b.listing_id\n          , CASE WHEN be.gross_amount IS NULL THEN b.gross_amount ELSE b.gross_amount+be.gross_amount END AS gmv\n          , p2p.amount AS p2p_amount\n          , scdw.amount as scdw_amount\n          , delp.amount+deld.amount as del_amount\n          , b.gross_amount - b.net_amount as coupon_amount\n          , ROW_NUMBER () OVER (PARTITION BY b.user_id, CASE WHEN b.status IN ('completed') THEN 1 ELSE 0 END ORDER BY b.request_end_at ASC) AS user_completed_no\n          , (cc.percent/100*p2p.amount) as commissions\n          , (cc.percent/100*p2p.amount)/NULLIF(p2p.amount,0) as p2p\n          , ((cc.percent/100*p2p.amount)+scdw.amount+delp.amount+deld.amount)/NULLIF(CASE WHEN be.gross_amount IS NULL THEN b.gross_amount ELSE b.gross_amount+be.gross_amount END,0) as overall\n      FROM bookings b\n      LEFT JOIN booking_extension be on be.booking_id = b.id\n          AND be.status = 'accepted'\n      LEFT JOIN listing_commission_class lc ON lc.listing_id = b.listing_id\n      JOIN commission_class cc ON cc.id = lc.commission_id\n      LEFT JOIN booking_lines scdw ON scdw.booking_id = b.id\n          AND scdw.slug IN ('lite','standard','premium','scdw-extension-lite','scdw-extension-standard','scdw-extension-premium')\n      LEFT JOIN booking_lines delp ON delp.booking_id = b.id\n          AND delp.slug IN ('car-pick-up-fee')\n      LEFT JOIN booking_lines deld ON deld.booking_id = b.id\n          AND deld.slug IN ('car-drop-off-fee')\n      LEFT JOIN booking_lines p2p ON p2p.booking_id = b.id\n          AND p2p.slug IN ('rental-fee','extension')\n          AND p2p.currency IN ('myr')\n      WHERE 1=1\n          AND b.currency = 'myr'\n          AND b.status IN ('accepted','start_driving','waiting_for_inspection','return_car','completed')\n          AND b.request_end_at >= '2023-01-01'\n  )\n  \n  , my_bookings AS (\n      SELECT\n          month\n          , COUNT(DISTINCT booking_id) as bookings\n          , SUM(booking_days) as booking_days\n          , COUNT(DISTINCT CASE WHEN user_completed_no = 1 THEN booking_id ELSE NULL END) AS mft\n          , COUNT(DISTINCT user_id) as mau\n          , COUNT(DISTINCT listing_id) as mac\n          , SUM(p2p_amount) as p2p_gmv\n          , SUM(scdw_amount) as scdw_gmv\n          , SUM(del_amount) as del_gmv\n          , SUM(coupon_amount)/SUM(p2p_amount) as cr\n          , AVG(p2p) as p2p_tr\n          , AVG(overall) as overall_tr\n          --, SUM(commissions) as comms\n      FROM my_bookings_raw\n      \n      WHERE 1=1\n          AND month >= '2023-01-01'\n      \n      GROUP BY 1        \n  )\n\n\nSELECT \n  to_char(tf.month_series,'MON-YYYY') as month\n  , p2p_gmv\n  , scdw_gmv\n  , del_gmv\n  --, comms\n  , cr\n  , p2p_tr\n  , overall_tr\n  , bookings\n  , booking_days\n  , booking_days/bookings::float as avg_days\n  , (p2p_gmv+scdw_gmv+del_gmv)/bookings::float as avg_basket\n  , bookings/NULLIF(mau,0)::float as bookings_mau\n  , bookings/NULLIF(mac,0)::float as bookings_mac\n  --, msu\n  , mft\n  , mau\n  , listed_cars\n  --, available_days\n  , mac as mac\n  , available_cars\nFROM time_frame tf\nLEFT JOIN my_listings l on l.month = tf.month_series\nLEFT JOIN my_bookings b on b.month = tf.month_series\nLEFT JOIN available_days_table avd on avd.month = tf.month_series\nWHERE b.month IS NOT NULL",
+        "options": {}
+      },
+      "id": "ac499163-a09b-400c-bc6f-f3a9038dfe00",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        -40,
+        480
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1cWfkDap0Re2GysegX6cUvrOFjKzNr-kTSfElStadJP0",
+          "mode": "list",
+          "cachedResultName": "TREVO MY | Business Performance",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cWfkDap0Re2GysegX6cUvrOFjKzNr-kTSfElStadJP0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1518246234,
+          "mode": "list",
+          "cachedResultName": "Actuals - Monthly",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cWfkDap0Re2GysegX6cUvrOFjKzNr-kTSfElStadJP0/edit#gid=1518246234"
+        },
+        "keepFirstRow": true
+      },
+      "id": "4227d0b7-c956-4138-83a7-89438e8292cf",
+      "name": "Clear Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        -40,
+        300
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1cWfkDap0Re2GysegX6cUvrOFjKzNr-kTSfElStadJP0",
+          "mode": "list",
+          "cachedResultName": "TREVO MY | Business Performance",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cWfkDap0Re2GysegX6cUvrOFjKzNr-kTSfElStadJP0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1518246234,
+          "mode": "list",
+          "cachedResultName": "Actuals - Monthly",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cWfkDap0Re2GysegX6cUvrOFjKzNr-kTSfElStadJP0/edit#gid=1518246234"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "month": "={{ $json.month }}",
+            "p2p_gmv": "={{ $json.p2p_gmv }}",
+            "scdw_gmv": "={{ $json.scdw_gmv }}",
+            "del_gmv": "={{ $json.del_gmv }}",
+            "cr": "={{ $json.cr }}",
+            "p2p_tr": "={{ $json.p2p_tr }}",
+            "overall_tr": "={{ $json.overall_tr }}",
+            "bookings": "={{ $json.bookings }}",
+            "booking_days": "={{ $json.booking_days }}",
+            "avg_days": "={{ $json.avg_days }}",
+            "avg_basket": "={{ $json.avg_basket }}",
+            "bookings_mau": "={{ $json.bookings_mau }}",
+            "bookings_mac": "={{ $json.bookings_mac }}",
+            "mft": "={{ $json.mft }}",
+            "mau": "={{ $json.mau }}",
+            "listed_cars": "={{ $json.listed_cars }}",
+            "mac": "={{ $json.mac }}",
+            "available_cars": "={{ $json.available_cars }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "month",
+              "displayName": "month",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "p2p_gmv",
+              "displayName": "p2p_gmv",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "scdw_gmv",
+              "displayName": "scdw_gmv",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "del_gmv",
+              "displayName": "del_gmv",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cr",
+              "displayName": "cr",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "p2p_tr",
+              "displayName": "p2p_tr",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "overall_tr",
+              "displayName": "overall_tr",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "bookings",
+              "displayName": "bookings",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "booking_days",
+              "displayName": "booking_days",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "avg_days",
+              "displayName": "avg_days",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "avg_basket",
+              "displayName": "avg_basket",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "bookings_mau",
+              "displayName": "bookings_mau",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "bookings_mac",
+              "displayName": "bookings_mac",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mft",
+              "displayName": "mft",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mau",
+              "displayName": "mau",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "listed_cars",
+              "displayName": "listed_cars",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mac",
+              "displayName": "mac",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "available_cars",
+              "displayName": "available_cars",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "821c3e65-bbf6-443b-b019-f7950f4e871e",
+      "name": "Update Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        120,
+        480
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1cWfkDap0Re2GysegX6cUvrOFjKzNr-kTSfElStadJP0",
+          "mode": "list",
+          "cachedResultName": "TREVO MY | Business Performance",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cWfkDap0Re2GysegX6cUvrOFjKzNr-kTSfElStadJP0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 101714055,
+          "mode": "list",
+          "cachedResultName": "N8N Update Timestamp",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cWfkDap0Re2GysegX6cUvrOFjKzNr-kTSfElStadJP0/edit#gid=101714055"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timezone": "={{ $json.Timezone }}",
+            "timestamp": "={{ $json.timestamp }}",
+            "Readable date": "={{ $json['Readable date'] }}",
+            "Readable time": "={{ $json['Readable time'] }}",
+            "Day of week": "={{ $json['Day of week'] }}",
+            "Year": "={{ $json.Year }}",
+            "Month": "={{ $json.Month }}",
+            "Day of month": "={{ $json['Day of month'] }}",
+            "Hour": "={{ $json.Hour }}",
+            "Minute": "={{ $json.Minute }}",
+            "Second": "={{ $json.Second }}"
+          },
+          "matchingColumns": [
+            "Timezone"
+          ],
+          "schema": [
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Readable date",
+              "displayName": "Readable date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Readable time",
+              "displayName": "Readable time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Day of week",
+              "displayName": "Day of week",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Year",
+              "displayName": "Year",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Month",
+              "displayName": "Month",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Day of month",
+              "displayName": "Day of month",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Hour",
+              "displayName": "Hour",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Minute",
+              "displayName": "Minute",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Second",
+              "displayName": "Second",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Timezone",
+              "displayName": "Timezone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "46a45b67-ff78-4e29-8a4e-9d516db7d471",
+      "name": "Append Timestamp",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        120,
+        300
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 600,
+    "errorWorkflow": "2"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-03-31T06:52:09.032Z",
+      "updatedAt": "2023-03-31T06:52:09.032Z",
+      "id": "5",
+      "name": "Patrick"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-01-22T06:10:09.012Z",
+  "versionId": "a7eb9d6d-8f04-4d5d-999f-97e1450b582a"
+}
