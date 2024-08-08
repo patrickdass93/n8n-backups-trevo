@@ -1,0 +1,894 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets2": {
+      "main": [
+        [
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets4": {
+      "main": [
+        [
+          {
+            "node": "Postgres2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets6": {
+      "main": [
+        [
+          {
+            "node": "Postgres3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres3": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-02-15T03:24:27.749Z",
+  "id": "RtTwN1elmkP8axAQ",
+  "name": "[JIUN] - GPS Request Sheet",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "66e9127f-9840-4ef4-b334-dbdb70a17a66",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        360,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\n\nSELECT \nto_char(tdr.created_at, 'YYYY-MM-DD HH24:MI')as created_at,\ntdr.listing_id ,\n       concat(u.first_name,' ',u.last_name) AS host_name ,\n       concat(u.phone_country_code,u.phone_number) AS host_phone ,\n       l.registration_no AS reg_no ,\n        concat(ua.address_line_1,' ',ua.address_line_2,' ',ua.postal_code) AS deliver_address,\n       CASE\n           WHEN ll.state_region_province ~* '(petaling|selangor|kuala|putrajaya|subang|sembilan|KL)' THEN 'Klang Valley'\n           WHEN (ll.state_region_province ~* '(penang|pinang|kedah)'\n                 OR ll.address_line_2 ~* '(parit)') THEN 'Penang'\n            WHEN ll.state_region_province ~* '(perak)' THEN 'Ipoh'\n           WHEN ll.state_region_province ~* '(kinabalu|sabah|labuan)' THEN 'Kota Kinabalu'\n           WHEN ll.state_region_province ~* 'johor' THEN 'Johor Bahru'\n           ELSE ll.state_region_province\n       END AS city \n       \nFROM tracking_device_requests tdr\nLEFT JOIN users u ON u.id = tdr.user_id\nLEFT JOIN listings l ON l.id = tdr.listing_id\nLEFT JOIN listing_location ll ON ll.listing_id = tdr.listing_id\nLEFT JOIN user_address ua on ua.id = tdr.delivery_id\n\nWHERE tdr.status = 'requested'\n  AND ll.country = 'Malaysia'\n  AND l.deleted_at is null\n  AND l.status = 'approved'\norder by tdr.created_at desc",
+        "options": {}
+      },
+      "id": "6bf4608f-da83-4f71-9dc6-a0cb3fe9d875",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        760,
+        280
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1KoeWjIv5_rtxPCHuVlN0a5aHjpXNfPkE3bJOMUgXb7c",
+          "mode": "list",
+          "cachedResultName": "[KV] GPS Request",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KoeWjIv5_rtxPCHuVlN0a5aHjpXNfPkE3bJOMUgXb7c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1238437060,
+          "mode": "list",
+          "cachedResultName": "N8N Import - GPS Requests Raw",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KoeWjIv5_rtxPCHuVlN0a5aHjpXNfPkE3bJOMUgXb7c/edit#gid=1238437060"
+        },
+        "clear": "specificRange",
+        "range": "A2:Z"
+      },
+      "id": "d5bf696e-9c93-40d4-bff3-47ef494d10c6",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        580,
+        280
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1KoeWjIv5_rtxPCHuVlN0a5aHjpXNfPkE3bJOMUgXb7c",
+          "mode": "list",
+          "cachedResultName": "[KV] GPS Request",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KoeWjIv5_rtxPCHuVlN0a5aHjpXNfPkE3bJOMUgXb7c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1238437060,
+          "mode": "list",
+          "cachedResultName": "N8N Import - GPS Requests Raw",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KoeWjIv5_rtxPCHuVlN0a5aHjpXNfPkE3bJOMUgXb7c/edit#gid=1238437060"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "created_at"
+          ],
+          "schema": [
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "listing_id",
+              "displayName": "listing_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "host_name",
+              "displayName": "host_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "host_phone",
+              "displayName": "host_phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reg_no",
+              "displayName": "reg_no",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "deliver_address",
+              "displayName": "deliver_address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "dd7ad75b-3cf5-45f4-a691-7642cbce6b76",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        960,
+        280
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\n\nwith base as(\nSELECT \nto_char(tdr.created_at, 'YYYY-MM-DD HH24:MI')as created_at,\ntdr.listing_id ,\n      concat(u.first_name,' ',u.last_name) AS host_name ,\n      concat(u.phone_country_code,u.phone_number) AS host_phone ,\n      l.registration_no AS reg_no ,\n        concat(ua.address_line_1,' ',ua.address_line_2,' ',ua.postal_code) AS delivery_address,\n      CASE\n          WHEN ll.state_region_province ~* '(petaling|selangor|putrajaya|subang|sembilan)' THEN 'Klang Valley'\n          WHEN ll.state_region_province ~* '(cyberjaya|kuala|KL)' THEN 'KL'\n          WHEN ll.state_region_province ~* '(nilai)' THEN 'Nilai'\n          WHEN (ll.state_region_province ~* '(penang|pinang|kedah)'\n                 OR ll.address_line_2 ~* '(parit)') THEN 'Penang'\n            WHEN ll.state_region_province ~* '(perak)' THEN 'Ipoh'\n          WHEN ll.state_region_province ~* '(kinabalu|sabah|labuan)' THEN 'Kota Kinabalu'\n          WHEN ll.state_region_province ~* 'johor' THEN 'Johor Bahru'\n          ELSE ll.state_region_province\n      END AS city,\n      tdr.status\n-- t.name,\n-- NULLIF(regexp_replace(tx.name, '\\D','','g'), '')::numeric as PIC\n\nFROM tracking_device_requests tdr\nLEFT JOIN users u ON u.id = tdr.user_id\nLEFT JOIN listings l ON l.id = tdr.listing_id\nLEFT JOIN listing_location ll ON ll.listing_id = tdr.listing_id\nLEFT JOIN user_address ua on ua.id = tdr.delivery_id\n-- LEFT JOIN tag_taggables tt on tt.taggable_id = l.id\n-- LEFT JOIN (select * from tags where category = 'listings' and slug ~* ('sc-')) t on t.id = tt.tag_id\n-- LEFT JOIN (select * from tags where category = 'listings' and slug ~* ('ct-')) tx on tx.id = tt.tag_id\n\n\nWHERE \n(tdr.status = 'payment_failed' or \ntdr.status = 'completed' or \ntdr.status = 'approved') \n  AND ll.country = 'Malaysia'\n  AND l.deleted_at is null\n  AND l.status = 'approved'\norder by tdr.created_at desc)\n\n, listingtag as (\nselect \n\ntt.taggable_id,\ntt.tag_id,\nt.name,\nNULLIF(regexp_replace(t.name, '\\D','','g'), '')::numeric as PIC\n\nfrom tag_taggables tt \n\nLEFT JOIN tags t on t.id = tt.tag_id\nwhere category = 'listings' and (slug ~* ('sc-') or slug ~* ('ct-'))\n\n\n)\n\n, usertag as (\nselect \n\ntt.taggable_id,\ntt.tag_id,\nt.name\n\nfrom tag_taggables tt \n\nLEFT JOIN tags t on t.id = tt.tag_id\nwhere category = 'users' and slug ~* ('sc-')\n\n)\n\nselect \n\nb.created_at,\nb.listing_id,\nb.host_name, \nb.host_phone,\nb.reg_no,\nb.delivery_address,\nb.city,\nb.status,\ncase when lt.name ~* ('SC -') then lt.name\nwhen lt.name ~* ('CT -') then ut.name\nwhen lt.name is null and b.city = 'Klang Valley' then 'Jacklin'\nwhen lt.name is null and b.city = 'KL' then 'Ryan'\nwhen lt.name is null and b.city = 'Nilai' then 'Inani'\nend as PIC\n\nfrom base b\nLEFT JOIN listingtag lt on lt.taggable_id = b.listing_id \nLEFT JOIN usertag ut on ut.taggable_id = lt.PIC\n\n-- where b.reg_no IN ('BQV352','WC7661C','DEG697','SMG8621','VKF598','SYX1941','KEM1222','BPH8184','VHF9654','BRG1825','CER1144','VKE7963','SWG8432','VKK7132','VBQ5532','KBH55','FE7313','VEB1036','RAP4510','VBV9703','VAC9912','VEW3788','JTB4431','ALP160')",
+        "options": {}
+      },
+      "id": "d32ee806-9e0e-4871-8552-5041b67a2c16",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        760,
+        460
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1KoeWjIv5_rtxPCHuVlN0a5aHjpXNfPkE3bJOMUgXb7c",
+          "mode": "list",
+          "cachedResultName": "[KV] GPS Request",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KoeWjIv5_rtxPCHuVlN0a5aHjpXNfPkE3bJOMUgXb7c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1974677081,
+          "mode": "list",
+          "cachedResultName": "N8N Import - GPS Completed Raw",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KoeWjIv5_rtxPCHuVlN0a5aHjpXNfPkE3bJOMUgXb7c/edit#gid=1974677081"
+        },
+        "clear": "specificRange",
+        "range": "A2:Z"
+      },
+      "id": "b75dd729-f10b-4cdf-b255-d71e4880e077",
+      "name": "Google Sheets2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        580,
+        460
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1KoeWjIv5_rtxPCHuVlN0a5aHjpXNfPkE3bJOMUgXb7c",
+          "mode": "list",
+          "cachedResultName": "[KV] GPS Request",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KoeWjIv5_rtxPCHuVlN0a5aHjpXNfPkE3bJOMUgXb7c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1974677081,
+          "mode": "list",
+          "cachedResultName": "N8N Import - GPS Completed Raw",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KoeWjIv5_rtxPCHuVlN0a5aHjpXNfPkE3bJOMUgXb7c/edit#gid=1974677081"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "created_at"
+          ],
+          "schema": [
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "listing_id",
+              "displayName": "listing_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "host_name",
+              "displayName": "host_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "host_phone",
+              "displayName": "host_phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reg_no",
+              "displayName": "reg_no",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "delivery_address",
+              "displayName": "delivery_address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "pic",
+              "displayName": "pic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "276943b4-f0c9-43b8-bffe-245a04990e69",
+      "name": "Google Sheets3",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        960,
+        460
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## KV - Requested",
+        "height": 80,
+        "width": 212
+      },
+      "id": "447573cd-9662-46f8-8c67-228cf1f1675e",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        120,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## KV - Completed",
+        "height": 80,
+        "width": 212
+      },
+      "id": "7aba0850-e7c7-430f-b166-20b4a1670cb9",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        120,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1meMfYHdH-Z6leWgnfsf6qAkFEzdV8_f9qVLZv_iRBic",
+          "mode": "list",
+          "cachedResultName": "GPS device stock in JB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1meMfYHdH-Z6leWgnfsf6qAkFEzdV8_f9qVLZv_iRBic/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 662741742,
+          "mode": "list",
+          "cachedResultName": "Raw",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1meMfYHdH-Z6leWgnfsf6qAkFEzdV8_f9qVLZv_iRBic/edit#gid=662741742"
+        },
+        "clear": "specificRange",
+        "range": "A2:Z"
+      },
+      "id": "b95c74e3-a813-4f24-ad00-4ba23f6da4dc",
+      "name": "Google Sheets4",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        580,
+        660
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1meMfYHdH-Z6leWgnfsf6qAkFEzdV8_f9qVLZv_iRBic",
+          "mode": "list",
+          "cachedResultName": "GPS device stock in JB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1meMfYHdH-Z6leWgnfsf6qAkFEzdV8_f9qVLZv_iRBic/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 662741742,
+          "mode": "list",
+          "cachedResultName": "Raw",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1meMfYHdH-Z6leWgnfsf6qAkFEzdV8_f9qVLZv_iRBic/edit#gid=662741742"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "updated_at"
+          ],
+          "schema": [
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "listing_id",
+              "displayName": "listing_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "host_name",
+              "displayName": "host_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "host_phone",
+              "displayName": "host_phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reg_no",
+              "displayName": "reg_no",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "deliver_address",
+              "displayName": "deliver_address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "6d8c8810-7450-45e1-ab5e-9dd2436c1564",
+      "name": "Google Sheets5",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        960,
+        660
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\n\nSELECT \nto_char(tdr.updated_at, 'YYYY-MM-DD HH24:MI')as updated_at,\ntdr.listing_id ,\n       concat(u.first_name,' ',u.last_name) AS host_name ,\n       concat(u.phone_country_code,u.phone_number) AS host_phone ,\n       l.registration_no AS reg_no ,\n        concat(ua.address_line_1,' ',ua.address_line_2,' ',ua.postal_code) AS deliver_address,\n       CASE\n           WHEN ll.state_region_province ~* '(petaling|selangor|kuala|putrajaya|subang|sembilan|KL)' THEN 'Klang Valley'\n           WHEN (ll.state_region_province ~* '(penang|pinang|kedah)'\n                 OR ll.address_line_2 ~* '(parit)') THEN 'Penang'\n            WHEN ll.state_region_province ~* '(perak)' THEN 'Ipoh'\n           WHEN ll.state_region_province ~* '(kinabalu|sabah|labuan)' THEN 'Kota Kinabalu'\n           WHEN ll.state_region_province ~* 'johor' THEN 'Johor Bahru'\n           ELSE ll.state_region_province\n       END AS city \n       \nFROM tracking_device_requests tdr\nLEFT JOIN users u ON u.id = tdr.user_id\nLEFT JOIN listings l ON l.id = tdr.listing_id\nLEFT JOIN listing_location ll ON ll.listing_id = tdr.listing_id\nLEFT JOIN user_address ua on ua.id = tdr.delivery_id\n\nWHERE tdr.status = 'requested'\n  AND ll.country = 'Malaysia'\n  AND l.deleted_at is null\n  AND l.status = 'approved'\norder by tdr.created_at desc\n\n",
+        "options": {}
+      },
+      "id": "a79a4960-1cdc-4417-be87-25a8d3904ae0",
+      "name": "Postgres2",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        760,
+        660
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## JB - Requested",
+        "height": 80,
+        "width": 212
+      },
+      "id": "c50fb9a6-cd14-4f11-80ff-436f2e57d724",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        120,
+        680
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1ffDMDAgFpQ2jgv3Nk18ViOT4cgW3xHQzdiewF--zBLk",
+          "mode": "list",
+          "cachedResultName": "[KK] GPS Request",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ffDMDAgFpQ2jgv3Nk18ViOT4cgW3xHQzdiewF--zBLk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Redash",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ffDMDAgFpQ2jgv3Nk18ViOT4cgW3xHQzdiewF--zBLk/edit#gid=0"
+        },
+        "clear": "specificRange",
+        "range": "A2:Z"
+      },
+      "id": "aca9470d-618e-4442-8da4-f5d61024f9f3",
+      "name": "Google Sheets6",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        580,
+        860
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1ffDMDAgFpQ2jgv3Nk18ViOT4cgW3xHQzdiewF--zBLk",
+          "mode": "list",
+          "cachedResultName": "[KK] GPS Request",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ffDMDAgFpQ2jgv3Nk18ViOT4cgW3xHQzdiewF--zBLk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Redash",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ffDMDAgFpQ2jgv3Nk18ViOT4cgW3xHQzdiewF--zBLk/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "updated_at"
+          ],
+          "schema": [
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "listing_id",
+              "displayName": "listing_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "host_name",
+              "displayName": "host_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "host_phone",
+              "displayName": "host_phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reg_no",
+              "displayName": "reg_no",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "deliver_address",
+              "displayName": "deliver_address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "RAW"
+        }
+      },
+      "id": "68c2d2eb-9cec-41ff-854c-0eed4b8f1402",
+      "name": "Google Sheets7",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        960,
+        860
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\n\nSELECT \nto_char(tdr.updated_at, 'YYYY-MM-DD HH24:MI')as updated_at,\ntdr.listing_id ,\n       concat(u.first_name,' ',u.last_name) AS host_name ,\n       concat(u.phone_country_code,u.phone_number) AS host_phone ,\n       l.registration_no AS reg_no ,\n        concat(ua.address_line_1,' ',ua.address_line_2,' ',ua.postal_code) AS deliver_address,\n       CASE\n           WHEN ll.state_region_province ~* '(petaling|selangor|kuala|putrajaya|subang|sembilan|KL)' THEN 'Klang Valley'\n           WHEN (ll.state_region_province ~* '(penang|pinang|kedah)'\n                 OR ll.address_line_2 ~* '(parit)') THEN 'Penang'\n            WHEN ll.state_region_province ~* '(perak)' THEN 'Ipoh'\n           WHEN ll.state_region_province ~* '(kinabalu|sabah|labuan)' THEN 'Kota Kinabalu'\n           WHEN ll.state_region_province ~* 'johor' THEN 'Johor Bahru'\n           ELSE ll.state_region_province\n       END AS city \n       \nFROM tracking_device_requests tdr\nLEFT JOIN users u ON u.id = tdr.user_id\nLEFT JOIN listings l ON l.id = tdr.listing_id\nLEFT JOIN listing_location ll ON ll.listing_id = tdr.listing_id\nLEFT JOIN user_address ua on ua.id = tdr.delivery_id\n\nWHERE tdr.status = 'requested'\n  AND ll.country = 'Malaysia'\n  AND l.deleted_at is null\n  AND l.status = 'approved'\norder by tdr.created_at desc\n\n",
+        "options": {}
+      },
+      "id": "8bdc677f-c64d-4269-b7e2-9ea3d97e9c82",
+      "name": "Postgres3",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        760,
+        860
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## KK - Requested",
+        "height": 80,
+        "width": 212
+      },
+      "id": "739faafa-c805-4d65-8f8c-ae34ed6832f1",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        120,
+        860
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-07-10T03:49:20.446Z",
+  "versionId": "6be72ba7-584f-4109-9e97-c8fc7d4b2a02"
+}
