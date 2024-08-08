@@ -1,0 +1,188 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "SendInBlue1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SendInBlue1": {
+      "main": [
+        [
+          {
+            "node": "SIB API1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-06-09T09:54:49.380Z",
+  "id": "89",
+  "name": "[TEMP] Entrepreneur Host EDM Blast 2023.06.09",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "upsert",
+        "email": "={{ $json.email }}",
+        "upsertAttributes": {
+          "upsertAttributesValues": [
+            {
+              "fieldName": "CPHOSTNAME",
+              "fieldValue": "={{ $json.user_name }}"
+            }
+          ]
+        }
+      },
+      "id": "77371a26-533e-4439-860d-dcfea119298d",
+      "name": "SendInBlue",
+      "type": "n8n-nodes-base.sendInBlue",
+      "typeVersion": 1,
+      "position": [
+        940,
+        -120
+      ],
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\"to\":[{\"email\":\"{{ $node[\"Google Sheets\"].json[\"EMAIL\"] }}\"}],\n\"templateId\":632\n}\n",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1240,
+        340
+      ],
+      "id": "5847b77c-76cf-4912-a05a-682216312341",
+      "retryOnFail": true,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {},
+      "id": "01416c07-35c1-43af-a07f-f1d0633113c6",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        600,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "191KROYJb-glhrtMWUYTUgr8JLZIlqPFhsqmLVgOoaQw",
+          "mode": "list",
+          "cachedResultName": "2023.05.28 - Commercial & Entrepreneur Host Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191KROYJb-glhrtMWUYTUgr8JLZIlqPFhsqmLVgOoaQw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 665148099,
+          "mode": "list",
+          "cachedResultName": "Existing EH eDM",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191KROYJb-glhrtMWUYTUgr8JLZIlqPFhsqmLVgOoaQw/edit#gid=665148099"
+        },
+        "options": {}
+      },
+      "id": "a1147a77-8aa8-4f4e-b176-6f3e089f3d11",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        840,
+        340
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "upsert",
+        "email": "={{ $json.EMAIL }}",
+        "upsertAttributes": {
+          "upsertAttributesValues": [
+            {
+              "fieldName": "CPHOSTNAME",
+              "fieldValue": "={{ $json.CPHOSTNAME }}"
+            }
+          ]
+        }
+      },
+      "id": "975656ef-21b4-4af1-92a5-d5b38dfe1508",
+      "name": "SendInBlue1",
+      "type": "n8n-nodes-base.sendInBlue",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        340
+      ],
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2023-04-20T14:46:13.712Z",
+      "updatedAt": "2023-04-20T14:46:13.712Z",
+      "id": "6",
+      "name": "One Time"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2023-06-09T09:59:05.152Z",
+  "versionId": "9165c8c7-e8d0-4242-a40b-b677ef7dfde8"
+}
