@@ -1,0 +1,824 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Dash Delivery Jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "[CT] - HSD Raya Booster",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dash Delivery Jobs": {
+      "main": [
+        [
+          {
+            "node": "IF unassigned within 6 hours",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF unassigned within 6 hours": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Function1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-04-03T09:57:54.187Z",
+  "id": "LjlUJ0zigB9ETrsx",
+  "name": "[KAVI][ADHOC] Raya 24 HSD Booster - Unassigned Dash Jobs",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1EfAeGb9yhNSQnQ-GOH7FzMy5BU4zHu8L0b2ldd5WWZ4",
+          "mode": "list",
+          "cachedResultName": "Raya 24 Host Self Delivery Booster Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1EfAeGb9yhNSQnQ-GOH7FzMy5BU4zHu8L0b2ldd5WWZ4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "TRACKER",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1EfAeGb9yhNSQnQ-GOH7FzMy5BU4zHu8L0b2ldd5WWZ4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "SMSSUCESS": "={{ $json.messages[0].status.name }}",
+            "HOSTPHONE": "={{ $json.messages[0].to }}",
+            "BOOKINGID": "={{ $('Function1').item.json.bookingid }}",
+            "BOOKINGREF": "={{ $('Function1').item.json.ref_no }}",
+            "CATEGORY": "UNASSIGNED_JOB",
+            "HOSTID": "={{ $('Function1').item.json.id }}",
+            "HOSTUUID": "={{ $('Postgres').item.json.uuid }}",
+            "HOSTEMAIL": "={{ $('Function1').item.json.email }}",
+            "DISTANCE": "={{ $('Function1').item.json.mileage }}",
+            "DELIVERYTYPE": "={{ $('Function1').item.json.type }}",
+            "JOBID": "={{ $('Function1').item.json.id }}",
+            "DATE": "={{ $('Function1').item.json.now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "DATE",
+              "displayName": "DATE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "BOOKINGID",
+              "displayName": "BOOKINGID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "JOBID",
+              "displayName": "JOBID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "BOOKINGREF",
+              "displayName": "BOOKINGREF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CATEGORY",
+              "displayName": "CATEGORY",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DELIVERYTYPE",
+              "displayName": "DELIVERYTYPE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HOSTID",
+              "displayName": "HOSTID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HOSTUUID",
+              "displayName": "HOSTUUID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HOSTEMAIL",
+              "displayName": "HOSTEMAIL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HOSTPHONE",
+              "displayName": "HOSTPHONE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DISTANCE",
+              "displayName": "DISTANCE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SMSSUCESS",
+              "displayName": "SMSSUCESS",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e1676f73-c8a0-4ae6-a613-79a153ec45fa",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1920,
+        260
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "16ab1487-fd50-4605-9136-0cb8332de74f",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        660,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"uniqueid\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['uniqueid']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        260
+      ],
+      "id": "b2976192-6210-4c20-9f27-8b10b8b7729b"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \nb.id AS bookingid\n, b.ref_no\n, b.status\n, b.created_at AS booking_created\n, b.request_start_at AS request_start\n, b.request_end_at AS request_end\n, $2 AS delivery_start\n, u.*\n, concat(u.phone_country_code, u.phone_number) as sms_phone\n, concat(b.ref_no, $3) as uniqueid\n, NOW()+'8 HOURS' as now\n, $3 AS type\n, $4 AS price\n, $5 AS mileage\nFROM bookings b \nLEFT JOIN listings l ON l.id = b.listing_id \nLEFT JOIN users u ON u.id = l.user_id \nWHERE b.id = $1",
+        "options": {
+          "queryReplacement": "={{ $json.reference_id }},  {{ $json.start_at }}, {{ $json.type }},  {{ $json.price }},  {{ $json.mileage }}"
+        }
+      },
+      "id": "af8074f0-0138-4865-8582-04f8b2211752",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1300,
+        260
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH dasht AS (\nSELECT *\n, concat(t.reference_id, '-', t.type) AS uniqueid\n, EXTRACT(EPOCH FROM (t.start_at - NOW())) / 3600 AS hours_left\n, NOW()+'8 HOURS' as now\n, ROW_NUMBER() OVER(PARTITION BY concat(t.reference_id, '-', t.type) ORDER BY t.created_at DESC) AS row_num\nFROM tasks t\nWHERE t.client = 'trevo'\nAND t.start_at BETWEEN '2024-04-08' AND '2024-04-21'\nand t.type IN ('trevo-d2d-export','trevo-d2d-import')\n--AND t.status = 'cancelled'\nORDER BY t.reference_id DESC\n)\n--unassigned\n--cancelled\n\nSELECT * \nfrom dasht \nWHERE row_num = 1 \n",
+        "options": {}
+      },
+      "id": "99c39514-c615-4818-8417-bd972f3c3224",
+      "name": "Dash Delivery Jobs",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        860,
+        260
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "31",
+          "name": "Dash DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.hours_left }}",
+              "value2": 6
+            }
+          ],
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "value2": "unassigned"
+            }
+          ]
+        }
+      },
+      "id": "4a1edaea-8fce-49a8-9de1-2fbdca71fb8c",
+      "name": "IF unassigned within 6 hours",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxvle.api.infobip.com/sms/2/text/advanced",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messages\": [\n    {\n      \"destinations\": [\n        {\n          \"to\": \"{{ $json[\"sms_phone\"] }}\"\n        }\n      ],\n      \"from\": \"Trevo\",\n      \"text\": \"RM0 TREVO: {{ $json[\"first_name\"] }}, no Dasher for booking {{ $json[\"ref_no\"] }}. Self-deliver and earn extra RM20/way. Choose Self-Deliver on the app now! T&C apply.\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "2c394a3d-9d24-45d5-a98c-eb3c0365031a",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1720,
+        260
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "20",
+          "name": "Infobip SMS [Kavi]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"uuid\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_Manual_Event\",\n            \"evtData\": {\n                \"Event_name\": \"hsd_raya24\",\n                \"hsd_ref\": \"{{ $json[\"ref_no\"] }}\"\n            }\n        }\n    ]\n}\n",
+        "options": {}
+      },
+      "id": "74cb974c-451a-4aff-8191-acf2a1be5112",
+      "name": "[CT] - HSD Raya Booster",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1720,
+        440
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11",
+    "saveDataSuccessExecution": "all"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds": [
+        "LLNMNPFPtrevo-d2d-export",
+        "1Q4W5V5Itrevo-d2d-import",
+        "REHXA9Q8trevo-d2d-export",
+        "68K91V08trevo-d2d-export",
+        "RIDREAQFtrevo-d2d-import",
+        "7CNVGV0Etrevo-d2d-import",
+        "1FDBAQE1trevo-d2d-import",
+        "2J6W7KUXtrevo-d2d-import",
+        "447C7KD1trevo-d2d-import",
+        "L6K0TG32trevo-d2d-import",
+        "EIYHPSJBtrevo-d2d-import",
+        "6HDMFWBLtrevo-d2d-export",
+        "PPUYR6XZtrevo-d2d-import",
+        "W36ST60Itrevo-d2d-import",
+        "3WTICWOJtrevo-d2d-import",
+        "0NA9B5P3trevo-d2d-export",
+        "I77OB3UUtrevo-d2d-export",
+        "6UZOJ82Mtrevo-d2d-export",
+        "MVL3WC3Mtrevo-d2d-export",
+        "WM00VUCOtrevo-d2d-export",
+        "BZNO8P4Dtrevo-d2d-export",
+        "I86626PHtrevo-d2d-export",
+        "69BAADAKtrevo-d2d-export",
+        "68V6IRU6trevo-d2d-export",
+        "II4UU148trevo-d2d-export",
+        "1FDBAQE1trevo-d2d-export",
+        "K7NSCO3Htrevo-d2d-export",
+        "6Z3QJ6RXtrevo-d2d-export",
+        "G7TGL969trevo-d2d-export",
+        "ZNM5Z6HKtrevo-d2d-export",
+        "I7QLLDATtrevo-d2d-export",
+        "9UZ17H38trevo-d2d-export",
+        "KMX9BHN2trevo-d2d-import",
+        "APYK4AOStrevo-d2d-export",
+        "G8I3HC7Strevo-d2d-import",
+        "S3GDV7WJtrevo-d2d-export",
+        "S2DNDM1Ktrevo-d2d-export",
+        "O32DO6IZtrevo-d2d-export",
+        "RPW40ZXMtrevo-d2d-export",
+        "4KJYI4XHtrevo-d2d-import",
+        "3WTICWOJtrevo-d2d-export",
+        "YC8KCZBJtrevo-d2d-export",
+        "NEHCTXFAtrevo-d2d-export",
+        "A6Z33R25trevo-d2d-export",
+        "0LLXCDH0trevo-d2d-export",
+        "MNGP67OLtrevo-d2d-export",
+        "V2XAALHAtrevo-d2d-export",
+        "B1X5XAV8trevo-d2d-export",
+        "X33K9UJCtrevo-d2d-import",
+        "84OFHTYGtrevo-d2d-export",
+        "RD2WTM5Mtrevo-d2d-export",
+        "ORAZ4LV0trevo-d2d-export",
+        "354XD8YKtrevo-d2d-import",
+        "W9XV2C4Jtrevo-d2d-export",
+        "25XF6YMItrevo-d2d-export",
+        "XGIJK8CJtrevo-d2d-import",
+        "RUYTFVD8trevo-d2d-import",
+        "NLH5UQLStrevo-d2d-import",
+        "V4R9VX8Dtrevo-d2d-export",
+        "S3XFNSFDtrevo-d2d-export",
+        "EZESC4I5trevo-d2d-import",
+        "HYZ2B1ONtrevo-d2d-export",
+        "OOAKF68Otrevo-d2d-export",
+        "GEO4PY1Qtrevo-d2d-import",
+        "354XD8YKtrevo-d2d-export",
+        "KEQ9YA6Strevo-d2d-export",
+        "MERM2OU6trevo-d2d-export",
+        "J1OCMEXWtrevo-d2d-export",
+        "LK6GDR58trevo-d2d-export",
+        "I9QBLCGLtrevo-d2d-import",
+        "3YCUXDUPtrevo-d2d-export",
+        "0I9GOJSBtrevo-d2d-export",
+        "NZD83MY8trevo-d2d-import",
+        "SKEG33VQtrevo-d2d-import",
+        "ZESJ57GWtrevo-d2d-import",
+        "1JA82XZAtrevo-d2d-import",
+        "Z53G4S3Utrevo-d2d-export",
+        "MONS0KN0trevo-d2d-export",
+        "03DKWW1Itrevo-d2d-export",
+        "YROAAH6Ftrevo-d2d-export",
+        "SPNNEKLCtrevo-d2d-export",
+        "GEO4PY1Qtrevo-d2d-export",
+        "1JA82XZAtrevo-d2d-export",
+        "UISLR7POtrevo-d2d-import",
+        "VAX7EVUDtrevo-d2d-import",
+        "VUTADWPMtrevo-d2d-import",
+        "NDQ21LA2trevo-d2d-export",
+        "HV0TT049trevo-d2d-import",
+        null,
+        "705341-trevo-d2d-export",
+        "692175-trevo-d2d-import",
+        "706248-trevo-d2d-import",
+        "706953-trevo-d2d-export",
+        "706802-trevo-d2d-export",
+        "706659-trevo-d2d-export",
+        "706816-trevo-d2d-export",
+        "705362-trevo-d2d-export",
+        "694313-trevo-d2d-import",
+        "705119-trevo-d2d-import",
+        "706743-trevo-d2d-export",
+        "706584-trevo-d2d-export",
+        "705189-trevo-d2d-export",
+        "706408-trevo-d2d-export",
+        "705298-trevo-d2d-import",
+        "703784-trevo-d2d-import",
+        "702267-trevo-d2d-import",
+        "697509-trevo-d2d-import",
+        "693714-trevo-d2d-import",
+        "706549-trevo-d2d-export",
+        "706539-trevo-d2d-export",
+        "706360-trevo-d2d-export",
+        "706431-trevo-d2d-export",
+        "691789-trevo-d2d-import",
+        "705467-trevo-d2d-export",
+        "687204-trevo-d2d-export",
+        "706411-trevo-d2d-export",
+        "706337-trevo-d2d-export",
+        "706398-trevo-d2d-export",
+        "706402-trevo-d2d-export",
+        "692290-trevo-d2d-import",
+        "702283-trevo-d2d-import",
+        "705047-trevo-d2d-export",
+        "706231-trevo-d2d-export",
+        "705642-trevo-d2d-export",
+        "706305-trevo-d2d-export",
+        "706248-trevo-d2d-export",
+        "706356-trevo-d2d-export",
+        "706122-trevo-d2d-export",
+        "705475-trevo-d2d-import",
+        "704914-trevo-d2d-import",
+        "705264-trevo-d2d-import",
+        "704211-trevo-d2d-import",
+        "691734-trevo-d2d-import",
+        "694576-trevo-d2d-import",
+        "693065-trevo-d2d-import",
+        "705739-trevo-d2d-import",
+        "702271-trevo-d2d-import",
+        "689733-trevo-d2d-import",
+        "695974-trevo-d2d-import",
+        "702695-trevo-d2d-import",
+        "704437-trevo-d2d-export",
+        "678372-trevo-d2d-import",
+        "687345-trevo-d2d-import",
+        "695598-trevo-d2d-import",
+        "705430-trevo-d2d-import",
+        "695307-trevo-d2d-export",
+        "693663-trevo-d2d-import",
+        "683585-trevo-d2d-import",
+        "704773-trevo-d2d-import",
+        "702661-trevo-d2d-import",
+        "701316-trevo-d2d-import",
+        "706103-trevo-d2d-export",
+        "705541-trevo-d2d-import",
+        "705030-trevo-d2d-import",
+        "706068-trevo-d2d-export",
+        "695724-trevo-d2d-import",
+        "706044-trevo-d2d-export",
+        "705824-trevo-d2d-export",
+        "705234-trevo-d2d-import",
+        "705878-trevo-d2d-export",
+        "705475-trevo-d2d-export",
+        "705708-trevo-d2d-export",
+        "696740-trevo-d2d-import",
+        "705589-trevo-d2d-export",
+        "702088-trevo-d2d-import",
+        "705606-trevo-d2d-export",
+        "701317-trevo-d2d-import",
+        "705996-trevo-d2d-export",
+        "705993-trevo-d2d-export",
+        "705963-trevo-d2d-export",
+        "697498-trevo-d2d-import",
+        "687165-trevo-d2d-import",
+        "695287-trevo-d2d-import",
+        "697608-trevo-d2d-import",
+        "704843-trevo-d2d-import",
+        "705395-trevo-d2d-import",
+        "704111-trevo-d2d-import",
+        "702859-trevo-d2d-export",
+        "694277-trevo-d2d-import",
+        "700861-trevo-d2d-import",
+        "705772-trevo-d2d-export",
+        "700982-trevo-d2d-import",
+        "698361-trevo-d2d-import",
+        "700613-trevo-d2d-import",
+        "705738-trevo-d2d-export",
+        "705739-trevo-d2d-export",
+        "702695-trevo-d2d-export",
+        "703610-trevo-d2d-export",
+        "705723-trevo-d2d-export",
+        "664177-trevo-d2d-import",
+        "705697-trevo-d2d-export",
+        "705702-trevo-d2d-export",
+        "705686-trevo-d2d-export",
+        "703985-trevo-d2d-export",
+        "701566-trevo-d2d-import",
+        "705674-trevo-d2d-export",
+        "705639-trevo-d2d-export",
+        "689259-trevo-d2d-import",
+        "705621-trevo-d2d-export",
+        "695052-trevo-d2d-import",
+        "704809-trevo-d2d-import",
+        "704111-trevo-d2d-export",
+        "693034-trevo-d2d-import",
+        "691923-trevo-d2d-import",
+        "705541-trevo-d2d-export",
+        "704604-trevo-d2d-export",
+        "692199-trevo-d2d-import",
+        "705571-trevo-d2d-export",
+        "655914-trevo-d2d-export",
+        "697492-trevo-d2d-export",
+        "705575-trevo-d2d-export",
+        "701900-trevo-d2d-import",
+        "701133-trevo-d2d-import",
+        "703609-trevo-d2d-export",
+        "696632-trevo-d2d-import",
+        "705550-trevo-d2d-export",
+        "705161-trevo-d2d-export",
+        "705562-trevo-d2d-export",
+        "705386-trevo-d2d-export",
+        "704811-trevo-d2d-export",
+        "703978-trevo-d2d-import",
+        "696839-trevo-d2d-import",
+        "705556-trevo-d2d-export",
+        "705147-trevo-d2d-export",
+        "705506-trevo-d2d-export",
+        "705395-trevo-d2d-export",
+        "705269-trevo-d2d-export",
+        "689697-trevo-d2d-import",
+        "683983-trevo-d2d-import",
+        "696855-trevo-d2d-import",
+        "701645-trevo-d2d-import",
+        "693825-trevo-d2d-import",
+        "704959-trevo-d2d-import",
+        "705248-trevo-d2d-export",
+        "699984-trevo-d2d-import",
+        "694370-trevo-d2d-import",
+        "703367-trevo-d2d-import",
+        "697942-trevo-d2d-import",
+        "690257-trevo-d2d-import",
+        "692681-trevo-d2d-import",
+        "692948-trevo-d2d-import",
+        "694085-trevo-d2d-import",
+        "699719-trevo-d2d-import",
+        "704417-trevo-d2d-export",
+        "705198-trevo-d2d-export",
+        "688609-trevo-d2d-import",
+        "704653-trevo-d2d-export",
+        "705193-trevo-d2d-export",
+        "700950-trevo-d2d-import",
+        "705223-trevo-d2d-export",
+        "705191-trevo-d2d-export",
+        "689362-trevo-d2d-import",
+        "691222-trevo-d2d-import",
+        "705197-trevo-d2d-export",
+        "699901-trevo-d2d-import",
+        "705042-trevo-d2d-export",
+        "698902-trevo-d2d-export",
+        "705153-trevo-d2d-export",
+        "699846-trevo-d2d-import",
+        "701342-trevo-d2d-export",
+        "691599-trevo-d2d-import",
+        "697519-trevo-d2d-export",
+        "703408-trevo-d2d-export",
+        "698680-trevo-d2d-export",
+        "705103-trevo-d2d-export",
+        "701368-trevo-d2d-export",
+        "701372-trevo-d2d-export",
+        "687862-trevo-d2d-export",
+        "679075-trevo-d2d-export",
+        "705096-trevo-d2d-export",
+        "704113-trevo-d2d-export",
+        "704988-trevo-d2d-export",
+        "695534-trevo-d2d-import",
+        "701417-trevo-d2d-import",
+        "703452-trevo-d2d-import",
+        "698878-trevo-d2d-import",
+        "697787-trevo-d2d-import",
+        "701577-trevo-d2d-import",
+        "700230-trevo-d2d-import",
+        "701039-trevo-d2d-import",
+        "701798-trevo-d2d-import",
+        "699773-trevo-d2d-import",
+        "704805-trevo-d2d-export",
+        "704786-trevo-d2d-export",
+        "701016-trevo-d2d-import",
+        "703825-trevo-d2d-export",
+        "704759-trevo-d2d-export",
+        "688346-trevo-d2d-import",
+        "704735-trevo-d2d-export",
+        "700632-trevo-d2d-import",
+        "692853-trevo-d2d-export",
+        "704533-trevo-d2d-export",
+        "699826-trevo-d2d-export",
+        "702462-trevo-d2d-import",
+        "700556-trevo-d2d-import",
+        "704634-trevo-d2d-export",
+        "703616-trevo-d2d-import",
+        "694791-trevo-d2d-export",
+        "690431-trevo-d2d-export",
+        "699964-trevo-d2d-export",
+        "701263-trevo-d2d-import",
+        "704003-trevo-d2d-import",
+        "703533-trevo-d2d-import",
+        "703334-trevo-d2d-export",
+        "700318-trevo-d2d-import",
+        "700447-trevo-d2d-import",
+        "702400-trevo-d2d-import",
+        "704259-trevo-d2d-import",
+        "704370-trevo-d2d-export",
+        "704319-trevo-d2d-export",
+        "703079-trevo-d2d-export",
+        "704279-trevo-d2d-export",
+        "701834-trevo-d2d-import",
+        "704259-trevo-d2d-export",
+        "695508-trevo-d2d-import",
+        "704003-trevo-d2d-export",
+        "691207-trevo-d2d-import",
+        "692987-trevo-d2d-export",
+        "687147-trevo-d2d-export",
+        "700870-trevo-d2d-export",
+        "694370-trevo-d2d-export",
+        "700683-trevo-d2d-export",
+        "699299-trevo-d2d-export",
+        "704196-trevo-d2d-export",
+        "692199-trevo-d2d-export",
+        "702088-trevo-d2d-export",
+        "693378-trevo-d2d-export",
+        "691222-trevo-d2d-export",
+        "693575-trevo-d2d-export",
+        "703398-trevo-d2d-export",
+        "692524-trevo-d2d-export",
+        "691599-trevo-d2d-export",
+        "702314-trevo-d2d-export",
+        "703739-trevo-d2d-export",
+        "702833-trevo-d2d-export",
+        "700985-trevo-d2d-export",
+        "701862-trevo-d2d-import",
+        "700448-trevo-d2d-export",
+        "702400-trevo-d2d-export",
+        "702788-trevo-d2d-export",
+        "702806-trevo-d2d-export",
+        "703782-trevo-d2d-export",
+        "701577-trevo-d2d-export",
+        "703684-trevo-d2d-export",
+        "698106-trevo-d2d-export",
+        "700861-trevo-d2d-export",
+        "700149-trevo-d2d-export",
+        "702472-trevo-d2d-import",
+        "698682-trevo-d2d-export",
+        "700982-trevo-d2d-export",
+        "701834-trevo-d2d-export",
+        "700489-trevo-d2d-export",
+        "701038-trevo-d2d-import",
+        "702212-trevo-d2d-import",
+        "696353-trevo-d2d-export",
+        "697435-trevo-d2d-export",
+        "702517-trevo-d2d-export",
+        "699519-trevo-d2d-import",
+        "698586-trevo-d2d-export",
+        "700402-trevo-d2d-export",
+        "700165-trevo-d2d-import",
+        "701953-trevo-d2d-import",
+        "701337-trevo-d2d-export",
+        "697077-trevo-d2d-export",
+        "702441-trevo-d2d-import",
+        "700556-trevo-d2d-export",
+        "703138-trevo-d2d-import",
+        "687994-trevo-d2d-export",
+        "697455-trevo-d2d-export",
+        "687165-trevo-d2d-export",
+        "699417-trevo-d2d-export",
+        "701588-trevo-d2d-export",
+        "702887-trevo-d2d-import",
+        "698021-trevo-d2d-export",
+        "690832-trevo-d2d-export",
+        "703547-trevo-d2d-export",
+        "703415-trevo-d2d-export",
+        "701613-trevo-d2d-export",
+        "698361-trevo-d2d-export",
+        "690905-trevo-d2d-export",
+        "703608-trevo-d2d-export",
+        "701439-trevo-d2d-export",
+        "691123-trevo-d2d-export",
+        "702447-trevo-d2d-import",
+        "701316-trevo-d2d-export",
+        "700549-trevo-d2d-import",
+        "693917-trevo-d2d-export",
+        "703273-trevo-d2d-export",
+        "703214-trevo-d2d-export",
+        "701455-trevo-d2d-export",
+        "701360-trevo-d2d-import",
+        "702742-trevo-d2d-export",
+        "698597-trevo-d2d-export",
+        "702112-trevo-d2d-import",
+        "702287-trevo-d2d-import",
+        "698898-trevo-d2d-import",
+        "700328-trevo-d2d-import",
+        "701218-trevo-d2d-import",
+        "697328-trevo-d2d-export",
+        "703169-trevo-d2d-export",
+        "703147-trevo-d2d-export",
+        "703154-trevo-d2d-export",
+        "703138-trevo-d2d-export",
+        "691813-trevo-d2d-export"
+      ]
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-04-20T14:46:13.712Z",
+      "updatedAt": "2023-04-20T14:46:13.712Z",
+      "id": "6",
+      "name": "One Time"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-04-23T09:43:51.504Z",
+  "versionId": "f170b318-5f2c-4480-96a8-49593709ddc7"
+}
