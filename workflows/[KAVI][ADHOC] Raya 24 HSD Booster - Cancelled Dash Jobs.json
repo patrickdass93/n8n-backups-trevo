@@ -1,0 +1,470 @@
+{
+  "active": false,
+  "connections": {
+    "Function1": {
+      "main": [
+        [
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Dash Delivery Jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF cancelled within 6 hours": {
+      "main": [
+        [
+          {
+            "node": "Function1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dash Delivery Jobs": {
+      "main": [
+        [
+          {
+            "node": "IF cancelled within 6 hours",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "[CT] - HSD Raya Booster",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-04-03T16:20:36.796Z",
+  "id": "hzsUIELoJrV79Jyu",
+  "name": "[KAVI][ADHOC] Raya 24 HSD Booster - Cancelled Dash Jobs",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT b.id AS bookingid\n, b.ref_no\n, b.status\n, b.created_at AS booking_created\n, b.request_start_at AS request_start\n, b.request_end_at AS request_end\n, $2 AS delivery_start\n, u.*\n, concat(u.phone_country_code, u.phone_number) as sms_phone\nFROM bookings b \nLEFT JOIN listings l ON l.id = b.listing_id \nLEFT JOIN users u ON u.id = l.user_id \nWHERE b.id = $1",
+        "options": {
+          "queryReplacement": "={{ $json.reference_id }},  {{ $json.start_at }}"
+        }
+      },
+      "id": "109276d2-d12f-49d5-8077-1fd4ccab78e3",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1600,
+        400
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "b3c51473-0365-4196-8f4f-3f43a912fea5",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"uniqueid\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['uniqueid']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1400,
+        400
+      ],
+      "id": "88cdc38d-4069-48f9-9344-04e095beeba0"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.hours_left }}",
+              "value2": 6
+            },
+            {
+              "value1": "={{ $json.hours_left }}",
+              "operation": "largerEqual"
+            }
+          ],
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "value2": "cancelled"
+            }
+          ]
+        }
+      },
+      "id": "5ff844e7-7264-4493-885a-97b622ae0703",
+      "name": "IF cancelled within 6 hours",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH dasht AS (\nSELECT *\n, concat(t.reference_id, '-', t.type) AS uniqueid\n, EXTRACT(EPOCH FROM (t.start_at - NOW())) / 3600 AS hours_left\n, NOW()+'8 HOURS' as now\n, ROW_NUMBER() OVER(PARTITION BY concat(t.reference_id, '-', t.type) ORDER BY t.created_at DESC) AS row_num\nFROM tasks t\nWHERE t.client = 'trevo'\nAND t.start_at BETWEEN '2024-04-08' AND '2024-04-21'\nand t.type IN ('trevo-d2d-export','trevo-d2d-import')\nAND (t.meta ->> 'memberBookingCancellation' != 'true' OR t.meta ->> 'memberBookingCancellation' IS NULL)\n--AND t.status = 'cancelled'\nORDER BY t.reference_id DESC\n)\n--unassigned\n--cancelled\n\nSELECT * \nfrom dasht \nWHERE row_num = 1 \n",
+        "options": {}
+      },
+      "id": "6d9b1d7a-59ba-4d5e-b2e1-147242d8189e",
+      "name": "Dash Delivery Jobs",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        980,
+        400
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "31",
+          "name": "Dash DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1EfAeGb9yhNSQnQ-GOH7FzMy5BU4zHu8L0b2ldd5WWZ4",
+          "mode": "list",
+          "cachedResultName": "Raya 24 Host Self Delivery Booster Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1EfAeGb9yhNSQnQ-GOH7FzMy5BU4zHu8L0b2ldd5WWZ4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "TRACKER",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1EfAeGb9yhNSQnQ-GOH7FzMy5BU4zHu8L0b2ldd5WWZ4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "SMSSUCESS": "={{ $json.messages[0].status.name }}",
+            "HOSTPHONE": "={{ $json.messages[0].to }}",
+            "BOOKINGID": "={{ $('Postgres1').item.json.bookingid }}",
+            "BOOKINGREF": "={{ $('Postgres1').item.json.ref_no }}",
+            "CATEGORY": "CANCELLED_JOB",
+            "HOSTID": "={{ $('Postgres1').item.json.id }}",
+            "HOSTUUID": "={{ $('Postgres1').item.json.uuid }}",
+            "HOSTEMAIL": "={{ $('Postgres1').item.json.email }}",
+            "DISTANCE": "={{ $('Function1').item.json.mileage }}",
+            "DELIVERYTYPE": "={{ $('Function1').item.json.type }}",
+            "JOBID": "={{ $('Function1').item.json.id }}",
+            "DATE": "={{ $('Function1').item.json.now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "DATE",
+              "displayName": "DATE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "BOOKINGID",
+              "displayName": "BOOKINGID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "JOBID",
+              "displayName": "JOBID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "BOOKINGREF",
+              "displayName": "BOOKINGREF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CATEGORY",
+              "displayName": "CATEGORY",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DELIVERYTYPE",
+              "displayName": "DELIVERYTYPE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HOSTID",
+              "displayName": "HOSTID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HOSTUUID",
+              "displayName": "HOSTUUID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HOSTEMAIL",
+              "displayName": "HOSTEMAIL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HOSTPHONE",
+              "displayName": "HOSTPHONE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DISTANCE",
+              "displayName": "DISTANCE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SMSSUCESS",
+              "displayName": "SMSSUCESS",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f5e72159-380d-488d-9b25-0ca14c3b7658",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        2020,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxvle.api.infobip.com/sms/2/text/advanced",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messages\": [\n    {\n      \"destinations\": [\n        {\n          \"to\": \"{{ $json[\"sms_phone\"] }}\" \n        }\n      ],\n      \"from\": \"Trevo\",\n      \"text\": \"RM0 TREVO: {{ $json[\"first_name\"] }}, no Dasher for booking {{ $json[\"ref_no\"] }}. Self-deliver and earn extra RM20/way. Choose Self-Deliver on the app now! T&C apply.\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "dc1f213f-12ae-478b-90b9-0d2aae21fd8a",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1820,
+        400
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "20",
+          "name": "Infobip SMS [Kavi]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxvle.api.infobip.com/sms/2/text/advanced",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messages\": [\n    {\n      \"destinations\": [\n        {\n          \"to\": \"{{ $json[\"sms_phone\"] }}\"\n        }\n      ],\n      \"from\": \"Trevo\",\n      \"text\": \"RM0 TREVO: {{ $json[\"first_name\"] }}, no Dasher for booking {{ $json[\"ref_no\"] }}. Self-deliver and earn extra RM20/way. Choose Self-Deliver on the app now! T&C apply.\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "87ec8fd6-26b0-4e3e-9211-2108ed59de77",
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1840,
+        140
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "20",
+          "name": "Infobip SMS [Kavi]"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"uuid\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_Manual_Event\",\n            \"evtData\": {\n                \"Event_name\": \"hsd_raya24\",\n                \"hsd_ref\": \"{{ $json[\"ref_no\"] }}\"\n            }\n        }\n    ]\n}\n",
+        "options": {}
+      },
+      "id": "0dca822e-6bf7-4a24-88f9-96a5affd47d3",
+      "name": "[CT] - HSD Raya Booster",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1820,
+        580
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11",
+    "saveDataSuccessExecution": "all"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds": [
+        "706676-trevo-d2d-export",
+        "706752-trevo-d2d-export",
+        "705642-trevo-d2d-import",
+        "687204-trevo-d2d-import",
+        "707754-trevo-d2d-export",
+        "705606-trevo-d2d-import",
+        "704437-trevo-d2d-import",
+        "706567-trevo-d2d-import",
+        "705736-trevo-d2d-import",
+        "701316-trevo-d2d-import",
+        "705605-trevo-d2d-export",
+        "698021-trevo-d2d-import",
+        "705153-trevo-d2d-import",
+        "704959-trevo-d2d-import",
+        "703177-trevo-d2d-import",
+        "700450-trevo-d2d-import",
+        "685438-trevo-d2d-import",
+        "699683-trevo-d2d-export",
+        "701932-trevo-d2d-import"
+      ]
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-04-20T14:46:13.712Z",
+      "updatedAt": "2023-04-20T14:46:13.712Z",
+      "id": "6",
+      "name": "One Time"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-04-23T09:43:52.482Z",
+  "versionId": "628c332b-ffa8-4119-8c8b-ba7490af2d41"
+}
