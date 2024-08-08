@@ -1,0 +1,334 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Chjeck execution_data Space",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Delete execution_data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete execution_data": {
+      "main": [
+        [
+          {
+            "node": "Vacuum execution_data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chjeck execution_data Space": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter1": {
+      "main": [
+        [
+          {
+            "node": "Delete execution_data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete execution_data1": {
+      "main": [
+        [
+          {
+            "node": "Vacuum execution_data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-11-28T03:30:30.745Z",
+  "id": "cy5xtZ4P1pW0Dw7o",
+  "name": "[KAVI] N8N Clear Data",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks"
+            }
+          ]
+        }
+      },
+      "id": "7f224334-285d-4905-9f21-23c6a1fa7a6e",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        460,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.count }}",
+              "operation": "largerEqual",
+              "value2": 3000
+            }
+          ]
+        }
+      },
+      "id": "2ed9570e-12fb-48fa-8f39-a81e8b9abb88",
+      "name": "Filter",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 1,
+      "position": [
+        900,
+        460
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "VACUUM FULL public.execution_data",
+        "options": {}
+      },
+      "id": "4641e656-1793-4538-810d-e9eba8c48aa1",
+      "name": "Vacuum execution_data",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        1340,
+        460
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "6Ns1IVbfFnPPey54",
+          "name": "N8N Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DELETE FROM public.execution_data",
+        "options": {}
+      },
+      "id": "60ba74e7-8d1f-4992-8b03-91f71c4fc694",
+      "name": "Delete execution_data",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        460
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "6Ns1IVbfFnPPey54",
+          "name": "N8N Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT COUNT(ed.\"executionId\"), MIN(ed.\"executionId\"),MAX(ed.\"executionId\")\nFROM execution_data ed",
+        "options": {}
+      },
+      "id": "35ba06ae-a3f2-4112-92b6-39a82e0a217f",
+      "name": "Chjeck execution_data Space",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        680,
+        460
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "6Ns1IVbfFnPPey54",
+          "name": "N8N Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH workflowdata_hogger AS (\n  SELECT \n    \"executionId\" AS exec_id,\n    \"workflowData\"::JSON->>'id' AS workflow_id\n  FROM execution_data ed\n  --WHERE ed.\"executionData\"::JSON->>'id' IN ('93')\n)\nSELECT workflow_id, \n  COUNT(exec_id) AS total_exec,\n  MAX(exec_id) AS max_exec_id\nFROM workflowdata_hogger  \nWHERE workflow_id IN ('93','81')\nGROUP BY workflow_id\n\nLIMIT 100\n",
+        "options": {}
+      },
+      "id": "6cb8d196-ef40-4206-a945-b6e10728181c",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        700,
+        740
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "6Ns1IVbfFnPPey54",
+          "name": "N8N Postgres"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.total_exec }}",
+              "operation": "largerEqual",
+              "value2": 100
+            }
+          ]
+        }
+      },
+      "id": "fb8ce87f-4da0-47fd-8107-680aff970f39",
+      "name": "Filter1",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 1,
+      "position": [
+        900,
+        680
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DELETE FROM public.execution_data\nwhere \"executionId\"  < {{ $json.max_exec_id - 100 }}\nAND \"workflowData\"::JSON->>'id' IN ('93','81')\n",
+        "options": {
+          "queryReplacement": "="
+        }
+      },
+      "id": "212a4217-3ad9-4b64-b602-38bafcfe9fa9",
+      "name": "Delete execution_data1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        680
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "6Ns1IVbfFnPPey54",
+          "name": "N8N Postgres"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "VACUUM FULL public.execution_data",
+        "options": {}
+      },
+      "id": "6bcb831d-00c0-49ea-9f7d-74e24ee2128f",
+      "name": "Vacuum execution_data1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        1340,
+        680
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "6Ns1IVbfFnPPey54",
+          "name": "N8N Postgres"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DELETE FROM public.execution_data\n--where \"executionId\"  < $1",
+        "options": {
+          "queryReplacement": "={{ $json.max-3000 }}"
+        }
+      },
+      "id": "05c77d08-298d-4141-a2d3-0f3b0daa3362",
+      "name": "Delete execution_data_original",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        200
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "6Ns1IVbfFnPPey54",
+          "name": "N8N Postgres"
+        }
+      },
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-11-28T06:22:09.206Z",
+      "updatedAt": "2023-11-28T06:22:09.206Z",
+      "id": "WpsHYyT3PE1K3S2D",
+      "name": "Core"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2023-12-15T07:56:44.300Z",
+  "versionId": "3dc05425-ac7c-4588-ba04-21926476efe0"
+}
