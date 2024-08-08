@@ -1,0 +1,143 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "SendInBlue1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SendInBlue1": {
+      "main": [
+        [
+          {
+            "node": "SendInBlue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-04-13T02:43:19.892Z",
+  "id": "60",
+  "name": "Saras temp SIB attribute update",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "4f3b18e2-6e05-40dc-87c1-34b615756457",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        700,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1bvibByjXy4q1sXXw12fO7KnLpi9xSPHZceExialpfJw",
+          "mode": "list",
+          "cachedResultName": "MONTHLY STATEMENT ATTRIBUTES (TREVO MY)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bvibByjXy4q1sXXw12fO7KnLpi9xSPHZceExialpfJw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 312899970,
+          "mode": "list",
+          "cachedResultName": "Sheet2 [Use this, thanks Kavi",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bvibByjXy4q1sXXw12fO7KnLpi9xSPHZceExialpfJw/edit#gid=312899970"
+        },
+        "options": {
+          "outputFormatting": {
+            "values": {
+              "general": "FORMATTED_VALUE",
+              "date": "FORMATTED_STRING"
+            }
+          }
+        }
+      },
+      "id": "ec0d39de-7043-435a-84c0-1bbb1b45c6f1",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        860,
+        280
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "attribute",
+        "attributeName": "={{ $node[\"Google Sheets\"].json.Attributes }}",
+        "attributeType": "text"
+      },
+      "id": "24cdb70d-f71a-4242-9693-70a73b7a8281",
+      "name": "SendInBlue",
+      "type": "n8n-nodes-base.sendInBlue",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        280
+      ],
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "attribute",
+        "operation": "delete",
+        "deleteAttributeName": "={{ $json.Attributes }}"
+      },
+      "id": "ccb1caaf-9d5a-4487-abb5-b7f2d4b981bc",
+      "name": "SendInBlue1",
+      "type": "n8n-nodes-base.sendInBlue",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        280
+      ],
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-04-16T06:34:15.237Z",
+  "versionId": "e48bd2a2-dc8b-4a77-a372-35ba221d3369"
+}
