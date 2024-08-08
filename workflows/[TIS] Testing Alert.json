@@ -1,0 +1,91 @@
+{
+  "active": false,
+  "connections": {
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Google Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-03-26T04:38:35.176Z",
+  "id": "Skh2OnzfL3sdIMJ9",
+  "name": "[TIS] Testing Alert",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "with kyc_status as (\nselect \na.user_id as uid\n,b.user_id\n,string_agg (distinct a.status, ', ') as agg\n,case when string_agg (distinct a.status, ', ') = 'approved' and count (a.kyc_type_id) = 4 then 'approved'\nwhen string_agg (distinct a.status, ', ') = 'rejected' and count (a.kyc_type_id) = 4 then 'rejected'\nwhen string_agg (distinct a.status, ', ') like '%rejected%' and count (a.kyc_type_id) = 4 then 'rejected'\nwhen string_agg (distinct a.status, ', ') like '%expired%' and count (a.kyc_type_id) = 4 then 'expired'\nwhen string_agg (distinct a.status, ', ') like '%incomplete%' and count (a.kyc_type_id) = 4 then 'incomplete'\nwhen string_agg (distinct a.status, ', ') like '%pending%' and count (a.kyc_type_id) = 4 then 'pending'\nwhen count (a.kyc_type_id) <4 then 'incomplete'\nelse null\nend as kyc_status\nfrom kyc as a \nleft join users as b on a.user_id = b.id \nwhere country = 'MY' \n--and a.updated_at between (now() - interval '60' day) and now()\n--and b.user_id = 2624031\ngroup by 1,2\n)\n, handled_base as (\nselect \nb.user_id \n,max (a.updated_at at TIME ZONE 'Asia/Kuala_Lumpur' ) as updated_at\nfrom \nkyc as a\nleft join users as b on a.user_id = b.id \nwhere\na.updated_at between (now() - interval '2' hour) and now() and \na.country = 'MY'\nand a.status in ('approved','rejected')\nand a.kyc_type_id <> '4f73b0e4-3f3b-4294-8462-6eca19f5dac9' --excluding LD\ngroup by 1\n)\n, ml_check as (\nselect \n--distinct a.user_id as uid, \nc.user_id,\ncase when b.cnt_updated_by = 1 and b.cnt_docs = 3 and cast ( is_ml_kyc as varchar (256)) = 'false' then 'manual'\nwhen b.cnt_updated_by = 1 and b.cnt_docs = 3 and cast ( is_ml_kyc as varchar (256)) = 'true' then 'ml'\nwhen b.cnt_updated_by > 1 then 'manual'\nelse 'pending' --incomplete docs update by agent\nend as updated_by\nfrom \nkyc as a\nleft join (\n\t\t\tselect \n\t\t\tuser_id ,\n\t\t\tcount (distinct is_ml_kyc) cnt_updated_by,\n\t\t\tcount (distinct kyc_type_id) cnt_docs\n\t\t\tfrom kyc \n\t\t\twhere \n\t\t\tcountry = 'MY'\n\t\t\tand \n\t\t\tkyc_type_id <> '4f73b0e4-3f3b-4294-8462-6eca19f5dac9' --excluding LD\n\t\t\tand status in ('approved', 'rejected')\n\t\t\tgroup by 1\n\t\t\t) as b on a.user_id = b.user_id \nleft join users as c on a.user_id = c.id\nwhere \na.country = 'MY' and\na.kyc_type_id <> '4f73b0e4-3f3b-4294-8462-6eca19f5dac9' --excluding LD\nand a.status in ('approved', 'rejected')\ngroup by 1,2\n)\n, backlog_hour as (\nselect \nto_char ((now()- interval '1' hour) AT TIME ZONE 'Asia/Kuala_Lumpur','dd-mm-YY HH:00:00') as time\n,sum (case when a.kyc_status = 'pending' then 1 else 0 end) as backlog_user_cnt \nfrom \nkyc_status as a\nwhere a.kyc_status = 'pending'\ngroup by 1\n)\n, handled_final as (\nselect\nto_char (a.updated_at,'dd-mm-YY HH:00:00') as time\n,sum (case when b.updated_by = 'manual' then 1 else 0 end) as manual_handled\n,sum (case when b.updated_by = 'ml' then 1 else 0 end) as ml_handled\nfrom \nhandled_base as a\nleft join ml_check as b on a.user_id = b.user_id \nleft join kyc_status as c on a.user_id = c.user_id \n--where c.kyc_status in ('approved','rejected')\ngroup by 1\n)\nselect \na.time \n,a.manual_handled\n,a.ml_handled \n,b.backlog_user_cnt\nfrom handled_final as a\nleft join backlog_hour as b on a.time = b.time \nwhere b.backlog_user_cnt is not null",
+        "options": {}
+      },
+      "id": "b5c76bf0-7e03-48e4-8c7f-d466d31e0e8f",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        440,
+        200
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "11",
+          "name": "KYC DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "a36c6d92-f7cd-488d-8c59-a39b81d5c0e1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "spaceId": "r",
+        "messageUi": {},
+        "additionalFields": {}
+      },
+      "id": "da53cfc9-4899-436f-b9d1-c8ed85fa1a4b",
+      "name": "Google Chat",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        660,
+        200
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "39",
+          "name": "General - alert@socar.my"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-03-27T03:26:53.676Z",
+  "versionId": "249b18ab-6453-48aa-a01c-8244715a729d"
+}
