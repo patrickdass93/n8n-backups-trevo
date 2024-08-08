@@ -1,0 +1,369 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Function1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "CENTRAL",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "NORTHERN",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SOUTHERN",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "EASTERN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-03-21T05:23:22.344Z",
+  "id": "44",
+  "name": "[KAVI] [SUPPLY] [SLACK] Listings with >= 3 Rejected Bookings Current Week Slack Reminder",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "1ac24544-8854-4265-afaf-a149569c7955",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        700,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect distinct A.listing_id,\nA.registration_no,\nA.city,\nA.user_id, \nA.host_name, \nA.email,\nA.phone_number, \nA.GB_link,\ncount(distinct A.ref_no)as rej_bookings\nfrom \n\t(select distinct b.ref_no, b.status, b.created_at::timestamp, l.id as listing_id, l.registration_no, \n\tcase when ll.city_id in (1) then 'KV'   \n\twhen ll.city_id in (2,12) then 'PGM' when ll.city_id in (48) then 'PGI'\n\twhen ll.city_id in (3,19,20,21) then 'KK'   when ll.city_id in (4,15) then 'JB' \n\twhen ll.city_id in (5) then 'IP'   when ll.city_id in (47) then 'NS'\n\twhen ll.city_id in (13) then 'LGK' else 'Others' end as City,\n\tl.user_id, \n\tconcat(u.first_name,' ',u.last_name)as host_name, \n\tu.email, \n\tu.phone_number,\n\tconcat('https://gearbox.trevo.my/trevo-listings/?id=',l.id) as GB_link\n\tfrom bookings b \n\tleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = b.listing_id\n\tleft join listings l on l.id = b.listing_id \n\tleft join users u on u.id = l.user_id \n\twhere b.status = 'rejected'\n\tand b.created_at::timestamp between (NOW() - interval'7 days') and NOW())A\ngroup by 1,2,3,4,5,6,7,8\nhaving count(distinct A.ref_no) >= '4'\norder by 9 desc",
+        "additionalFields": {}
+      },
+      "id": "784d8cd7-bf68-4b1b-803c-2ba81465c8f9",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        900,
+        280
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.city }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "KV"
+            },
+            {
+              "value2": "NS"
+            },
+            {
+              "value2": "PGI",
+              "output": 1
+            },
+            {
+              "value2": "PGM",
+              "output": 1
+            },
+            {
+              "value2": "LGK",
+              "output": 1
+            },
+            {
+              "value2": "IP",
+              "output": 1
+            },
+            {
+              "value2": "JB",
+              "output": 2
+            },
+            {
+              "value2": "KK",
+              "output": 3
+            }
+          ]
+        }
+      },
+      "id": "f3a5ca53-f357-4bb6-aa70-8799b1f9e8f2",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "#n8n-central-alerts",
+          "mode": "name"
+        },
+        "text": "=LISTINGS WITH REJECTION >=4 IN LAST 7 DAYS:\n\nGB Link: {{ $json[\"gb_link\"] }}\nRegistration No: {{ $json[\"registration_no\"] }}\nL7D Rej Bookings Count: {{$json[\"rej_bookings\"]}}\nHost ID: {{ $json[\"user_id\"] }}\nHost Name: {{ $json[\"host_name\"] }}",
+        "otherOptions": {}
+      },
+      "id": "6e1b5da2-46d2-4c9d-9616-b3774103b3bc",
+      "name": "CENTRAL",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [
+        1480,
+        40
+      ],
+      "credentials": {
+        "slackApi": {
+          "id": "24",
+          "name": "Slack - SMM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "#n8n-central-alerts",
+          "mode": "name"
+        },
+        "text": "=LISTINGS WITH REJECTION >=4 IN LAST 7 DAYS:\n\nGB Link: {{ $json[\"gb_link\"] }}\nRegistration No: {{ $json[\"registration_no\"] }}\nL7D Rej Bookings Count: {{$json[\"rej_bookings\"]}}\nHost ID: {{ $json[\"user_id\"] }}\nHost Name: {{ $json[\"host_name\"] }}",
+        "otherOptions": {}
+      },
+      "id": "6aadbd45-a313-4fcf-bfeb-9842ddd2f020",
+      "name": "NORTHERN",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [
+        1480,
+        220
+      ],
+      "credentials": {
+        "slackApi": {
+          "id": "24",
+          "name": "Slack - SMM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "#n8n-central-alerts",
+          "mode": "name"
+        },
+        "text": "=LISTINGS WITH REJECTION >=4 IN LAST 7 DAYS:\n\nGB Link: {{ $json[\"gb_link\"] }}\nRegistration No: {{ $json[\"registration_no\"] }}\nL7D Rej Bookings Count: {{$json[\"rej_bookings\"]}}\nHost ID: {{ $json[\"user_id\"] }}\nHost Name: {{ $json[\"host_name\"] }}",
+        "otherOptions": {}
+      },
+      "id": "f03cb2fd-ce37-4a22-97ca-8e52dce2d41c",
+      "name": "SOUTHERN",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [
+        1480,
+        400
+      ],
+      "credentials": {
+        "slackApi": {
+          "id": "24",
+          "name": "Slack - SMM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "#n8n-central-alerts",
+          "mode": "name"
+        },
+        "text": "=LISTINGS WITH REJECTION >=4 IN LAST 7 DAYS:\n\nGB Link: {{ $json[\"gb_link\"] }}\nRegistration No: {{ $json[\"registration_no\"] }}\nL7D Rej Bookings Count: {{$json[\"rej_bookings\"]}}\nHost ID: {{ $json[\"user_id\"] }}\nHost Name: {{ $json[\"host_name\"] }}",
+        "otherOptions": {}
+      },
+      "id": "720827aa-9752-44c9-ba6a-4bd41faef752",
+      "name": "EASTERN",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [
+        1480,
+        580
+      ],
+      "credentials": {
+        "slackApi": {
+          "id": "24",
+          "name": "Slack - SMM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"listing_id\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['listing_id']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        280
+      ],
+      "id": "907abbe2-ab2e-4acf-87dd-a2e0da11db04"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds": [
+        52317,
+        43319,
+        48542,
+        33294,
+        40359,
+        39019,
+        39673,
+        52181,
+        47556,
+        48222,
+        29418,
+        30397,
+        40969,
+        52907,
+        37520,
+        25332,
+        53697,
+        52667,
+        39776,
+        53988,
+        53597,
+        46429,
+        38011,
+        53715,
+        38202,
+        53733,
+        43258,
+        50738,
+        39013,
+        53366,
+        41041,
+        53497,
+        53546,
+        43810,
+        51636,
+        52438,
+        40990,
+        42764,
+        40293,
+        45416,
+        52881,
+        52422,
+        38773,
+        43447,
+        52172,
+        26174,
+        43230,
+        52278,
+        47438,
+        52244,
+        47046,
+        51539,
+        34137,
+        52022,
+        51001,
+        37994,
+        36334,
+        50466,
+        51290,
+        17251,
+        27101,
+        40670,
+        42935,
+        31947,
+        40065,
+        42131,
+        12516,
+        2970,
+        40505,
+        43392
+      ]
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-04-23T02:12:23.353Z",
+  "versionId": "29dae270-bbd4-4625-95fc-f1539b430890"
+}
