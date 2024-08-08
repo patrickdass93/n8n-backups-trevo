@@ -1,0 +1,232 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "IF1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Google Chat1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-06-09T03:51:03.062Z",
+  "id": "88",
+  "name": "[KAVI][Alert] Booking Request Alert Google Chat",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "5 8-22 * * *"
+            }
+          ]
+        }
+      },
+      "id": "b6340b3f-29a5-4831-a370-d80d17e2111c",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        600,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\nWITH hourly_stats AS (\n  SELECT \n    TO_CHAR(b.created_at, 'YYYY-WW') AS year_week,\n    EXTRACT(DOW FROM b.created_at) AS day_of_week,\n    EXTRACT(HOUR FROM b.created_at) AS hour_of_day,\n    COUNT(DISTINCT b.id) AS booking_requests\n  FROM bookings b\n  LEFT JOIN listings l ON l.id = b.listing_id\n  LEFT JOIN listing_location ll ON ll.listing_id = l.id \n  WHERE b.created_at BETWEEN (NOW() - INTERVAL '3 months') AND NOW() -- Filter data for the past 3 months\n    AND ll.country = 'Malaysia'\n  GROUP BY 1, 2, 3\n)\nSELECT \n  day_of_week,\n  hour_of_day,\n  STDDEV(booking_requests) AS standard_deviation,\n  CASE WHEN FLOOR(AVG(booking_requests) - 1.5 * STDDEV(booking_requests)) < 0 THEN 0 ELSE FLOOR(AVG(booking_requests) - 1.5 * STDDEV(booking_requests)) END AS lower_threshold,\n  CASE WHEN FLOOR(AVG(booking_requests) - 2.25 * STDDEV(booking_requests)) < 0 THEN 0 ELSE FLOOR(AVG(booking_requests) - 2.25 * STDDEV(booking_requests)) END AS lower_threshold_2,\n  COALESCE((\n    SELECT \n      booking_requests\n    FROM \n      hourly_stats\n    WHERE \n      hour_of_day = EXTRACT(HOUR FROM NOW() - INTERVAL '1 hour') -- Get only the latest hour\n      AND day_of_week = CASE WHEN EXTRACT(HOUR FROM NOW() - INTERVAL '1 hour') = 23 THEN EXTRACT(DOW FROM NOW() - INTERVAL '1 day') ELSE EXTRACT(DOW FROM NOW()) END -- Filter DOW today\n      AND year_week = TO_CHAR(NOW(), 'YYYY-WW')\n    LIMIT 1\n  ), 0) AS latest_booking_requests\nFROM \n  hourly_stats\nWHERE \n  day_of_week = EXTRACT(DOW FROM NOW()) -- Filter DOW today\n  AND hour_of_day = EXTRACT(HOUR FROM NOW() - INTERVAL '1 hour')\nGROUP BY \n  day_of_week, hour_of_day\nORDER BY \n  hour_of_day DESC\nLIMIT 1;\n",
+        "options": {
+          "largeNumbersOutput": "numbers"
+        }
+      },
+      "id": "8bc1730a-dc6a-46a4-bc77-3cb902e0423e",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.1,
+      "position": [
+        780,
+        320
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "value1": "={{ $json.latest_booking_requests }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "={{ $json.lower_threshold_2 }}"
+            },
+            {
+              "value2": "={{ $json.lower_threshold }}",
+              "output": 1
+            }
+          ]
+        }
+      },
+      "id": "528fd07c-d560-4307-8c22-14f02fb9f9d1",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAtIW1dxg",
+        "messageUi": {
+          "text": "=*[ALERT]* Booking Request Warning - Dropped Below 1st Band\n\nRequests: {{ $json[\"latest_booking_requests\"] }} \n1st Lower Band: {{ $json[\"lower_threshold\"] }}\n2nd Lower Band (Urgent): {{ $json[\"lower_threshold_2\"] }}"
+        },
+        "additionalFields": {}
+      },
+      "id": "3f0b20e9-0c32-43c0-a4bf-2212fd2f4212",
+      "name": "Google Chat",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        280
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAtIW1dxg",
+        "messageUi": {
+          "text": "=*[ALERT]* Booking Request Warning - Dropped Below 2nd Band *(URGENT)*\n\nRequests: {{ $json[\"latest_booking_requests\"] }} \n1st Lower Band: {{ $json[\"lower_threshold\"] }}\n2nd Lower Band (Urgent): {{ $json[\"lower_threshold_2\"] }}"
+        },
+        "additionalFields": {}
+      },
+      "id": "1364da93-228f-4b07-bcb4-12b5c6319f95",
+      "name": "Google Chat1",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        120
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.latest_booking_requests }}",
+              "operation": "isEmpty"
+            }
+          ]
+        }
+      },
+      "id": "93295deb-2a2f-4734-b1ab-47c2a3662604",
+      "name": "IF1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        940,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "5 08-22 * * *"
+            }
+          ]
+        }
+      },
+      "id": "a700bd14-314d-4ea6-b08a-af69f6c7ad54",
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        620,
+        100
+      ],
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11",
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-05-02T09:18:06.968Z",
+  "versionId": "c4a935eb-5c7e-4773-af8f-d3ae1e93672f"
+}
