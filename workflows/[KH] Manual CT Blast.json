@@ -1,0 +1,240 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Year End Incentive '23 PN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "MPV Availability Blast",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets2": {
+      "main": [
+        [
+          {
+            "node": "Demand EDM - Dec '23",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-12-11T02:34:05.873Z",
+  "id": "Ks9cf65YPUoNeHNS",
+  "name": "[KH] Manual CT Blast",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "77b6e8ae-b192-4f2a-8e05-d2642802f076",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        620,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1yUR2p2czbrGVFzurV5hXRhxIFP5Xou6i4XVcppXd4iU",
+          "mode": "list",
+          "cachedResultName": "20231220 - LM & OD Incentive Blast",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yUR2p2czbrGVFzurV5hXRhxIFP5Xou6i4XVcppXd4iU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yUR2p2czbrGVFzurV5hXRhxIFP5Xou6i4XVcppXd4iU/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "da62ee28-00e8-4766-a9f4-330dc6141310",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        780,
+        240
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Agj3Pr1-grjAoC8wl7ZvUg1eZ157onqKYUMJno30sAU",
+          "mode": "list",
+          "cachedResultName": "20231207 - December Rejection Analysis",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Agj3Pr1-grjAoC8wl7ZvUg1eZ157onqKYUMJno30sAU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1503521162,
+          "mode": "list",
+          "cachedResultName": "MPV Only Blast V2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Agj3Pr1-grjAoC8wl7ZvUg1eZ157onqKYUMJno30sAU/edit#gid=1503521162"
+        },
+        "options": {}
+      },
+      "id": "f3a3d260-1c71-4f1a-b857-28503ead532a",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        780,
+        -200
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"uuid\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_Manual_Event\",\n            \"evtData\": {\n                \"Event_name\": \"20231209_availability\"\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "8f857fcd-6b9d-4415-97f9-05bd9c71cc29",
+      "name": "MPV Availability Blast",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        940,
+        -200
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1FdoSvd2pj2-9aBosbAUV1OGmjGX4V4DZ5vCLrJqbZEU",
+          "mode": "list",
+          "cachedResultName": "20231218 - Demand EDM",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FdoSvd2pj2-9aBosbAUV1OGmjGX4V4DZ5vCLrJqbZEU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2134178908,
+          "mode": "list",
+          "cachedResultName": "Sheet8",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FdoSvd2pj2-9aBosbAUV1OGmjGX4V4DZ5vCLrJqbZEU/edit#gid=2134178908"
+        },
+        "options": {}
+      },
+      "id": "5f98ae9a-0685-4767-a750-311cb16d4d1e",
+      "name": "Google Sheets2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        780,
+        -40
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"uuid\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_Manual_Event\",\n            \"evtData\": {\n                \"Event_name\": \"20231218_demandedm\",\n                \"region_1\": \"{{ $json[\"region_1\"] }}\",\n                \"region_2\": \"{{ $json[\"region_2\"] }}\",\n                \"region_3\": \"{{ $json[\"region_3\"] }}\",\n                \"model_1\": \"{{ $json[\"model_1\"] }}\",\n                \"model_2\": \"{{ $json[\"model_2\"] }}\",\n                \"model_3\": \"{{ $json[\"model_3\"] }}\",\n                \"pot_1\": \"{{ $json[\"pot_1\"] }}\",\n                \"pot_2\": \"{{ $json[\"pot_2\"] }}\",\n                \"pot_3\": \"{{ $json[\"pot_3\"] }}\",\n                \"availability\": \"{{ $json[\"availability_2\"] }}\"\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "28fb5c44-7ca7-4d3a-a894-cb604b7e04d1",
+      "name": "Demand EDM - Dec '23",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        940,
+        -40
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"uuid\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_Manual_Event\",\n            \"evtData\": {\n                \"Event_name\": \"20231221_yearendincentive\"\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "05ac3e0a-6625-4431-afa2-9f69fdeafc1c",
+      "name": "Year End Incentive '23 PN",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        940,
+        240
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-12-21T03:09:58.819Z",
+  "versionId": "d56a3359-445b-4a46-b142-fbdea157b9dc"
+}
