@@ -1,0 +1,61 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Freshdesk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-09-27T03:05:07.455Z",
+  "id": "j3F04QM1FjVoPdtz",
+  "name": "My workflow 4",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "12fe8de5-8469-4163-a876-4eddd073a084",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        720,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "options": {}
+      },
+      "id": "40ef3f6d-c54d-45ba-84e5-76c85e0aa2cb",
+      "name": "Freshdesk",
+      "type": "n8n-nodes-base.freshdesk",
+      "typeVersion": 1,
+      "position": [
+        940,
+        280
+      ],
+      "credentials": {
+        "freshdeskApi": {
+          "id": "22",
+          "name": "SOCAR CS Freshdesk"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-09-27T03:05:07.455Z",
+  "versionId": "63ddc286-eac8-45de-89f4-77ce330a8c0c"
+}
