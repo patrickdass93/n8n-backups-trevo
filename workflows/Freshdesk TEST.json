@@ -1,0 +1,150 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Freshdesk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-09-27T08:24:24.826Z",
+  "id": "00OYvdARlBSkphIx",
+  "name": "Freshdesk TEST",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "addc1d3c-afe2-4804-8763-f9c6d0114cce",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        360,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "options": {
+          "updatedSince": "2023-09-16T16:00:00.000Z"
+        }
+      },
+      "id": "a6095757-7d58-4b93-b74f-246aad9819a5",
+      "name": "Freshdesk",
+      "type": "n8n-nodes-base.freshdesk",
+      "typeVersion": 1,
+      "position": [
+        520,
+        340
+      ],
+      "credentials": {
+        "freshdeskApi": {
+          "id": "22",
+          "name": "SOCAR CS Freshdesk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "16-27KxwxruR0HoCpZZJZngQk351WoOwAX7iol8_l7wo",
+          "mode": "list",
+          "cachedResultName": "20230927 - FreshDesk Test",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16-27KxwxruR0HoCpZZJZngQk351WoOwAX7iol8_l7wo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16-27KxwxruR0HoCpZZJZngQk351WoOwAX7iol8_l7wo/edit#gid=0"
+        }
+      },
+      "id": "5ae945d2-2ecd-4db1-925c-7648f54c7486",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        880,
+        340
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "16-27KxwxruR0HoCpZZJZngQk351WoOwAX7iol8_l7wo",
+          "mode": "list",
+          "cachedResultName": "20230927 - FreshDesk Test",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16-27KxwxruR0HoCpZZJZngQk351WoOwAX7iol8_l7wo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16-27KxwxruR0HoCpZZJZngQk351WoOwAX7iol8_l7wo/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "d71f2b28-0dd0-4b4e-95c2-72aff30d3b8f",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1040,
+        340
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-09-27T08:50:35.983Z",
+  "versionId": "01f6c23e-0b30-4652-9d9f-388298cb8cff"
+}
