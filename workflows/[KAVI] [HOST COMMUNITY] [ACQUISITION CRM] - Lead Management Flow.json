@@ -1,0 +1,116 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-04-06T02:18:18.510Z",
+  "id": "56",
+  "name": "[KAVI] [HOST COMMUNITY] [ACQUISITION CRM] - Lead Management Flow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "b60e4867-d2d4-4718-bc7e-871fe292f277",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        620,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo",
+          "mode": "list",
+          "cachedResultName": "Lead Compilation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 789909624,
+          "mode": "list",
+          "cachedResultName": "Compilation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit#gid=789909624"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRange",
+              "headerRow": 2,
+              "firstDataRow": 3
+            }
+          }
+        }
+      },
+      "id": "3790d999-f024-4ca1-9178-76c8565199cc",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        840,
+        280
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {}
+          ]
+        }
+      },
+      "id": "1bcabb5f-333c-4c2d-a2e4-544c41ba523b",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        280
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-04-10T02:36:25.823Z",
+  "versionId": "d4e3c22b-8ab5-428f-aefd-16f141f67053"
+}
