@@ -1,0 +1,181 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Avg Requests L3H v L6H",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Avg Requests L3H v L6H": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Google Chat - Requests/Hour",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-06-08T06:50:51.338Z",
+  "id": "85",
+  "name": "[Pat] Key Alerts",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "10 09-23 * * *"
+            }
+          ]
+        }
+      },
+      "id": "5d2fa02d-7e22-4e37-b393-4d578c708d89",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        120
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "84a0fd89-a8e5-43e4-aa01-a79731b99c3c",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=WITH\n    time_frame AS (\n        SELECT \n            GENERATE_SERIES(\n                    NOW()\n                    , NOW()::DATE + INTERVAL '1 DAY'\n                    , INTERVAL '1 hour'\n                ) date_series\n        )\n        \n    ,time_lab AS (\n        SELECT \n            DATE_PART('HOUR',date_series) as hour\n        FROM time_frame\n        )\n    \n    , my_bookings AS (\n        SELECT\n            EXTRACT(HOUR FROM b.created_at AT TIME ZONE 'Asia/Kuala_Lumpur')::SMALLINT AS booking_request_hour\n            , COUNT(DISTINCT b.id) as bookings\n        FROM bookings b\n        \n        WHERE 1=1\n            AND b.currency = 'myr'\n            AND b.created_at::DATE = NOW()::DATE\n        GROUP BY 1\n    )\n    \n    , l3h_bookings AS (\n        SELECT \n            booking_request_hour\n            , AVG(bookings) as bookings\n        FROM my_bookings b\n        WHERE 1=1\n            AND booking_request_hour BETWEEN \n                    EXTRACT(HOUR FROM NOW() AT TIME ZONE 'Asia/Kuala_Lumpur')::SMALLINT - 4 AND \n                    EXTRACT(HOUR FROM NOW() AT TIME ZONE 'Asia/Kuala_Lumpur')::SMALLINT - 1\n        GROUP BY 1\n    )\n    \n    , l6h_bookings AS (\n        SELECT \n            booking_request_hour\n            , AVG(bookings) as bookings\n        FROM my_bookings b\n        WHERE 1=1\n            AND booking_request_hour BETWEEN \n                    EXTRACT(HOUR FROM NOW() AT TIME ZONE 'Asia/Kuala_Lumpur')::SMALLINT - 7 AND \n                    EXTRACT(HOUR FROM NOW() AT TIME ZONE 'Asia/Kuala_Lumpur')::SMALLINT - 1\n        GROUP BY 1\n    )\n\nSELECT \n    EXTRACT(HOUR FROM NOW() AT TIME ZONE 'Asia/Kuala_Lumpur')::SMALLINT - 1 as last_hour\n    , ROUND(AVG(l3.bookings),1) AS l3h_avg_bookings\n    , ROUND(AVG(l6.bookings),1) AS l6h_avg_bookings\n    , ROUND((AVG(l6.bookings)/AVG(l3.bookings)-1)*100,1) AS variance\nFROM time_lab tf\nLEFT JOIN l3h_bookings l3 ON l3.booking_request_hour = tf.hour\nLEFT JOIN l6h_bookings l6 ON l6.booking_request_hour = tf.hour\nWHERE 1=1 \n    AND tf.hour BETWEEN 9 AND 23",
+        "additionalFields": {}
+      },
+      "id": "9dfe34f8-4e67-4d8a-829a-ad458b40e292",
+      "name": "Avg Requests L3H v L6H",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        120
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "trevodb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAtIW1dxg",
+        "messageUi": {
+          "text": "=There has been {{ $node[\"Avg Requests L3H v L6H\"].json[\"variance\"] }}% drop in requested bookings in the past 3 hours.\n\nAverage requests:\nL3H: {{ $node[\"Avg Requests L3H v L6H\"].json[\"l3h_avg_bookings\"] }}\nL6H: {{ $node[\"Avg Requests L3H v L6H\"].json[\"l6h_avg_bookings\"] }}"
+        },
+        "additionalFields": {}
+      },
+      "id": "18ca3423-fcb8-450a-a49d-cdffe79bbe75",
+      "name": "Google Chat - Requests/Hour",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        280,
+        0
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.variance }}",
+              "operation": "larger",
+              "value2": 25
+            }
+          ]
+        }
+      },
+      "id": "31115192-cbe0-43e2-bc5b-a3adfb0310f3",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        80,
+        120
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "f9e03137-6a47-4f13-964c-b5af6dd61f6f",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        280,
+        220
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "any",
+    "executionTimeout": 3600,
+    "errorWorkflow": "2",
+    "saveDataSuccessExecution": "all"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-03-31T06:52:09.032Z",
+      "updatedAt": "2023-03-31T06:52:09.032Z",
+      "id": "5",
+      "name": "Patrick"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2023-08-05T10:22:21.910Z",
+  "versionId": "47b0c58d-73c0-4568-bb96-671c5fae2ad3"
+}
