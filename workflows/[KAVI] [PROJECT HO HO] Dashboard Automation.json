@@ -1,0 +1,582 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres3": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres2": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres4": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres5": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets3": {
+      "main": [
+        [
+          {
+            "node": "Postgres5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2022-12-22T03:07:27.275Z",
+  "id": "14",
+  "name": "[KAVI] [PROJECT HO HO] Dashboard Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 6
+            }
+          ]
+        }
+      },
+      "id": "aaa40b80-a664-428c-9277-e9650ea6a5a6",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        620,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect\ncount(dates.ymd) as Total_Days_avai\nfrom listings l \nleft join listing_availability la on la.listing_id = l.id \nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = l.id\njoin (SELECT generate_series(timestamp '2022-12-16', timestamp '2023-01-02', interval '1 day')::date ymd) dates on \ndates.ymd between la.start_date::date and la.end_date::date\nwhere ll.country = 'Malaysia'",
+        "additionalFields": {}
+      },
+      "id": "8c299347-1d98-4ad7-9f96-fe3350392b32",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        800,
+        100
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "16",
+          "name": "trevodb_recreated"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect\nA.rej_booking,\nA.fuld_booking,\nA.fuld_listings,\nROUND(((A.fuld_booking::numeric/nullif(A.spec_req,0))*100),2) as AFR_rate,\nA.GMV\nfrom\n(select\ncount(distinct case when ((b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')) or (b.status in ('withdrawn','cancelled') and b.reason ~* '(host|owner|avai|car)') or (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null))) then b.id end) as spec_req,\ncount(distinct case when b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') then b.id end) as fuld_booking,\ncount(distinct case when b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') then b.listing_id end) as fuld_listings,\ncount(distinct case when (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) or (b.status in ('withdrawn', 'cancelled') and b.reason ~* '(host|owner|avai|car)') then b.id end) as rej_booking,\nsum(case when b.status in ('accepted', 'waiting_for_inspection', 'start_driving', 'return_car', 'completed') \nthen (case when d3.del_pickup_disc is null and d4.del_dropoff_disc is null then b.gross_amount \nelse b.gross_amount + coalesce(d1.del_pickup, 0) + coalesce(d2.del_dropoff, 0)\n- coalesce(d3.del_pickup_disc, 0) - coalesce(d4.del_dropoff_disc, 0) end) end) as GMV\nfrom bookings b \nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = b.listing_id\nleft join\n(select bl.booking_id, bl.amount as del_pickup from booking_lines bl where bl.slug = 'car-pick-up-fee') d1\non b.id = d1.booking_id\nleft join\n(select bl.booking_id, bl.amount as del_dropoff from booking_lines bl where bl.slug = 'car-drop-off-fee') d2\non b.id = d2.booking_id\nleft join\n(select bl.booking_id, bl.amount as del_pickup_disc from booking_lines bl where bl.slug = 'car-pick-up-discount-fee') d3\non b.id = d3.booking_id\nleft join\n(select bl.booking_id, bl.amount as del_dropoff_disc from booking_lines bl where bl.slug = 'car-drop-off-discount-fee') d4\non b.id = d4.booking_id\nwhere b.request_end_at >= '2022-12-16 00:00' and b.request_start_at <= '2023-01-02 23:59'\nand ll.country = 'Malaysia')A",
+        "additionalFields": {}
+      },
+      "id": "988ec825-0820-4a17-a561-8bf5b98f3fc2",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        800,
+        240
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "16",
+          "name": "trevodb_recreated"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect\nA.rej_booking as rej_hoho,\nA.fuld_booking as fuld_hoho,\nA.fuld_listings as fuld_listings_hoho,\nROUND(((A.fuld_booking::numeric/nullif(A.spec_req,0))*100),2) as AFR_rate_hoho,\nA.GMV as gmv_hoho\nfrom\n(select\ncount(distinct case when ((b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')) or (b.status in ('withdrawn','cancelled') and b.reason ~* '(host|owner|avai|car)') or (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null))) then b.id end) as spec_req,\ncount(distinct case when b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') then b.id end) as fuld_booking,\ncount(distinct case when b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') then b.listing_id end) as fuld_listings,\ncount(distinct case when (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) or (b.status in ('withdrawn', 'cancelled') and b.reason ~* '(host|owner|avai|car)') then b.id end) as rej_booking,\nsum(case when b.status in ('accepted', 'waiting_for_inspection', 'start_driving', 'return_car', 'completed') \nthen (case when d3.del_pickup_disc is null and d4.del_dropoff_disc is null then b.gross_amount \nelse b.gross_amount + coalesce(d1.del_pickup, 0) + coalesce(d2.del_dropoff, 0)\n- coalesce(d3.del_pickup_disc, 0) - coalesce(d4.del_dropoff_disc, 0) end) end) as GMV\nfrom bookings b \nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = b.listing_id\nleft join\n(select bl.booking_id, bl.amount as del_pickup from booking_lines bl where bl.slug = 'car-pick-up-fee') d1\non b.id = d1.booking_id\nleft join\n(select bl.booking_id, bl.amount as del_dropoff from booking_lines bl where bl.slug = 'car-drop-off-fee') d2\non b.id = d2.booking_id\nleft join\n(select bl.booking_id, bl.amount as del_pickup_disc from booking_lines bl where bl.slug = 'car-pick-up-discount-fee') d3\non b.id = d3.booking_id\nleft join\n(select bl.booking_id, bl.amount as del_dropoff_disc from booking_lines bl where bl.slug = 'car-drop-off-discount-fee') d4\non b.id = d4.booking_id\nwhere b.request_end_at >= '2022-12-16 00:00' and b.request_start_at <= '2023-01-02 23:59'\nand ll.country = 'Malaysia'\nand b.listing_id in ('37858',\n'19972',\n'32385',\n'39960',\n'63',\n'11352',\n'33675',\n'28724',\n'33819',\n'32482',\n'40186',\n'40569',\n'41785',\n'37706',\n'40835',\n'40896',\n'27722',\n'39373',\n'29539',\n'35991',\n'39170',\n'37105',\n'25174',\n'5135',\n'27519',\n'40890',\n'848',\n'6107',\n'6871',\n'9708',\n'17984',\n'27988',\n'28436',\n'30316',\n'31404',\n'31632',\n'33302',\n'33659',\n'33820',\n'34917',\n'36069',\n'36415',\n'36968',\n'37198',\n'37392',\n'38218',\n'38311',\n'38573',\n'38912',\n'38925',\n'39279',\n'39371',\n'39837',\n'39999',\n'40670',\n'40705',\n'41011',\n'41135',\n'9552',\n'37529',\n'39439',\n'27319',\n'29528',\n'35373',\n'39622',\n'36427',\n'37724',\n'39461',\n'40786',\n'33760',\n'37453',\n'39343',\n'10983',\n'28301',\n'32796',\n'35567',\n'36081',\n'40753',\n'1166',\n'39536',\n'1266',\n'34695',\n'40850',\n'14683',\n'34878',\n'39774',\n'40329',\n'40760',\n'35342',\n'36282',\n'38286',\n'40502',\n'40946',\n'840',\n'34798',\n'36721',\n'36956',\n'39717',\n'599',\n'642',\n'866',\n'867',\n'1167',\n'1168',\n'1169',\n'1655',\n'2038',\n'2157',\n'2183',\n'4751',\n'5085',\n'5107',\n'5763',\n'6298',\n'7368',\n'7718',\n'8126',\n'8309',\n'9625',\n'10752',\n'10847',\n'11593',\n'12617',\n'12818',\n'12864',\n'13915',\n'14204',\n'15477',\n'15677',\n'15846',\n'16726',\n'17151',\n'17462',\n'17840',\n'18799',\n'19008',\n'19252',\n'19288',\n'19995',\n'20035',\n'20046',\n'20211',\n'20600',\n'21203',\n'21205',\n'21210',\n'21214',\n'21217',\n'21219',\n'21248',\n'21296',\n'22527',\n'22570',\n'22669',\n'22917',\n'22940',\n'22969',\n'23122',\n'23237',\n'23826',\n'24531',\n'24942',\n'25011',\n'25099',\n'25129',\n'25293',\n'25442',\n'25601',\n'25623',\n'25661',\n'26252',\n'26261',\n'26309',\n'26805',\n'26952',\n'26974',\n'27043',\n'27121',\n'27357',\n'27387',\n'27438',\n'27452',\n'27509',\n'27715',\n'27750',\n'27915',\n'28185',\n'28455',\n'28722',\n'28915',\n'28958',\n'28986',\n'28999',\n'29119',\n'29135',\n'29362',\n'29376',\n'29394',\n'29435',\n'29448',\n'29490',\n'29609',\n'29658',\n'29727',\n'29772',\n'30397',\n'30398',\n'30729',\n'30748',\n'30837',\n'30909',\n'31066',\n'31146',\n'31155',\n'31162',\n'31379',\n'31715',\n'31784',\n'32342',\n'32406',\n'32507',\n'32528',\n'32529',\n'32621',\n'32681',\n'32908',\n'33041',\n'33376',\n'33551',\n'33607',\n'33612',\n'33615',\n'33639',\n'33801',\n'33803',\n'33806',\n'33826',\n'33895',\n'33920',\n'33926',\n'33927',\n'33942',\n'33975',\n'34005',\n'34028',\n'34273',\n'34320',\n'34334',\n'34416',\n'34461',\n'34462',\n'34679',\n'34700',\n'34706',\n'34796',\n'34851',\n'34930',\n'34931',\n'34949',\n'34967',\n'34971',\n'35009',\n'35016',\n'35022',\n'35073',\n'35103',\n'35128',\n'35153',\n'35154',\n'35221',\n'35272',\n'35383',\n'35434',\n'35498',\n'35561',\n'35654',\n'35767',\n'35933',\n'36174',\n'36175',\n'36178',\n'36274',\n'36334',\n'36365',\n'36424',\n'36426',\n'36473',\n'36506',\n'36507',\n'36519',\n'36521',\n'36583',\n'36616',\n'36670',\n'36708',\n'36718',\n'36751',\n'36775',\n'36791',\n'36804',\n'36827',\n'36838',\n'36894',\n'36923',\n'36963',\n'36988',\n'36989',\n'36990',\n'36991',\n'37008',\n'37059',\n'37063',\n'37099',\n'37199',\n'37213',\n'37221',\n'37239',\n'37278',\n'37292',\n'37314',\n'37333',\n'37393',\n'37397',\n'37433',\n'37462',\n'37527',\n'37531',\n'37542',\n'37575',\n'37589',\n'37631',\n'37632',\n'37685',\n'37720',\n'37726',\n'37728',\n'37792',\n'37809',\n'37816',\n'37880',\n'37948',\n'38025',\n'38029',\n'38030',\n'38092',\n'38099',\n'38129',\n'38151',\n'38189',\n'38194',\n'38202',\n'38250',\n'38267',\n'38322',\n'38375',\n'38384',\n'38405',\n'38439',\n'38442',\n'38444',\n'38447',\n'38473',\n'38580',\n'38581',\n'38582',\n'38592',\n'38599',\n'38651',\n'38672',\n'38692',\n'38716',\n'38717',\n'38786',\n'38814',\n'38816',\n'38829',\n'38842',\n'38852',\n'38875',\n'38907',\n'38910',\n'38936',\n'38938',\n'38960',\n'38980',\n'39005',\n'39014',\n'39062',\n'39086',\n'39102',\n'39120',\n'39127',\n'39140',\n'39149',\n'39151',\n'39247',\n'39267',\n'39269',\n'39325',\n'39327',\n'39346',\n'39374',\n'39375',\n'39388',\n'39492',\n'39505',\n'39506',\n'39514',\n'39555',\n'39563',\n'39567',\n'39601',\n'39612',\n'39641',\n'39670',\n'39673',\n'39721',\n'39734',\n'39738',\n'39786',\n'39838',\n'39851',\n'39873',\n'39889',\n'39933',\n'39948',\n'39966',\n'39982',\n'40005',\n'40012',\n'40028',\n'40044',\n'40049',\n'40052',\n'40116',\n'40126',\n'40158',\n'40209',\n'40220',\n'40246',\n'40312',\n'40324',\n'40341',\n'40348',\n'40370',\n'40377',\n'40400',\n'40401',\n'40417',\n'40434',\n'40453',\n'40522',\n'40528',\n'40550',\n'40609',\n'40629',\n'40641',\n'40675',\n'40692',\n'40694',\n'40706',\n'40707',\n'40709',\n'40735',\n'40737',\n'40763',\n'40775',\n'40806',\n'40808',\n'40814',\n'40834',\n'40837',\n'40849',\n'40856',\n'40857',\n'40871',\n'40873',\n'40883',\n'40885',\n'40886',\n'40888',\n'40889',\n'40892',\n'40903',\n'40941',\n'40942',\n'40976',\n'41012',\n'41023',\n'41051',\n'41053',\n'41058',\n'41059',\n'41087',\n'41127',\n'41148',\n'41154',\n'41172',\n'41196',\n'41203',\n'41231',\n'41234',\n'41249',\n'41264',\n'41268',\n'41325',\n'41336',\n'41439',\n'41515',\n'41548',\n'41550',\n'41586',\n'41610',\n'41629',\n'41642',\n'41664',\n'41706',\n'41708',\n'41740',\n'41742',\n'41749',\n'41750',\n'41753',\n'41783',\n'41842',\n'41952',\n'41973',\n'41974',\n'5155',\n'7774',\n'19217',\n'21964',\n'25164',\n'29265',\n'29459',\n'34676',\n'35416',\n'35444',\n'36585',\n'36651',\n'37001',\n'37688',\n'37838',\n'37895',\n'38193',\n'38861',\n'38874',\n'39333',\n'39435',\n'39437',\n'39976',\n'41105',\n'41656',\n'41915',\n'41972',\n'5381',\n'5383',\n'10981',\n'18980',\n'23121',\n'25550',\n'25902',\n'26258',\n'26404',\n'28628',\n'29710',\n'33630',\n'33698',\n'34442',\n'36079',\n'36263',\n'36745',\n'37256',\n'37483',\n'38015',\n'38379',\n'38713',\n'39660',\n'39693',\n'39829',\n'39911',\n'40146',\n'40221',\n'40242',\n'40593',\n'40634',\n'40773',\n'40779',\n'40963',\n'40965',\n'41031',\n'41139',\n'41516',\n'41862',\n'41918',\n'42064',\n'2497',\n'9884',\n'11381',\n'17005',\n'19207',\n'19496',\n'20013',\n'21778',\n'25448',\n'29533',\n'31750',\n'32141',\n'34085',\n'34248',\n'34835',\n'34871',\n'35310',\n'35522',\n'36849',\n'37112',\n'37865',\n'38434',\n'38522',\n'39378',\n'39912',\n'40036',\n'40307',\n'40668',\n'40776',\n'40832',\n'40921',\n'41070',\n'41125',\n'27829',\n'33287',\n'34854',\n'37922',\n'38027',\n'38458',\n'38553',\n'39637',\n'39692',\n'39701',\n'39915',\n'40649',\n'40739',\n'40777',\n'40977',\n'41156',\n'41537',\n'41608',\n'41953',\n'42089',\n'19353',\n'25833',\n'27474',\n'32446',\n'36144',\n'37011',\n'38345',\n'39489',\n'40570',\n'41093',\n'14686',\n'36613',\n'37352',\n'37713',\n'38560',\n'38795',\n'39226',\n'39699',\n'40531',\n'20220',\n'29287',\n'29402',\n'37998',\n'38884',\n'40000',\n'40113',\n'40185',\n'40435',\n'40582',\n'40608',\n'40611',\n'25627',\n'27497',\n'36200',\n'37568',\n'39415',\n'39730',\n'41242',\n'41635',\n'41762',\n'41858',\n'1740',\n'10982',\n'15497',\n'33164',\n'41152',\n'8572',\n'32750',\n'37073',\n'38899',\n'39349',\n'41259',\n'41501',\n'41763',\n'34172',\n'37943',\n'39741',\n'40727',\n'12899',\n'14675',\n'31278',\n'35550',\n'40594',\n'14236',\n'38671',\n'39691',\n'40915',\n'34338',\n'37782',\n'38924',\n'41295',\n'28487',\n'34911',\n'41062',\n'6279',\n'20054',\n'23956',\n'35565',\n'37941',\n'40533',\n'40538',\n'40754',\n'33762',\n'40831',\n'41061',\n'1116',\n'10988',\n'13357',\n'13558',\n'23254',\n'26306',\n'27379',\n'27501',\n'27551',\n'28526',\n'33083',\n'33360',\n'33505',\n'34530',\n'35255',\n'35412',\n'35599',\n'37237',\n'38116',\n'39006',\n'40327',\n'40642',\n'40695',\n'41040',\n'41724'))A",
+        "additionalFields": {}
+      },
+      "id": "b08234dc-e10b-4eab-a78d-f025c023d9ca",
+      "name": "Postgres2",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        800,
+        540
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "16",
+          "name": "trevodb_recreated"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect\ncount(dates.ymd) as Total_Days_avai_hoho\nfrom listings l \nleft join listing_availability la on la.listing_id = l.id \nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = l.id\njoin (SELECT generate_series(timestamp '2022-12-16', timestamp '2023-01-02', interval '1 day')::date ymd) dates on \ndates.ymd between la.start_date::date and la.end_date::date\nwhere ll.country = 'Malaysia'\nand l.id in ('37858',\n'19972',\n'32385',\n'39960',\n'63',\n'11352',\n'33675',\n'28724',\n'33819',\n'32482',\n'40186',\n'40569',\n'41785',\n'37706',\n'40835',\n'40896',\n'27722',\n'39373',\n'29539',\n'35991',\n'39170',\n'37105',\n'25174',\n'5135',\n'27519',\n'40890',\n'848',\n'6107',\n'6871',\n'9708',\n'17984',\n'27988',\n'28436',\n'30316',\n'31404',\n'31632',\n'33302',\n'33659',\n'33820',\n'34917',\n'36069',\n'36415',\n'36968',\n'37198',\n'37392',\n'38218',\n'38311',\n'38573',\n'38912',\n'38925',\n'39279',\n'39371',\n'39837',\n'39999',\n'40670',\n'40705',\n'41011',\n'41135',\n'9552',\n'37529',\n'39439',\n'27319',\n'29528',\n'35373',\n'39622',\n'36427',\n'37724',\n'39461',\n'40786',\n'33760',\n'37453',\n'39343',\n'10983',\n'28301',\n'32796',\n'35567',\n'36081',\n'40753',\n'1166',\n'39536',\n'1266',\n'34695',\n'40850',\n'14683',\n'34878',\n'39774',\n'40329',\n'40760',\n'35342',\n'36282',\n'38286',\n'40502',\n'40946',\n'840',\n'34798',\n'36721',\n'36956',\n'39717',\n'599',\n'642',\n'866',\n'867',\n'1167',\n'1168',\n'1169',\n'1655',\n'2038',\n'2157',\n'2183',\n'4751',\n'5085',\n'5107',\n'5763',\n'6298',\n'7368',\n'7718',\n'8126',\n'8309',\n'9625',\n'10752',\n'10847',\n'11593',\n'12617',\n'12818',\n'12864',\n'13915',\n'14204',\n'15477',\n'15677',\n'15846',\n'16726',\n'17151',\n'17462',\n'17840',\n'18799',\n'19008',\n'19252',\n'19288',\n'19995',\n'20035',\n'20046',\n'20211',\n'20600',\n'21203',\n'21205',\n'21210',\n'21214',\n'21217',\n'21219',\n'21248',\n'21296',\n'22527',\n'22570',\n'22669',\n'22917',\n'22940',\n'22969',\n'23122',\n'23237',\n'23826',\n'24531',\n'24942',\n'25011',\n'25099',\n'25129',\n'25293',\n'25442',\n'25601',\n'25623',\n'25661',\n'26252',\n'26261',\n'26309',\n'26805',\n'26952',\n'26974',\n'27043',\n'27121',\n'27357',\n'27387',\n'27438',\n'27452',\n'27509',\n'27715',\n'27750',\n'27915',\n'28185',\n'28455',\n'28722',\n'28915',\n'28958',\n'28986',\n'28999',\n'29119',\n'29135',\n'29362',\n'29376',\n'29394',\n'29435',\n'29448',\n'29490',\n'29609',\n'29658',\n'29727',\n'29772',\n'30397',\n'30398',\n'30729',\n'30748',\n'30837',\n'30909',\n'31066',\n'31146',\n'31155',\n'31162',\n'31379',\n'31715',\n'31784',\n'32342',\n'32406',\n'32507',\n'32528',\n'32529',\n'32621',\n'32681',\n'32908',\n'33041',\n'33376',\n'33551',\n'33607',\n'33612',\n'33615',\n'33639',\n'33801',\n'33803',\n'33806',\n'33826',\n'33895',\n'33920',\n'33926',\n'33927',\n'33942',\n'33975',\n'34005',\n'34028',\n'34273',\n'34320',\n'34334',\n'34416',\n'34461',\n'34462',\n'34679',\n'34700',\n'34706',\n'34796',\n'34851',\n'34930',\n'34931',\n'34949',\n'34967',\n'34971',\n'35009',\n'35016',\n'35022',\n'35073',\n'35103',\n'35128',\n'35153',\n'35154',\n'35221',\n'35272',\n'35383',\n'35434',\n'35498',\n'35561',\n'35654',\n'35767',\n'35933',\n'36174',\n'36175',\n'36178',\n'36274',\n'36334',\n'36365',\n'36424',\n'36426',\n'36473',\n'36506',\n'36507',\n'36519',\n'36521',\n'36583',\n'36616',\n'36670',\n'36708',\n'36718',\n'36751',\n'36775',\n'36791',\n'36804',\n'36827',\n'36838',\n'36894',\n'36923',\n'36963',\n'36988',\n'36989',\n'36990',\n'36991',\n'37008',\n'37059',\n'37063',\n'37099',\n'37199',\n'37213',\n'37221',\n'37239',\n'37278',\n'37292',\n'37314',\n'37333',\n'37393',\n'37397',\n'37433',\n'37462',\n'37527',\n'37531',\n'37542',\n'37575',\n'37589',\n'37631',\n'37632',\n'37685',\n'37720',\n'37726',\n'37728',\n'37792',\n'37809',\n'37816',\n'37880',\n'37948',\n'38025',\n'38029',\n'38030',\n'38092',\n'38099',\n'38129',\n'38151',\n'38189',\n'38194',\n'38202',\n'38250',\n'38267',\n'38322',\n'38375',\n'38384',\n'38405',\n'38439',\n'38442',\n'38444',\n'38447',\n'38473',\n'38580',\n'38581',\n'38582',\n'38592',\n'38599',\n'38651',\n'38672',\n'38692',\n'38716',\n'38717',\n'38786',\n'38814',\n'38816',\n'38829',\n'38842',\n'38852',\n'38875',\n'38907',\n'38910',\n'38936',\n'38938',\n'38960',\n'38980',\n'39005',\n'39014',\n'39062',\n'39086',\n'39102',\n'39120',\n'39127',\n'39140',\n'39149',\n'39151',\n'39247',\n'39267',\n'39269',\n'39325',\n'39327',\n'39346',\n'39374',\n'39375',\n'39388',\n'39492',\n'39505',\n'39506',\n'39514',\n'39555',\n'39563',\n'39567',\n'39601',\n'39612',\n'39641',\n'39670',\n'39673',\n'39721',\n'39734',\n'39738',\n'39786',\n'39838',\n'39851',\n'39873',\n'39889',\n'39933',\n'39948',\n'39966',\n'39982',\n'40005',\n'40012',\n'40028',\n'40044',\n'40049',\n'40052',\n'40116',\n'40126',\n'40158',\n'40209',\n'40220',\n'40246',\n'40312',\n'40324',\n'40341',\n'40348',\n'40370',\n'40377',\n'40400',\n'40401',\n'40417',\n'40434',\n'40453',\n'40522',\n'40528',\n'40550',\n'40609',\n'40629',\n'40641',\n'40675',\n'40692',\n'40694',\n'40706',\n'40707',\n'40709',\n'40735',\n'40737',\n'40763',\n'40775',\n'40806',\n'40808',\n'40814',\n'40834',\n'40837',\n'40849',\n'40856',\n'40857',\n'40871',\n'40873',\n'40883',\n'40885',\n'40886',\n'40888',\n'40889',\n'40892',\n'40903',\n'40941',\n'40942',\n'40976',\n'41012',\n'41023',\n'41051',\n'41053',\n'41058',\n'41059',\n'41087',\n'41127',\n'41148',\n'41154',\n'41172',\n'41196',\n'41203',\n'41231',\n'41234',\n'41249',\n'41264',\n'41268',\n'41325',\n'41336',\n'41439',\n'41515',\n'41548',\n'41550',\n'41586',\n'41610',\n'41629',\n'41642',\n'41664',\n'41706',\n'41708',\n'41740',\n'41742',\n'41749',\n'41750',\n'41753',\n'41783',\n'41842',\n'41952',\n'41973',\n'41974',\n'5155',\n'7774',\n'19217',\n'21964',\n'25164',\n'29265',\n'29459',\n'34676',\n'35416',\n'35444',\n'36585',\n'36651',\n'37001',\n'37688',\n'37838',\n'37895',\n'38193',\n'38861',\n'38874',\n'39333',\n'39435',\n'39437',\n'39976',\n'41105',\n'41656',\n'41915',\n'41972',\n'5381',\n'5383',\n'10981',\n'18980',\n'23121',\n'25550',\n'25902',\n'26258',\n'26404',\n'28628',\n'29710',\n'33630',\n'33698',\n'34442',\n'36079',\n'36263',\n'36745',\n'37256',\n'37483',\n'38015',\n'38379',\n'38713',\n'39660',\n'39693',\n'39829',\n'39911',\n'40146',\n'40221',\n'40242',\n'40593',\n'40634',\n'40773',\n'40779',\n'40963',\n'40965',\n'41031',\n'41139',\n'41516',\n'41862',\n'41918',\n'42064',\n'2497',\n'9884',\n'11381',\n'17005',\n'19207',\n'19496',\n'20013',\n'21778',\n'25448',\n'29533',\n'31750',\n'32141',\n'34085',\n'34248',\n'34835',\n'34871',\n'35310',\n'35522',\n'36849',\n'37112',\n'37865',\n'38434',\n'38522',\n'39378',\n'39912',\n'40036',\n'40307',\n'40668',\n'40776',\n'40832',\n'40921',\n'41070',\n'41125',\n'27829',\n'33287',\n'34854',\n'37922',\n'38027',\n'38458',\n'38553',\n'39637',\n'39692',\n'39701',\n'39915',\n'40649',\n'40739',\n'40777',\n'40977',\n'41156',\n'41537',\n'41608',\n'41953',\n'42089',\n'19353',\n'25833',\n'27474',\n'32446',\n'36144',\n'37011',\n'38345',\n'39489',\n'40570',\n'41093',\n'14686',\n'36613',\n'37352',\n'37713',\n'38560',\n'38795',\n'39226',\n'39699',\n'40531',\n'20220',\n'29287',\n'29402',\n'37998',\n'38884',\n'40000',\n'40113',\n'40185',\n'40435',\n'40582',\n'40608',\n'40611',\n'25627',\n'27497',\n'36200',\n'37568',\n'39415',\n'39730',\n'41242',\n'41635',\n'41762',\n'41858',\n'1740',\n'10982',\n'15497',\n'33164',\n'41152',\n'8572',\n'32750',\n'37073',\n'38899',\n'39349',\n'41259',\n'41501',\n'41763',\n'34172',\n'37943',\n'39741',\n'40727',\n'12899',\n'14675',\n'31278',\n'35550',\n'40594',\n'14236',\n'38671',\n'39691',\n'40915',\n'34338',\n'37782',\n'38924',\n'41295',\n'28487',\n'34911',\n'41062',\n'6279',\n'20054',\n'23956',\n'35565',\n'37941',\n'40533',\n'40538',\n'40754',\n'33762',\n'40831',\n'41061',\n'1116',\n'10988',\n'13357',\n'13558',\n'23254',\n'26306',\n'27379',\n'27501',\n'27551',\n'28526',\n'33083',\n'33360',\n'33505',\n'34530',\n'35255',\n'35412',\n'35599',\n'37237',\n'38116',\n'39006',\n'40327',\n'40642',\n'40695',\n'41040',\n'41724')",
+        "additionalFields": {}
+      },
+      "id": "db4a5103-a74b-4b52-8134-5ca5212055f7",
+      "name": "Postgres3",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        800,
+        400
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "16",
+          "name": "trevodb_recreated"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1w1vhZx-1SOTXE9BCMmw3ljCIQ3xp6JIqHQLMNKxZ4aw",
+          "mode": "list",
+          "cachedResultName": "Share The Joy! Opt In (Project Ho-Ho Responses)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w1vhZx-1SOTXE9BCMmw3ljCIQ3xp6JIqHQLMNKxZ4aw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1050182923,
+          "mode": "list",
+          "cachedResultName": "N8N Import",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w1vhZx-1SOTXE9BCMmw3ljCIQ3xp6JIqHQLMNKxZ4aw/edit#gid=1050182923"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "timestamp",
+        "options": {}
+      },
+      "id": "9dc175b9-4330-4cd0-889d-0b68e00f34f5",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1640,
+        60
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "44575e2b-e83b-42cd-9ad0-93dfec6a5f73",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "6f00e251-2fbe-48de-aef7-dc32223d1c4d",
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "e2f089a8-e6ba-49b3-a23e-112b5c9414d4",
+      "name": "Merge2",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        1220,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "271f8f85-73bd-41f9-a383-a76794514fa7",
+      "name": "Merge3",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "timestamp",
+              "value": "={{ $json[\"Year\"] }}"
+            }
+          ],
+          "number": [
+            {
+              "name": "timestamp2",
+              "value": "={{ $json[\"Readable date\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fe3fcb80-a047-4a8e-9b39-1dc41e76d621",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        800,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect distinct l.id, \nl.registration_no, \nm.name as model,\ncase when ll.city_id in (1) then '1. KV'   \nwhen ll.city_id in (2,12) then '2. PG'\nwhen ll.city_id in (3,19,20,21) then '3. KK'  \nwhen ll.city_id in (4,15) then '4. JB' \nwhen ll.city_id in (5) then '5. IP' \nwhen ll.city_id in (47) then '6. NS'\nwhen ll.city_id in (13) then '7. LGK'\nelse '8. Others' end as city,\nl.user_id, \nconcat(u.first_name, ' ',u.last_name)as host_name, \nu.email, \nu.phone_number,\ncase when bj.rej_booking is null then '0' else bj.rej_booking end as rej_booking,\nla.avai_days,\ncase when bc.fuld_booking is null then '0' else bc.fuld_booking end as fuld_booking,\ncase when fd.fuld_days is null then '0' else fd.fuld_days end as fuld_days\nfrom listings l \nleft join users u on u.id = l.user_id\nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = l.id\nleft join models m on m.id = l.model_id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) or (b.status in ('withdrawn', 'cancelled') and b.reason ~* '(host|owner|avai|car)') then b.ref_no end) as rej_booking\n        from bookings b \n        where b.request_end_at >= '2022-12-16 00:00' and b.request_start_at <= '2023-01-02 23:59'\n        group by 1)bj\n        on bj.listing_id = l.id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when b.status in ('completed','start_driving','waiting_for_inspection', 'return_car','accepted') then b.id end) as fuld_booking\n        from bookings b \n        where b.request_end_at >= '2022-12-16 00:00' and b.request_start_at <= '2023-01-02 23:59'\n        group by 1)bc\n        on bc.listing_id = l.id\n--\nleft join \n        (select l.id,\n        count(dates.ymd) as avai_days\n        from listings l\n        left join listing_availability la on la.listing_id=l.id\n        left join (SELECT generate_series(timestamp '2022-12-16', timestamp '2023-01-02', interval '1 day')::date ymd) dates on \n        dates.ymd between la.start_date::date and la.end_date::date\n        where l.status='approved' and l.deleted_at is null \n        GROUP BY 1)la\n        on la.id = l.id\n--\nleft join\n                (select distinct b.listing_id,\n                count(distinct dates.ymd) as fuld_days\n                from bookings b \n                left join listing_location ll on ll.listing_id = b.listing_id \n                join (SELECT generate_series(timestamp '2022-12-16', '2023-01-02' , interval '1 day')::date as ymd) dates \n                on dates.ymd between b.request_start_at::date and b.request_end_at::date\n                where b.status in ('completed','start_driving','waiting_for_inspection', 'return_car','accepted')\n                and ll.country = 'Malaysia'\n                group by 1)fd\n                on fd.listing_id = l.id\nwhere l.status = 'approved'\nand l.deleted_at is null\nand l.registration_no in ('TEST123',\n'NDF4198',\n'AMF5732',\n'W5029U',\n'VEN7757',\n'DEH1781',\n'WC2110G',\n'RT2667',\n'NDJ3994',\n'PLJ2419',\n'BRB760',\n'PMQ2919',\n'VHW7864',\n'SAC9115E',\n'VGV5448',\n'WXY1233',\n'WA9874L',\n'W6322U',\n'VK3651',\n'SYU4286',\n'VAA257',\n'ALT316',\n'PLR4335',\n'AMD722',\n'VEF4418',\n'VBJ6646',\n'KV6649E',\n'PMT8816',\n'JVK4005',\n'TCE4579',\n'SYV152',\n'JTN315',\n'KFL336',\n'SYU8932',\n'VEK8541',\n'BMW2522',\n'VAH903',\n'VHV4299',\n'AKJ8251',\n'AKX989',\n'RT6046',\n'ALD1170',\n'PNF2786',\n'PMV3547',\n'PNT3116',\n'VCX3664',\n'RY2118',\n'VFN1978',\n'VHG7106',\n'VGM550',\n'PLU2599',\n'VBF2002',\n'VCA493',\n'VN6372',\n'SYA6533',\n'VEM5981',\n'JTV190',\n'BNM645',\n'VDS1669',\n'DDY1505',\n'QM812K',\n'PNB4086',\n'VBB1124',\n'TBR8737',\n'VCY6362',\n'PPN1447',\n'TTB6482',\n'VHT7967',\n'XX654',\n'AKM8923',\n'KFF1607',\n'RAE7257',\n'PPM9517',\n'VEV3470',\n'WC927F',\n'VAJ7290',\n'NDR228',\n'VJR3279',\n'KV2015E',\n'VEN1009',\n'SU7229F',\n'VCC2260',\n'ALF2470',\n'PPQ3270',\n'VJV1181',\n'KV962E',\n'SYU9517',\n'VDT8946',\n'UM5001',\n'JTC8348',\n'VES7776',\n'SYV625',\n'SYV617',\n'WB1187S',\n'SYP3157',\n'VM7840',\n'PPF2888',\n'VJJ3024',\n'VBT5631',\n'E4430',\n'MBU12',\n'VBF5502',\n'SYW605',\n'SAB6632T',\n'VAW8372',\n'SAC2862E',\n'BQX6220',\n'VJJ9405',\n'JQQ1559',\n'PQJ5437',\n'VJA409',\n'AMK1141',\n'BPG6993',\n'W8634V',\n'SY137',\n'PQH6367',\n'SU6989G',\n'VHK149',\n'VDG2751',\n'PME9784',\n'JVA5501',\n'VAN8782',\n'VFY360',\n'VDQ4069',\n'AMN5367',\n'RAN3511',\n'QRM763',\n'VJQ1762',\n'SYS2336',\n'WYY8003',\n'BPJ7700',\n'UM8684',\n'SYR7252',\n'VBL5011',\n'ALH2126',\n'KV5683D',\n'VEJ5140',\n'FE6501',\n'JVH7252',\n'SYJ2',\n'JRS4171',\n'QS310J',\n'SYV1246',\n'VBV7066',\n'WVT9696',\n'VJK7729',\n'WA4905V',\n'ALC5082',\n'BPF7539',\n'JSB6697',\n'BNB6229',\n'MCY1338',\n'IIUM7769',\n'SK3829B',\n'UUM6337',\n'VHJ6203',\n'JRD2924',\n'BNE5203',\n'VCV9540',\n'SYF5553',\n'AMP2089',\n'VDS3868',\n'VHC326',\n'SB9595F',\n'JSD4166',\n'PKX8378',\n'SMA1008',\n'SYD2647',\n'WA2365W',\n'VBF9686',\n'BRD4619',\n'BQY2280',\n'MDN9191',\n'VGA3122',\n'JSX2837',\n'VDY750',\n'WA7793E',\n'VGM860',\n'VHT4267',\n'VHQ1387',\n'JTB8537',\n'VDB9250',\n'WC1147B',\n'VFJ6558',\n'VAU3845',\n'JSB4905',\n'VGA544',\n'SY1251',\n'VDJ5888',\n'VAA123',\n'VHU5728',\n'UU169',\n'KV3319E',\n'AJK25',\n'SU1102J',\n'JQT9292',\n'SAB2191P',\n'VEW3228',\n'VEW3228',\n'SB244E',\n'PLK8265',\n'BAMBEE42',\n'VCN6755',\n'PPK6521',\n'SMF9831',\n'PPU6746',\n'PMN8472',\n'PMP1293',\n'VBQ2963',\n'PLU30',\n'SWF3993',\n'SYA7458',\n'UTM60',\n'PLN4711',\n'VS6541',\n'PQL7250',\n'VHE7532',\n'SMF8227',\n'SU3923H',\n'AMP3927',\n'SWD2362',\n'SYQ6882',\n'NDM9293',\n'VBW8858',\n'SYU6304',\n'LG6862',\n'SYR7756',\n'SYU4191',\n'SAB1416W',\n'W9465L',\n'SAC8584A',\n'SYE9655',\n'SAA1045J',\n'SAB375T',\n'BPW1755',\n'VBR4362',\n'QS3868B',\n'PNU5266',\n'PP808',\n'JVG6590',\n'KV3748E',\n'SAB9895W',\n'SYV3751',\n'SYS9189',\n'PLQ7984',\n'TCC4900',\n'SYU8030',\n'QAB9290C',\n'QM3699A',\n'VJF7444',\n'VDJ4649',\n'SB9790F',\n'SYV1817',\n'SYK1124',\n'JVK4005',\n'WB2005F',\n'SU3834G',\n'SD8298T',\n'PLE9040',\n'VP5486',\n'G1M9465',\n'KV3774E',\n'KV4044E',\n'KV2405E',\n'KV6696E',\n'TCP4174',\n'KV8487E',\n'KV4380D',\n'KV4892D',\n'KV3736E',\n'KV7170D',\n'KV8440E',\n'VAD5421',\n'KEJ6591',\n'VFT8301',\n'WC5135G',\n'BPX8828',\n'VAB5639',\n'VN7676',\n'JQJ144',\n'SB9309C',\n'PMC9183',\n'VJB7231',\n'PLV212',\n'KV4887E',\n'KV3849E',\n'VCM9862',\n'VDK3715',\n'VJQ7519',\n'VAV9642',\n'WXV7298',\n'SYV1734',\n'SMD8500',\n'ALB1104',\n'PMQ6164',\n'PQA8015',\n'PMA5765',\n'PNL4154',\n'SB1368E',\n'VDN9073',\n'VK4945',\n'PMF884',\n'PMR9881',\n'JVL9881',\n'PPD9881',\n'PNH3173',\n'JTK4036',\n'MDG7035',\n'PNU3135',\n'SYQ6628',\n'PMC7598',\n'VCE5343',\n'VHW2653',\n'KV9678E',\n'VHA9312',\n'VAN6784',\n'BNQ5155',\n'VCM4397',\n'G2459',\n'VS6864',\n'JUF797',\n'SY3953',\n'VJB2318',\n'TCA3643',\n'VCK9391',\n'WC7906R',\n'VEQ1516',\n'KEX6676',\n'SAB8688X',\n'WWW9301',\n'VDF2392',\n'SSA1176A',\n'SU1176J',\n'PQE9913',\n'VU3695',\n'SD9013N',\n'ALG3347',\n'SYP8329',\n'WA271V',\n'ST5640Y',\n'SYP681',\n'SYR8853',\n'PMQ5308',\n'VHC326',\n'VBA2085',\n'WC9578P',\n'SMB97',\n'BDR7769',\n'KFA7986',\n'PKT6789',\n'WA8893G',\n'AMH4395',\n'SAC9868B',\n'NDH882',\n'W273V',\n'SS5033X',\n'RY2118',\n'WB2467E',\n'VEL8041',\n'SAC9262E',\n'VGJ2166',\n'VAR5911',\n'W5762V',\n'BMW3801',\n'SMF3280',\n'SMG2351',\n'W202P',\n'BNY1460',\n'AKD4867',\n'VHW2959',\n'SWA8608',\n'PMY7137',\n'CEH63',\n'SYU6304',\n'JSK474',\n'MALAYSIA634',\n'VHK115',\n'SK6515B',\n'BQL4513',\n'SYV582',\n'VJQ6651',\n'BAMBEE42',\n'BQY4706',\n'BQF720',\n'PMY7138',\n'W9850S',\n'PMP2649',\n'SWB8116',\n'Q8239',\n'VAA1251',\n'AKD4867',\n'PNR4472',\n'JRU2052',\n'VCM1027',\n'SYM3155',\n'VK8672',\n'ALQ5218',\n'VJB8465',\n'SYG7650',\n'VEB2287',\n'VJD8084',\n'VJB5815',\n'SYT8420',\n'SYU9123',\n'SYM9123',\n'WD8648F',\n'ST1507X',\n'KFF662',\n'KV8223E',\n'VFK992',\n'VAQ7561',\n'WC9429D',\n'VGC8955',\n'VFJ9402',\n'SYT9279',\n'KFF919',\n'VED5659',\n'MCS1141',\n'KEN1565',\n'VDY5876',\n'VHR5692',\n'WA975Q',\n'QAA7747U',\n'JQP1221',\n'SYW3219',\n'VHN9607',\n'VCQ2438',\n'TCL320',\n'VJS2589',\n'BPS8008',\n'SK8738D',\n'WB1352P',\n'RAA6254',\n'VFB3427',\n'PKP5778',\n'RS497',\n'VAA8641',\n'VDH9424',\n'WB8669P',\n'VHA1656',\n'JUU6816',\n'SYQ934',\n'VAN6045',\n'QTR616',\n'VHF2327',\n'WA8702Y',\n'SAC9491E',\n'PMY5357',\n'SYS9282',\n'SD4882T',\n'JUC291',\n'VF9224',\n'SWD2332',\n'PLG5568',\n'VDP522',\n'WWH7935',\n'VEF3308',\n'VCV5516',\n'SS8797V',\n'VBU4555',\n'JUJ5348',\n'AMC5458',\n'WXX9992',\n'PMF1141',\n'VBG3446',\n'VFJ1025',\n'BQF3824',\n'MDH8149',\n'AKX3080',\n'JQY6055',\n'VBK8924',\n'WC1528T',\n'SYR8280',\n'VT4062',\n'SYE1808',\n'SAC9961C',\n'JTL4102',\n'SYV5893',\n'JRX6327',\n'JUP5655',\n'SYG637',\n'AKS192',\n'DDM4053',\n'WC5661W',\n'BPE4264',\n'JTC233',\n'JUX3218',\n'VDN711',\n'QAB3060D',\n'FE8248',\n'VAY3704',\n'VDR5647',\n'VHH6374',\n'AJG5420',\n'',\n'TEST456',\n'VGQ4486',\n'VU1349',\n'NDD4314',\n'PQL2973',\n'VEF4089',\n'KV6648E',\n'JTC233',\n'JTM7322',\n'KFL4728',\n'VFX3405',\n'WSH829',\n'JVC4299',\n'VCW3161',\n'MCY6381',\n'VET5500',\n'JSV2299',\n'VW75',\n'WYQ1125',\n'VDH228',\n'SYU4717',\n'VEL6603',\n'MDD4069',\n'VBT5803',\n'VHB1735',\n'JVH336',\n'SYV2970',\n'VJS2531',\n'VBT7072',\n'AMK8495',\n'PQL3635',\n'AML3360',\n'SYS2291',\n'WYK7700',\n'VJM3442',\n'VHV5011',\n'SAC7F',\n'SYV1247',\n'VHT5091',\n'AMG2969',\n'SD1339T',\n'VAP3198',\n'JTC2411',\n'BPV5787',\n'DCR6094',\n'SYS860',\n'VBM9019',\n'VBC5882',\n'VBN173',\n'KV3781E',\n'JSK1495',\n'JUY8147',\n'SB54',\n'PQJ2782',\n'PMK930',\n'SK3993D',\n'IIUM118',\n'PQL7839',\n'SYT8277',\n'SK3923D',\n'SYT5769',\n'SU1636J',\n'SYR9219',\n'SYR7758',\n'SYE7702',\n'JVR7450',\n'SWD9895',\n'SYV3752',\n'SAC3701F',\n'SYU8060',\n'QM3699L',\n'ALE3561',\n'PPF2685',\n'KFJ3613',\n'WA9536B',\n'KV6676E',\n'G1M4370',\n'PMG5179',\n'SAC3056B',\n'KV6512D',\n'VJQ7526',\n'SWD139',\n'VG391',\n'VJK6442',\n'QM7035K',\n'SU6698J',\n'KV9679E',\n'DDT1774',\n'PNA6654',\n'SYQ3619',\n'SAC9860A',\n'PKL8684',\n'VJG4510',\n'WB6217H',\n'VGP3701',\n'AMF5737',\n'ST9820Y',\n'VJJ3748',\n'SMG2236',\n'WXY1233',\n'WB44S',\n'WRV9355',\n'W9099R',\n'JTU4069',\n'MCM1441',\n'AKP4303',\n'MALAYSIA436',\n'VJM6651',\n'SB54.',\n'SWD8226',\n'MCM1441',\n'VAA7115',\n'WC193Y',\n'PLF8978',\n'VAW4857',\n'VB3375',\n'SYV5938',\n'KDV8825',\n'BQC1331',\n'WD7745A',\n'JRQ6367',\n'TCL350',\n'VJL7265',\n'WC8495B',\n'SYB5062',\n'DDL4036',\n'VED5437',\n'VDJ4276',\n'SMG4668',\n'VBH9238',\n'VT1554',\n'MCX4999',\n'AMR3360',\n'KV114E',\n'VFQ1415',\n'KFK6648',\n'VCK7573',\n'VHP6643',\n'VJP455',\n'VEF4166',\n'MCV115',\n'VAT5500',\n'WB7344W',\n'AMN228',\n'SYV7021',\n'VBT5642',\n'AFS2222',\n'PQL2558',\n'SYP6833',\n'WVN2168',\n'SYT4847',\n'SYV1248',\n'SD3829T',\n'VCC2521',\n'VBR976',\n'SAB668R',\n'WA6474A',\n'VHA7847',\n'VBN175',\n'QS1024L',\n'JRF1014',\n'PPB6668',\n'ALX2022',\n'AHV4663',\n'PQM6933',\n'SME3923',\n'SYT2362',\n'SYU1663',\n'SYR7759',\n'SYT4849',\n'SAB6061V',\n'SYU8070',\n'PPF6260',\n'KV6976E',\n'RAD7988',\n'SS2150W',\n'VB375',\n'SYR5961',\n'KV6647E',\n'PMU3025',\n'WA6122D',\n'AMH8521',\n'VJJ899',\n'SY2072',\n'VB7932',\n'BNT7282',\n'MALAYSIA127',\n'BNK8061',\n'WC5716M',\n'G1M3257',\n'VDG9389',\n'VHS350',\n'VJL7292',\n'PPJ7669',\n'PQH5561',\n'PLQ5638',\n'PPA7527',\n'G1M3065',\n'VHP6624',\n'VJR9379',\n'VHW6635',\n'VFP9594',\n'AJD23',\n'DDE9166',\n'BQH228',\n'SYV6317',\n'SWE247',\n'SYU6346',\n'SAB3829K',\n'JRR4032',\n'SD8666N',\n'JQV8142',\n'VBN177',\n'AJQ7156',\n'QBF3348',\n'SMG1388',\n'SYR5717',\n'SYT4860',\n'SYV9550',\n'VAU8137',\n'PPN478.',\n'KV7881E',\n'SS3338C',\n'VF9578',\n'SWF3250',\n'KV6643E',\n'VJU6157',\n'AMH4390',\n'SAC3502A',\n'SS9819U',\n'VHU1426',\n'KEU4597',\n'VGT1331',\n'VJX380',\n'RAD6193',\n'KV4114E',\n'VDX9372',\n'VEV8270',\n'KFJ9106',\n'VGV8867',\n'W8286S',\n'BLH41',\n'BQX336',\n'JVE247',\n'SAC2363A',\n'DEG8666',\n'SAB7813A',\n'SK5312B',\n'VBN178',\n'QRQ3348',\n'SAC8328D',\n'SYR7763',\n'SYU617',\n'VAL6338',\n'KV1588E',\n'SS4401W',\n'VF9246',\n'KV6621E',\n'RAN3730',\n'PQH339',\n'EJA98',\n'RAJ8311',\n'JJJ311',\n'VCF3247',\n'VHF1331',\n'VFP4562',\n'VFK7394',\n'VBK8363',\n'WXX9799',\n'WWB1485',\n'VBN586',\n'JVP7262',\n'SD3348T',\n'SK2404B',\n'SU6668F',\n'RAK4943',\n'KFK6649',\n'PQJ278',\n'JTT7454',\n'BRQ2299',\n'VJF6892',\n'JSR2859',\n'SWE3348',\n'SYB2404',\n'KV5988E',\n'JQE5841',\n'VCT4919',\n'NDM5288',\n'KFK6647',\n'PQL6393',\n'VAG4309',\n'VHU4007',\n'SYT7748',\n'PLX3831',\n'SB7748F')\norder by 10 desc",
+        "additionalFields": {}
+      },
+      "id": "2f04167d-b02b-408a-b23e-722eaa8c1971",
+      "name": "Postgres4",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        800,
+        680
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "16",
+          "name": "trevodb_recreated"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1w1vhZx-1SOTXE9BCMmw3ljCIQ3xp6JIqHQLMNKxZ4aw",
+          "mode": "list",
+          "cachedResultName": "Share The Joy! Opt In (Project Ho-Ho Responses)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w1vhZx-1SOTXE9BCMmw3ljCIQ3xp6JIqHQLMNKxZ4aw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 228360117,
+          "mode": "list",
+          "cachedResultName": "N8N - Listings & Performance",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w1vhZx-1SOTXE9BCMmw3ljCIQ3xp6JIqHQLMNKxZ4aw/edit#gid=228360117"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "registration_no",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "2627957d-deb2-46e6-91e5-eb7a8356477d",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1020,
+        680
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\n\nselect distinct ru.user_id as referred_user,\nru.referred_by as host_id,\ncount(distinct case when b.status = 'completed' then b.id end) as completed_bookings\nfrom (select ur.id, ur.referred_by, ur.user_id\nfrom user_referrals ur \nwhere 1=1\nand ur.created_at between '2022-12-16' and '2023-01-02'\nand ur.referred_by in ('1544310',\n'883569',\n'102858',\n'741414',\n'95700',\n'55',\n'40686',\n'70127',\n'1140171',\n'1692841',\n'1019575',\n'55',\n'99030',\n'906069',\n'1781232',\n'1213982',\n'587014',\n'1621386',\n'517313',\n'70127',\n'415393',\n'259352',\n'508536',\n'1417187',\n'182548',\n'532598',\n'508536',\n'1767072',\n'46550',\n'756223',\n'1728157',\n'543935',\n'517313',\n'38331',\n'1560172',\n'32215',\n'87854',\n'85616',\n'1002354',\n'83898',\n'954165',\n'936319',\n'94951',\n'1070475',\n'1371084',\n'1560172',\n'742',\n'83898',\n'1483996',\n'916851',\n'526',\n'87257',\n'160754',\n'905214',\n'1408629',\n'46806',\n'1211952',\n'89213',\n'88955',\n'1327598',\n'93080',\n'864449',\n'1690902',\n'196',\n'596366',\n'1024815',\n'283644',\n'405330',\n'50832',\n'1792432',\n'167631',\n'28',\n'8833',\n'786253',\n'72504',\n'72662',\n'43216',\n'1370334',\n'882465',\n'1548338',\n'1110240',\n'42740',\n'196',\n'1785148',\n'283644',\n'191913',\n'82203',\n'1548023',\n'1272523',\n'597564',\n'1680157',\n'259352',\n'92593',\n'8833',\n'973395',\n'38331',\n'44737',\n'1043596',\n'31229',\n'106416',\n'1266647',\n'1518624',\n'1380530',\n'46071',\n'82416',\n'15848',\n'104476',\n'879330',\n'405330',\n'46071',\n'44737',\n'55',\n'3416',\n'31698',\n'113951',\n'1686287',\n'774175',\n'83051',\n'154957',\n'81995',\n'1346967',\n'8833',\n'430743',\n'1110240',\n'90087',\n'905214',\n'106416',\n'1004992',\n'1602420',\n'539271',\n'1001824',\n'46550',\n'1702228',\n'275009',\n'564787',\n'259352',\n'68370',\n'439390',\n'760777',\n'217493',\n'1380530',\n'244211',\n'57924',\n'48960',\n'741414',\n'1314368',\n'87257',\n'87257',\n'163',\n'1593875',\n'48803',\n'81614',\n'526',\n'5162',\n'439390',\n'744783',\n'58937',\n'50826',\n'866940',\n'756223',\n'1314368',\n'1405645',\n'995716',\n'34411',\n'1502324',\n'37712',\n'1533288',\n'1370476',\n'1567142',\n'737906',\n'1656931',\n'1766883',\n'1098431',\n'954165',\n'1728157',\n'1605353',\n'1649137',\n'1848140',\n'1556143',\n'80844',\n'78103',\n'460900',\n'823816',\n'742',\n'1646364',\n'1380530',\n'320',\n'75521',\n'66902',\n'64522',\n'78178',\n'14452',\n'82506',\n'120252',\n'212229',\n'241544',\n'97503',\n'124086',\n'460900',\n'94302',\n'777020',\n'717155',\n'760777',\n'92561',\n'344308',\n'564787',\n'1054251',\n'450963',\n'58937',\n'579140',\n'81067',\n'612861',\n'93080',\n'835761',\n'951300',\n'943138',\n'82506',\n'1422813',\n'163',\n'1483996',\n'1579998',\n'1579998',\n'911833',\n'359547',\n'1328702',\n'1621386',\n'980908',\n'1593875',\n'998476',\n'1576941',\n'259352',\n'737332',\n'1613293',\n'1655543',\n'64327',\n'859956',\n'1764628',\n'1727370',\n'760777',\n'1695209',\n'1646364',\n'655488',\n'1747081',\n'1822268',\n'1873271',\n'82304',\n'1382241',\n'31534',\n'1704502',\n'1380530',\n'1569154',\n'1751078',\n'1380530',\n'1346967',\n'3416',\n'55',\n'68825',\n'96868',\n'124086',\n'57062',\n'120252',\n'120252',\n'212229',\n'344308',\n'34411',\n'212229',\n'501994',\n'613542',\n'564787',\n'259352',\n'259352',\n'344308',\n'69770',\n'79964',\n'93080',\n'57351',\n'936319',\n'344308',\n'58937',\n'1131189',\n'11182',\n'64327',\n'756223',\n'259352',\n'79964',\n'878200',\n'1260967',\n'344308',\n'31534',\n'36367',\n'864449',\n'737906',\n'760777',\n'259352',\n'1567018',\n'50832',\n'344308',\n'823816',\n'1533288',\n'1368061',\n'866940',\n'35874',\n'50832',\n'94713',\n'65335',\n'85642',\n'30507',\n'1653937',\n'1426894',\n'75521',\n'1640431',\n'299369',\n'85861',\n'613530',\n'262055',\n'1594773',\n'936319',\n'9244',\n'1481008',\n'1730437',\n'587014',\n'587014',\n'85642',\n'1667621',\n'1796148',\n'1807704',\n'1754076',\n'344308',\n'134249',\n'1640431',\n'1826888',\n'1646364',\n'1823686',\n'1808757',\n'1107418',\n'1646364',\n'1646364',\n'146505',\n'1764628',\n'1406705',\n'1649335',\n'55',\n'1800661',\n'1646364',\n'788538',\n'320366',\n'835761',\n'864449',\n'739892',\n'65123',\n'1594773',\n'1631098',\n'1131311',\n'125625',\n'1740388',\n'1752490',\n'733467',\n'1823686',\n'1646364',\n'82596',\n'188643',\n'25330',\n'92561',\n'1551948',\n'1314368',\n'1161113',\n'8833',\n'460900',\n'1737895',\n'44530',\n'111646',\n'864449',\n'106416',\n'57351',\n'89213',\n'1552332',\n'1518624',\n'1002354',\n'50197',\n'87257',\n'102537',\n'85861',\n'262573',\n'262573',\n'176936',\n'59258',\n'81067',\n'439390',\n'577201',\n'684922',\n'112171',\n'69590',\n'760777',\n'704538',\n'79964',\n'867053',\n'775306',\n'951935',\n'179122',\n'25190',\n'25190',\n'344308',\n'52504',\n'32215',\n'92664',\n'262261',\n'259352',\n'58937',\n'1161113',\n'1288741',\n'526',\n'120252',\n'176936',\n'176936',\n'188643',\n'760777',\n'1443798',\n'839440',\n'839440',\n'473536',\n'1382241',\n'176936',\n'93080',\n'756223',\n'1504223',\n'13209',\n'439629',\n'344308',\n'77065',\n'1338809',\n'74415',\n'57351',\n'31534',\n'25190',\n'1649137',\n'998476',\n'1650099',\n'684922',\n'864449',\n'1211952',\n'259352',\n'926665',\n'1613293',\n'1502324',\n'1040128',\n'75521',\n'36367',\n'1718013',\n'64327',\n'895345',\n'87250',\n'1736757',\n'1481026',\n'691981',\n'1489844',\n'1808757',\n'1808757',\n'577201',\n'1821839',\n'1337956',\n'1747081',\n'146505',\n'1580873',\n'285836',\n'1350872',\n'1728157',\n'68825',\n'548933',\n'1265113',\n'89213',\n'31534',\n'31534',\n'777659',\n'564787',\n'78238',\n'176936',\n'50832',\n'1592458',\n'69509',\n'1580873',\n'89213',\n'58627',\n'93080',\n'145002',\n'439629',\n'88807',\n'1233648',\n'1513826',\n'79964',\n'124086',\n'50832',\n'973395',\n'1601687',\n'25691',\n'382833',\n'81995',\n'768504',\n'98738',\n'1807704',\n'1086194',\n'1814475',\n'565924',\n'995716',\n'1148234',\n'71042',\n'550525',\n'482512',\n'367036',\n'1662865',\n'1569154',\n'1480475',\n'1753803',\n'1518624',\n'87055',\n'124086',\n'1380530',\n'1518624',\n'403623',\n'526',\n'526',\n'196',\n'74134',\n'57668',\n'81067',\n'94106',\n'526',\n'120252',\n'124086',\n'262573',\n'262573',\n'418650',\n'57062',\n'46071',\n'573320',\n'176936',\n'30507',\n'760777',\n'1113490',\n'768504',\n'1107418',\n'79851',\n'936319',\n'344308',\n'684922',\n'1282223',\n'1265113',\n'299369',\n'1382241',\n'31534',\n'1337956',\n'414692',\n'671772',\n'1454506',\n'1844',\n'839440',\n'85642',\n'58937',\n'1527648',\n'113071',\n'75521',\n'1643608',\n'684922',\n'344308',\n'55',\n'1481008',\n'1680157',\n'564216',\n'515835',\n'760777',\n'680875',\n'46362',\n'1649335',\n'94302',\n'1356852',\n'55554',\n'1417187',\n'1808757',\n'196778',\n'212229',\n'31534',\n'851965',\n'62231',\n'911833',\n'1499923',\n'1522686',\n'138802',\n'1887856',\n'869699',\n'163',\n'867053',\n'869699',\n'1004992',\n'1800267',\n'1471045',\n'945695',\n'1813475',\n'1417187',\n'1595405',\n'1115150',\n'81995',\n'1310560',\n'299369',\n'1613409',\n'1702228',\n'299369',\n'1650266',\n'1518624',\n'393957',\n'39299',\n'113801',\n'1034977',\n'51595',\n'1518624',\n'837383',\n'82416',\n'1518624',\n'99098',\n'272873',\n'106212',\n'89213',\n'1846907',\n'44737',\n'1767072',\n'836802',\n'25190',\n'526',\n'76024',\n'82304',\n'25190',\n'262573',\n'262573',\n'31534',\n'31534',\n'384097',\n'44737',\n'81995',\n'11423',\n'325533',\n'704538',\n'240490',\n'684922',\n'564787',\n'579140',\n'44737',\n'50832',\n'738401',\n'347987',\n'950903',\n'1086194',\n'756223',\n'376826',\n'134249',\n'1334510',\n'839440',\n'839440',\n'1004992',\n'1525292',\n'70782',\n'386175',\n'1506630',\n'1594684',\n'993245',\n'154154',\n'1110240',\n'75521',\n'1695209',\n'154276',\n'696840',\n'543935',\n'79685',\n'344029',\n'1560172',\n'82304',\n'1560172',\n'325533',\n'1646364',\n'82416',\n'82304',\n'1888383',\n'1619409',\n'1726387',\n'305964',\n'950903',\n'1487157',\n'120252',\n'672945',\n'612834',\n'696840',\n'82304',\n'69528',\n'113801',\n'774175',\n'181411',\n'82203',\n'63269',\n'57926',\n'60705',\n'950903',\n'1702228',\n'325533',\n'1380530',\n'1211952',\n'113801',\n'506309',\n'113801',\n'509913',\n'573297',\n'42740',\n'774175',\n'39299',\n'515142',\n'93080',\n'81995',\n'1306569',\n'299369',\n'774175',\n'113801',\n'106416',\n'1518624',\n'1702228',\n'1560172',\n'687631',\n'1650266',\n'50832',\n'1211779',\n'81995',\n'124086',\n'320366',\n'307858',\n'82416',\n'1767072',\n'1767072',\n'1819605',\n'1827218',\n'12907',\n'92919',\n'99935',\n'100767',\n'478114',\n'68370',\n'36367',\n'680149',\n'756223',\n'788538',\n'680149',\n'936319',\n'28',\n'509913',\n'89213',\n'89213',\n'881184',\n'31534',\n'12907',\n'680149',\n'1678674',\n'152287',\n'1764725',\n'839515',\n'1569154')\ngroup by 1,2,3) ru \nleft join bookings b on b.user_id = ru.user_id\nand b.request_start_at between '2022-12-16' and '2023-01-02'\ngroup by 1,2\n",
+        "additionalFields": {}
+      },
+      "id": "ef87ec30-694f-48d7-90a9-614028011c36",
+      "name": "Postgres5",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1020,
+        820
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "16",
+          "name": "trevodb_recreated"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1w1vhZx-1SOTXE9BCMmw3ljCIQ3xp6JIqHQLMNKxZ4aw",
+          "mode": "list",
+          "cachedResultName": "Share The Joy! Opt In (Project Ho-Ho Responses)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w1vhZx-1SOTXE9BCMmw3ljCIQ3xp6JIqHQLMNKxZ4aw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 333487071,
+          "mode": "list",
+          "cachedResultName": "N8N - New User Referral",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w1vhZx-1SOTXE9BCMmw3ljCIQ3xp6JIqHQLMNKxZ4aw/edit#gid=333487071"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "referred_user",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "0a075942-3427-4ec8-a972-7010b85be6d3",
+      "name": "Google Sheets2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1240,
+        820
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1w1vhZx-1SOTXE9BCMmw3ljCIQ3xp6JIqHQLMNKxZ4aw",
+          "mode": "list",
+          "cachedResultName": "Share The Joy! Opt In (Project Ho-Ho Responses)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w1vhZx-1SOTXE9BCMmw3ljCIQ3xp6JIqHQLMNKxZ4aw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 333487071,
+          "mode": "list",
+          "cachedResultName": "N8N - New User Referral",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w1vhZx-1SOTXE9BCMmw3ljCIQ3xp6JIqHQLMNKxZ4aw/edit#gid=333487071"
+        },
+        "clear": "specificRows",
+        "startIndex": 2,
+        "rowsToDelete": 400
+      },
+      "id": "5d4dd4f3-476b-4f1b-8973-c06224004217",
+      "name": "Google Sheets3",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        800,
+        820
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": false,
+    "callerPolicy": "any",
+    "executionTimeout": 300,
+    "errorWorkflow": "11"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2023-01-02T02:56:13.821Z",
+  "versionId": "e79c7e84-563e-4e33-8f86-c6ad1d78a2bb"
+}
