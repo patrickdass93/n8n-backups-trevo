@@ -1,0 +1,689 @@
+{
+  "active": true,
+  "connections": {
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets2": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "IF1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function1": {
+      "main": [
+        [
+          {
+            "node": "MY|UserTag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MY|UserTag": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF1": {
+      "main": [
+        [
+          {
+            "node": "Function1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets3": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets4": {
+      "main": [
+        [
+          {
+            "node": "Postgres2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-06-07T02:31:46.765Z",
+  "id": "83",
+  "name": "[KAVI] Entrepreneur Host GB Tagging",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \nu.email\n, u.uuid\n, t.name as entreprenuer_tag\n, CONCAT(u.first_name, ' ',u.last_name) as name\n, COUNT(distinct case when l.status = 'approved' AND l.deleted_at IS NULL then l.id end) as approved_listings\nfrom users u \nleft join listings l on l.user_id = u.id \nleft join listing_location ll on ll.listing_id = l.id \nleft join (select tt.tag_id, tt.taggable_id from tag_taggables tt where tt.tag_id = 477 and tt.taggable ='users') tt on tt.taggable_id = u.id \nleft join tags t on t.id = tt.tag_id\nwhere ll.country = 'Malaysia'\ngroup by 1,2,3,4\nhaving COUNT(distinct l.id) >= '1' ",
+        "options": {}
+      },
+      "id": "8ec3a080-e76d-40f3-b10d-bd0c9258afac",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.1,
+      "position": [
+        1000,
+        320
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api-v2.trevo.my/common-users/web-hook/lean-plum/user-tag",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n\"Authorization\":\"Basic c29jYXJfbW9iaWxpdHk6UWZUalduWnI0dTd3IXolQw==\",\n\"Content-Type\":\"application/json\",\n\"Accept-Encoding\":\"gzip, deflate, br\",\n\"User-Agent\":\"Leanplum-Webhook\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"userId\":\"{{ $json[\"UUID\"] }}\",\n\"action\":\"add\",\n\"secretKey\":\"4E635266556A586E5A7234753778214125442A472D4B6150645367566B597033\",\n\"userTagSlug\":\"entrepreneur-host\",\n\"campaignName\":\"entp_autotag\"\n} ",
+        "options": {}
+      },
+      "id": "25c60c42-b03c-4132-ba54-9cd2b507a72b",
+      "name": "MY|UserTag",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2100,
+        320
+      ],
+      "retryOnFail": true,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * \nfrom users u \nWHERE u.email = 'kavindra.herat@live.com'",
+        "options": {}
+      },
+      "id": "6c5be667-ad53-4fb9-88dc-67c1f8ef5e66",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.1,
+      "position": [
+        560,
+        120
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1l9LNSuH9gvMgmgbixn6akw36ZTjFEOXtZdTp8YXBUx0",
+          "mode": "list",
+          "cachedResultName": "Entrepreneur Host Program Form",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1l9LNSuH9gvMgmgbixn6akw36ZTjFEOXtZdTp8YXBUx0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1049826928,
+          "mode": "list",
+          "cachedResultName": "Entp Raw Check",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1l9LNSuH9gvMgmgbixn6akw36ZTjFEOXtZdTp8YXBUx0/edit#gid=1049826928"
+        },
+        "clear": "specificRange",
+        "range": "A2:F"
+      },
+      "id": "aa384567-8b1b-49ee-8103-3a3c3fab42fc",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        860,
+        320
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1l9LNSuH9gvMgmgbixn6akw36ZTjFEOXtZdTp8YXBUx0",
+          "mode": "list",
+          "cachedResultName": "Entrepreneur Host Program Form",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1l9LNSuH9gvMgmgbixn6akw36ZTjFEOXtZdTp8YXBUx0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1049826928,
+          "mode": "list",
+          "cachedResultName": "Entp Raw Check",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1l9LNSuH9gvMgmgbixn6akw36ZTjFEOXtZdTp8YXBUx0/edit#gid=1049826928"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "email",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "e7f6e652-f16e-4770-868d-e917d299c0bd",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1140,
+        320
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1l9LNSuH9gvMgmgbixn6akw36ZTjFEOXtZdTp8YXBUx0",
+          "mode": "list",
+          "cachedResultName": "Entrepreneur Host Program Form",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1l9LNSuH9gvMgmgbixn6akw36ZTjFEOXtZdTp8YXBUx0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2052339725,
+          "mode": "list",
+          "cachedResultName": "Entp Verification",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1l9LNSuH9gvMgmgbixn6akw36ZTjFEOXtZdTp8YXBUx0/edit#gid=2052339725"
+        },
+        "options": {}
+      },
+      "id": "ce82dc64-bb65-4473-a0b7-637edaae9a18",
+      "name": "Google Sheets2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1280,
+        320
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "value1": "={{ $json['APPROVED LISTINGS'] }}",
+        "rules": {
+          "rules": [
+            {
+              "operation": "largerEqual",
+              "value2": 5
+            },
+            {
+              "value2": 5,
+              "output": 1
+            }
+          ]
+        },
+        "fallbackOutput": 2
+      },
+      "id": "cd7cd00a-472c-42c5-8434-a3fcb9354482",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"email\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['email']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1960,
+        320
+      ],
+      "id": "5538dc15-574f-422f-bc04-712bb3e6c233"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json['TAGGED ALREADY \n- Do Not Edit'] }}",
+              "operation": "isEmpty"
+            }
+          ]
+        }
+      },
+      "id": "eaf7cd22-38cc-4895-bfee-ca7a6da2cef7",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8,
+              "triggerAtMinute": 30
+            }
+          ]
+        }
+      },
+      "id": "24d7d9c9-d481-4fd7-93c8-2ed165ea42d6",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        700,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1l9LNSuH9gvMgmgbixn6akw36ZTjFEOXtZdTp8YXBUx0",
+          "mode": "list",
+          "cachedResultName": "Entrepreneur Host Program Form",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1l9LNSuH9gvMgmgbixn6akw36ZTjFEOXtZdTp8YXBUx0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1139908367,
+          "mode": "list",
+          "cachedResultName": "Tag Logs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1l9LNSuH9gvMgmgbixn6akw36ZTjFEOXtZdTp8YXBUx0/edit#gid=1139908367"
+        },
+        "columnToMatchOn": "email",
+        "valueToMatchOn": "={{ $node.Function1.json.email }}",
+        "fieldsUi": {
+          "values": [
+            {
+              "column": "UUID",
+              "fieldValue": "={{ $node.Function1.json.UUID }}"
+            },
+            {
+              "column": "Name",
+              "fieldValue": "={{ $node.Function1.json.Name }}"
+            },
+            {
+              "column": "timestamp",
+              "fieldValue": "={{ $node['Schedule Trigger'].json['Readable date'] }}"
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "81c536eb-07a8-4e45-af99-ca6405fd0b4e",
+      "name": "Google Sheets3",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        2240,
+        320
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json['comment if removed'] }}",
+              "operation": "isEmpty"
+            }
+          ]
+        }
+      },
+      "id": "3a8d5556-1caf-4c93-8a35-c7edf00ae306",
+      "name": "IF1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1780,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1l9LNSuH9gvMgmgbixn6akw36ZTjFEOXtZdTp8YXBUx0",
+          "mode": "list",
+          "cachedResultName": "Entrepreneur Host Program Form",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1l9LNSuH9gvMgmgbixn6akw36ZTjFEOXtZdTp8YXBUx0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1049826928,
+          "mode": "list",
+          "cachedResultName": "Entp Raw Check",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1l9LNSuH9gvMgmgbixn6akw36ZTjFEOXtZdTp8YXBUx0/edit#gid=1049826928"
+        },
+        "clear": "specificRange",
+        "range": "A2:F"
+      },
+      "id": "9d8907d6-6170-41d6-84e3-49db5c17c618",
+      "name": "Google Sheets4",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        2400,
+        320
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \nu.email\n, u.uuid\n, t.name as entreprenuer_tag\n, CONCAT(u.first_name, ' ',u.last_name) as name\n, COUNT(distinct case when l.status = 'approved' AND l.deleted_at IS NULL then l.id end) as approved_listings\nfrom users u \nleft join listings l on l.user_id = u.id \nleft join listing_location ll on ll.listing_id = l.id \nleft join (select tt.tag_id, tt.taggable_id from tag_taggables tt where tt.tag_id = 477 and tt.taggable ='users') tt on tt.taggable_id = u.id \nleft join tags t on t.id = tt.tag_id\nwhere ll.country = 'Malaysia'\ngroup by 1,2,3,4\nhaving COUNT(distinct l.id) >= '1' ",
+        "options": {}
+      },
+      "id": "d2e86f51-d765-4330-8c37-4405a6805365",
+      "name": "Postgres2",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.1,
+      "position": [
+        2540,
+        320
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1l9LNSuH9gvMgmgbixn6akw36ZTjFEOXtZdTp8YXBUx0",
+          "mode": "list",
+          "cachedResultName": "Entrepreneur Host Program Form",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1l9LNSuH9gvMgmgbixn6akw36ZTjFEOXtZdTp8YXBUx0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1049826928,
+          "mode": "list",
+          "cachedResultName": "Entp Raw Check",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1l9LNSuH9gvMgmgbixn6akw36ZTjFEOXtZdTp8YXBUx0/edit#gid=1049826928"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "email",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "b8ac9be4-582a-4998-9960-e84b1d57f5c2",
+      "name": "Google Sheets5",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        2680,
+        320
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11",
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        "emirproton87@gmail.com",
+        "wjkkcarrent@gmail.com",
+        "Kennyackk@gmail.com",
+        "yee_vm@yahoo.com",
+        "amosthien89@gmail.com",
+        "Ccky.197@gmail.com",
+        "jasontt80@gmail.com",
+        "erikssonchin@hotmail.com",
+        "izlan190199@icloud.com",
+        "izharbahriemib@gmail.com",
+        "Kevinyoong92@gmail.com",
+        "Safiretradingservices@gmail.com",
+        "johorgrab@gmail.com",
+        "beegze@yahoo.com",
+        "estelleliew1411@gmail.com",
+        "aaronleong1510@gmail.com",
+        "greendaily.kk@gmail.com",
+        "iancklai@hotmail.com",
+        "Johnsonhje@gmail.com",
+        "v.mak@vmakempire.com",
+        "shaharifmdshah@gmail.com",
+        "ytan831113@gmail.com",
+        "Sammychan860@gmail.com",
+        "enixman96@gmail.com",
+        "fortuneempire8@gmail.com",
+        "kk.Phuah3233@gmail.com",
+        "mohdhusnanibrahim@gmail.com",
+        "Cmsglobalservice@gmail.com",
+        "fhempireventures@gmail.com",
+        "l_nicholas@rocketmail.com",
+        "Irvine.yeo87@gmail.com",
+        "mafiqhafeez@gmail.com",
+        "tiffany_wongyi@hotmail.com",
+        "deicidee@gmail.com",
+        "faizalrosli705@gmail.com",
+        "Fralyc77@gmail.com",
+        "chanwooilim@gmail.com",
+        "championcar68@gmail.com",
+        "alaxlim28@gmail.com",
+        "wei_chian@hotmail.com",
+        "jinghwa88@gmail.com",
+        "account@epicrides.com.my",
+        "Jayviertan@gmail.com",
+        "kenny32.hamilton@gmail.com",
+        "king.lau68@live.com",
+        "cheeonn9198@gmail.com",
+        "megarahju@live.com",
+        "kaiqian0819@gmail.com",
+        "Venuskah@gmail.com",
+        "azamlokmanal94@gmail.com",
+        "ericyeap1982@gmail.com",
+        "alvin5350@gmail.com",
+        "syafiqahumirah@gmail.com",
+        "blackpearlmotorsport@gmail.com",
+        "m1ket1ng78@gmail.com",
+        "ahlieang@gmail.com",
+        "sales@itours.com.my",
+        "info.scooter.rabbit@gmail.com",
+        "booking@hyperluxurycar.com",
+        "kenny.lim@golem-lab.com",
+        "Stanleyku12334@gmail.com",
+        "awkeecar@gmail.com",
+        "Skytripstransport@gmail.com",
+        "Carbnb.my@gmail.com"
+      ]
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-07-27T00:31:07.653Z",
+  "versionId": "eee3672d-7282-4bce-8164-a9aa4cd17a02"
+}
