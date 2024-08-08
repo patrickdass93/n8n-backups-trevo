@@ -1,0 +1,695 @@
+{
+  "active": false,
+  "connections": {
+    "SendInBlue": {
+      "main": [
+        [
+          {
+            "node": "SIB API2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "SendInBlue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "SendInBlue1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SendInBlue1": {
+      "main": [
+        [
+          {
+            "node": "SIB API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SendInBlue2": {
+      "main": [
+        [
+          {
+            "node": "SIB API3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "SendInBlue2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SendInBlue3": {
+      "main": [
+        [
+          {
+            "node": "SIB API4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "SendInBlue3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-08-30T08:15:16.023Z",
+  "id": "5sP931i40YhzuF0x",
+  "name": "[JIUN] [HOST COMMUNITY] - Hosts with Expired/Expiring Docs One time Comm",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect distinct l.id, \nl.registration_no,\nl.user_id,\ncase when ht.host_type is null then 'Organic' else ht.host_type end as host_type,\nconcat(u.first_name, ' ',u.last_name)as host_name,\nu.phone_number, \nu.email, \nu.uuid,\nli.name, \nto_char(li.expiry,'YYYY-MM-DD')as expiry,\nceil((extract(EPOCH FROM li.expiry::timestamp) - EXTRACT(EPOCH FROM NOW()::timestamp))/86400) as days_left\nfrom listings l \nleft join users u on u.id = l.user_id\nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = l.id\nleft join listing_insurance li on li.listing_id = l.id\nleft join companies c on c.owner_id = l.user_id\n--\n        left join\n    (select distinct l.user_id, l.id, t.name as host_type\n    from listings l\n    left join tag_taggables tt on tt.taggable_id = l.user_id \n    left join tags t on t.id = tt.tag_id\n    where t.name ~* '(entrepreneur|commercial)')ht\n    on ht.user_id = u.id\n--\nwhere 1=1\n--and l.id = '20035'\nand li.expiry <= (NOW()::timestamp + interval'90 days') and li.expiry >= NOW()\nand ll.country = 'Malaysia'\nand l.status = 'approved'\nand l.deleted_at is null\ngroup by 1,2,3,4,5,6,7,8,9,10,11\nhaving (ceil((extract(EPOCH FROM li.expiry::timestamp) - EXTRACT(EPOCH FROM NOW()::timestamp))/86400) <= 30)\nand ((case when ht.host_type is null then 'Organic' else ht.host_type end) != 'Commercial Host') \norder by 11 ",
+        "options": {}
+      },
+      "id": "356d8697-9f2b-424e-9f42-a3c0b8443bb5",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        100
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "update",
+        "identifier": "={{ $json.email }}",
+        "updateAttributes": {
+          "updateAttributesValues": [
+            {
+              "fieldName": "CPHOSTNAME",
+              "fieldValue": "={{ $json.host_name }}"
+            }
+          ]
+        }
+      },
+      "id": "618416a2-6d3f-40a6-b5f3-ac6dfae93dd6",
+      "name": "SendInBlue",
+      "type": "n8n-nodes-base.sendInBlue",
+      "typeVersion": 1,
+      "position": [
+        980,
+        100
+      ],
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\"to\":[{\"email\":\"{{ $('Postgres').item.json[\"email\"] }}\"}],\n\"templateId\":718\n}\n",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1140,
+        100
+      ],
+      "id": "d6141e00-b1ee-4f15-a23a-5f902ddb7749",
+      "retryOnFail": true,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "disabled": true,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect distinct l.id, \nl.registration_no,\nl.user_id,\ncase when ht.host_type is null then 'Organic' else ht.host_type end as host_type,\nconcat(u.first_name, ' ',u.last_name)as host_name,\nu.phone_number, \nu.email, \nu.uuid,\nli.name, \nto_char(li.expiry,'YYYY-MM-DD')as expiry,\nceil((extract(EPOCH FROM li.expiry::timestamp) - EXTRACT(EPOCH FROM NOW()::timestamp))/86400) as days_left\nfrom listings l \nleft join users u on u.id = l.user_id\nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = l.id\nleft join listing_insurance li on li.listing_id = l.id\nleft join companies c on c.owner_id = l.user_id\n--\n        left join\n    (select distinct l.user_id, l.id, t.name as host_type\n    from listings l\n    left join tag_taggables tt on tt.taggable_id = l.user_id \n    left join tags t on t.id = tt.tag_id\n    where t.name ~* '(entrepreneur|commercial)')ht\n    on ht.user_id = u.id\n--\nwhere 1=1\n--and l.id = '20035'\nand li.expiry < NOW()\nand ll.country = 'Malaysia'\nand l.status = 'approved'\nand l.deleted_at is null\ngroup by 1,2,3,4,5,6,7,8,9,10,11\nhaving ((case when ht.host_type is null then 'Organic' else ht.host_type end) != 'Commercial Host') \norder by 11 ",
+        "options": {}
+      },
+      "id": "5830aea9-8a12-4233-b312-2ae4b2d1d3ce",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        280
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "update",
+        "identifier": "={{ $json.email }}",
+        "updateAttributes": {
+          "updateAttributesValues": [
+            {
+              "fieldName": "CPHOSTNAME",
+              "fieldValue": "={{ $json.host_name }}"
+            }
+          ]
+        }
+      },
+      "id": "d2bea82c-e683-4b1e-9837-6875475ed466",
+      "name": "SendInBlue1",
+      "type": "n8n-nodes-base.sendInBlue",
+      "typeVersion": 1,
+      "position": [
+        980,
+        280
+      ],
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\"to\":[{\"email\":\"{{ $('Postgres1').item.json[\"email\"] }}\"}],\n\"templateId\":721\n}\n",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1140,
+        280
+      ],
+      "id": "107a329c-1e11-4371-8bc1-952563d85fec",
+      "retryOnFail": true,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "disabled": true,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "content": "## Listings with Insurance expiring in less than 30 days"
+      },
+      "id": "7f1bec5c-195b-42f7-beb7-4293839a6723",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        320,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Listings with Insurance expired",
+        "height": 138
+      },
+      "id": "2a9d061f-03dd-4aa9-a958-d462e74bafeb",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        320,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"uuid\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"insurance_expired_wa\",\n            \"evtData\": {\"hostname\": \"{{$json[\"host_name\"]}}\",\n                \"cplate\": \"{{$json[\"registration_no\"]}}\"\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "64d2fcc4-a048-4d47-a0a3-53f52681db44",
+      "name": "HTTP Request2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        980,
+        460
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect distinct l.id, \nl.registration_no,\nl.user_id,\ncase when ht.host_type is null then 'Organic' else ht.host_type end as host_type,\nconcat(u.first_name, ' ',u.last_name)as host_name,\nu.phone_number, \nu.email, \nu.uuid,\nli.name, \nto_char(li.expiry,'YYYY-MM-DD')as expiry,\nceil((extract(EPOCH FROM li.expiry::timestamp) - EXTRACT(EPOCH FROM NOW()::timestamp))/86400) as days_left\nfrom listings l \nleft join users u on u.id = l.user_id\nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = l.id\nleft join listing_insurance li on li.listing_id = l.id\nleft join companies c on c.owner_id = l.user_id\n--\n        left join\n    (select distinct l.user_id, l.id, t.name as host_type\n    from listings l\n    left join tag_taggables tt on tt.taggable_id = l.user_id \n    left join tags t on t.id = tt.tag_id\n    where t.name ~* '(entrepreneur|commercial)')ht\n    on ht.user_id = u.id\n--\nwhere 1=1\n--and l.id = '20035'\nand li.expiry < NOW()\nand ll.country = 'Malaysia'\nand l.status = 'approved'\nand l.deleted_at is null\ngroup by 1,2,3,4,5,6,7,8,9,10,11\nhaving ((case when ht.host_type is null then 'Organic' else ht.host_type end) != 'Commercial Host') \norder by 11 ",
+        "options": {}
+      },
+      "id": "dcf62cf3-ffd0-4f7e-a189-474033352dbb",
+      "name": "Postgres2",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        800,
+        460
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Listings with Insurance expired (Whatsapp)",
+        "height": 138
+      },
+      "id": "feeb97f4-d772-4897-96ea-2b1cf5d1064a",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        320,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Without Car details",
+        "height": 538.9660493827158,
+        "width": 270.398148148148
+      },
+      "id": "6b6e8066-9d17-41fd-b4fa-94ec9b04d8a5",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        20,
+        41.42283950617298
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## With Car details",
+        "height": 355.12962962962933,
+        "width": 270.398148148148
+      },
+      "id": "d6e86351-2961-4ce1-ac56-43b11b9a2086",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        20,
+        680
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "update",
+        "identifier": "={{ $json.EMAIL}}",
+        "updateAttributes": {
+          "updateAttributesValues": [
+            {
+              "fieldName": "CPHOSTNAME",
+              "fieldValue": "={{ $json.CPHOSTNAME}}"
+            },
+            {
+              "fieldName": "LISTING1",
+              "fieldValue": "={{ $json.LISTING1 }}"
+            },
+            {
+              "fieldName": "LISTING2",
+              "fieldValue": "={{ $json.LISTING2 }}"
+            },
+            {
+              "fieldName": "LISTING3",
+              "fieldValue": "={{ $json.LISTING3 }}"
+            },
+            {
+              "fieldName": "LISTING4",
+              "fieldValue": "={{ $json.LISTING4 }}"
+            },
+            {
+              "fieldName": "LISTING5",
+              "fieldValue": "={{ $json.LISTING5 }}"
+            },
+            {
+              "fieldName": "LISTING6",
+              "fieldValue": "={{ $json.LISTING6 }}"
+            }
+          ]
+        }
+      },
+      "id": "d8f535e5-e866-47b6-a14a-e97337d19200",
+      "name": "SendInBlue2",
+      "type": "n8n-nodes-base.sendInBlue",
+      "typeVersion": 1,
+      "position": [
+        980,
+        740
+      ],
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\"to\":[{\"email\":\"{{ $('Google Sheets').item.json[\"EMAIL\"]}}\"}],\n\"templateId\":723\n}\n",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1140,
+        740
+      ],
+      "id": "560a3712-d302-4fb6-9818-ed4d11e76c2a",
+      "retryOnFail": true,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "content": "## Listings with Insurance expiring in less than 30 days"
+      },
+      "id": "82bba95b-7a86-44b7-b930-435f251a269c",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        320,
+        680
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Listings with Insurance expired",
+        "height": 138
+      },
+      "id": "a9707aa1-cfed-4355-9b15-dbc5b1b48f05",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        320,
+        900
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "a4e66b83-bce0-4354-b004-1b840cd91ee1",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        620,
+        820
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1LQs3ubpHFW3sHKJKTxZ9TRQ-dYu1DXL_OmrQ4r3mzaE",
+          "mode": "list",
+          "cachedResultName": "Hosts with Expired/Expiring Docs One time Comm (Updated as off 4th Sep 2023)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LQs3ubpHFW3sHKJKTxZ9TRQ-dYu1DXL_OmrQ4r3mzaE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 356435384,
+          "mode": "list",
+          "cachedResultName": "eDM Expiring Hosts (All Hosts)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LQs3ubpHFW3sHKJKTxZ9TRQ-dYu1DXL_OmrQ4r3mzaE/edit#gid=356435384"
+        },
+        "options": {}
+      },
+      "id": "81331318-d994-4007-8f34-36458e079e80",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        820,
+        740
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1LQs3ubpHFW3sHKJKTxZ9TRQ-dYu1DXL_OmrQ4r3mzaE",
+          "mode": "list",
+          "cachedResultName": "Hosts with Expired/Expiring Docs One time Comm (Updated as off 4th Sep 2023)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LQs3ubpHFW3sHKJKTxZ9TRQ-dYu1DXL_OmrQ4r3mzaE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1526245004,
+          "mode": "list",
+          "cachedResultName": "eDM Expired Hosts (1-10 cars)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LQs3ubpHFW3sHKJKTxZ9TRQ-dYu1DXL_OmrQ4r3mzaE/edit#gid=1526245004"
+        },
+        "options": {}
+      },
+      "id": "a5b479bf-8929-4ff4-ac46-8549d4544aec",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        820,
+        920
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "update",
+        "identifier": "={{ $json.EMAIL}}",
+        "updateAttributes": {
+          "updateAttributesValues": [
+            {
+              "fieldName": "CPHOSTNAME",
+              "fieldValue": "={{ $json.CPHOSTNAME}}"
+            },
+            {
+              "fieldName": "LISTING1",
+              "fieldValue": "={{ $json.LISTING1 }}"
+            },
+            {
+              "fieldName": "LISTING2",
+              "fieldValue": "={{ $json.LISTING2 }}"
+            },
+            {
+              "fieldName": "LISTING3",
+              "fieldValue": "={{ $json.LISTING3 }}"
+            },
+            {
+              "fieldName": "LISTING4",
+              "fieldValue": "={{ $json.LISTING4 }}"
+            },
+            {
+              "fieldName": "LISTING5",
+              "fieldValue": "={{ $json.LISTING5 }}"
+            },
+            {
+              "fieldName": "LISTING6",
+              "fieldValue": "={{ $json.LISTING6 }}"
+            },
+            {
+              "fieldName": "LISTING7",
+              "fieldValue": "={{ $json.LISTING7 }}"
+            },
+            {
+              "fieldName": "LISTING8",
+              "fieldValue": "={{ $json.LISTING8 }}"
+            },
+            {
+              "fieldName": "LISTING9",
+              "fieldValue": "={{ $json.LISTING9 }}"
+            },
+            {
+              "fieldName": "LISTING10",
+              "fieldValue": "={{ $json.LISTING10 }}"
+            }
+          ]
+        }
+      },
+      "id": "91cc595d-65c6-45ff-a1c4-680b33edc41e",
+      "name": "SendInBlue3",
+      "type": "n8n-nodes-base.sendInBlue",
+      "typeVersion": 1,
+      "position": [
+        980,
+        920
+      ],
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\"to\":[{\"email\":\"{{ $('Google Sheets1').item.json[\"EMAIL\"] }}\"}],\n\"templateId\":722\n}\n",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API4",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1140,
+        920
+      ],
+      "id": "34fef344-871e-4678-a1b5-ed52fcb4f0b3",
+      "retryOnFail": true,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "continueOnFail": true
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2023-09-04T07:42:46.109Z",
+  "versionId": "c5536fdf-d21a-40d2-a3ae-c9f8d968c5f7"
+}
