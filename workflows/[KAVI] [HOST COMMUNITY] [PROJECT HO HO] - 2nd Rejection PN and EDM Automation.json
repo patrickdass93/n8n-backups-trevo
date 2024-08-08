@@ -1,0 +1,296 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "2nd Rejection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function": {
+      "main": [
+        [
+          {
+            "node": "SIB API - Send 2nd Rejection Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "LP API - Send PN - Add User to Campaign1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2nd Rejection": {
+      "main": [
+        [
+          {
+            "node": "Function",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2022-12-14T13:27:23.894Z",
+  "id": "9",
+  "name": "[KAVI] [HOST COMMUNITY] [PROJECT HO HO] - 2nd Rejection PN and EDM Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "616d8569-7fbb-49a6-a4f4-2fd0fcec42fa",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        700,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"id\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['id']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        280
+      ],
+      "id": "d889062b-55c2-4b2d-9a71-632a68abf2db"
+    },
+    {
+      "parameters": {
+        "content": "## 2nd Rejection Workflow",
+        "height": 83.58744376208503,
+        "width": 308.1614314796167
+      },
+      "id": "b6127358-8dda-464f-8e10-a0e80a69d04d",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        300,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.leanplum.com/api?action=startCampaign",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={ \"appId\" : \"app_BXrjE7dc15VWXDLRfh77tActhBhSkCHeQhETDE1mXfQ\", \"clientKey\" : \"dev_L9yBjOmwfR3fNiVjL9woIYfWzsy5hMcGDx0og8isAFw\", \"apiVersion\" : \"1.0.6\", \"userId\":\"{{ $json[\"uuid\"] }}\", \"campaignId\":\"6666281586589696\", \"createDisposition\" : \"CreateNever\"}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "LP API - Send PN - Add User to Campaign1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1220,
+        380
+      ],
+      "id": "2f134168-881b-4d0f-95c9-7496fc5cd7ef"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect distinct l.id, \nl.registration_no, \nm.name as model,\ncase when ll.city_id in (1) then '1. KV'   \nwhen ll.city_id in (2,12) then '2. PG'\nwhen ll.city_id in (3,19,20,21) then '3. KK'  \nwhen ll.city_id in (4,15) then '4. JB' \nwhen ll.city_id in (5) then '5. IP' \nwhen ll.city_id in (47) then '6. NS'\nwhen ll.city_id in (13) then '7. LGK'\nelse '8. Others' end as city,\nl.user_id, \nconcat(u.first_name, ' ',u.last_name)as host_name, \nu.email, \nu.phone_number,\nu.uuid,\ncase when bj.rej_booking is null then '0' else bj.rej_booking end as rej_booking,\nla.avai_days,\ncase when bc.fuld_booking is null then '0' else bc.fuld_booking end as fuld_booking,\ncase when fd.fuld_days is null then '0' else fd.fuld_days end as fuld_days\nfrom listings l \nleft join users u on u.id = l.user_id\nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = l.id\nleft join models m on m.id = l.model_id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) or (b.status in ('withdrawn', 'cancelled') and b.reason ~* '(host|owner|avai|car)') then b.ref_no end) as rej_booking\n        from bookings b \n        where b.request_end_at >= '2022-12-16 00:00' and b.request_start_at <= '2023-01-02 23:59'\n        group by 1)bj\n        on bj.listing_id = l.id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when b.status in ('completed','start_driving','waiting_for_inspection', 'return_car','accepted') then b.id end) as fuld_booking\n        from bookings b \n        where b.request_end_at >= '2022-12-16 00:00' and b.request_start_at <= '2023-01-02 23:59'\n        group by 1)bc\n        on bc.listing_id = l.id\n--\nleft join \n        (select l.id,\n        count(dates.ymd) as avai_days\n        from listings l\n        left join listing_availability la on la.listing_id=l.id\n        left join (SELECT generate_series(timestamp '2022-12-16', timestamp '2023-01-02', interval '1 day')::date ymd) dates on \n        dates.ymd between la.start_date::date and la.end_date::date\n        where l.status='approved' and l.deleted_at is null \n        GROUP BY 1)la\n        on la.id = l.id\n--\nleft join\n                (select distinct b.listing_id,\n                count(distinct dates.ymd) as fuld_days\n                from bookings b \n                left join listing_location ll on ll.listing_id = b.listing_id \n                join (SELECT generate_series(timestamp '2022-12-16', '2023-01-02' , interval '1 day')::date as ymd) dates \n                on dates.ymd between b.request_start_at::date and b.request_end_at::date\n                where b.status in ('completed','start_driving','waiting_for_inspection', 'return_car','accepted')\n                and ll.country = 'Malaysia'\n                group by 1)fd\n                on fd.listing_id = l.id\nwhere l.status = 'approved'\nand l.deleted_at is null\nand bj.rej_booking = 2\nand l.id in (63,\n33819,\n11352,\n25174,\n27519,\n6107,\n9708,\n17984,\n27319,\n27722,\n28436,\n28724,\n30316,\n31632,\n33302,\n33659,\n34878,\n34917,\n35373,\n37706,\n38218,\n38311,\n38573,\n38912,\n38925,\n39279,\n39622,\n39999,\n40835,\n40896,\n41011,\n41135,\n35567,\n36427,\n10983,\n14683,\n29539,\n35991,\n28301,\n32796,\n40753,\n1166,\n39343,\n39536,\n39837,\n37105,\n35342,\n40760,\n39774,\n40890,\n38286,\n40946,\n840,\n36721,\n599,\n642,\n848,\n866,\n867,\n1167,\n1168,\n1169,\n1266,\n1655,\n1740,\n2038,\n2157,\n2183,\n4751,\n5085,\n5107,\n5155,\n5763,\n6298,\n6871,\n7368,\n7718,\n7774,\n8126,\n8309,\n9625,\n9884,\n10752,\n10847,\n11593,\n12617,\n12818,\n12864,\n12899,\n13915,\n14204,\n15477,\n15677,\n15846,\n16201,\n16726,\n17151,\n17462,\n17840,\n18799,\n18980,\n19008,\n19207,\n19252,\n19288,\n19972,\n19995,\n20035,\n20046,\n20211,\n20220,\n20600,\n21203,\n21205,\n21210,\n21214,\n21217,\n21219,\n21248,\n21296,\n22527,\n22570,\n22669,\n22917,\n22940,\n22969,\n23121,\n23122,\n23237,\n23826,\n24531,\n24942,\n25011,\n25099,\n25129,\n25293,\n25442,\n25448,\n25601,\n25623,\n25902,\n26261,\n26309,\n26404,\n26805,\n26952,\n26974,\n27043,\n27121,\n27387,\n27438,\n27474,\n27509,\n27715,\n27750,\n27829,\n27915,\n28185,\n28455,\n28628,\n28722,\n28915,\n28958,\n28986,\n28999,\n29119,\n29135,\n29265,\n29362,\n29376,\n29394,\n29402,\n29435,\n29448,\n29459,\n29609,\n29658,\n29727,\n29772,\n30398,\n30729,\n30748,\n30837,\n30909,\n31066,\n31146,\n31155,\n31162,\n31379,\n31404,\n31715,\n31784,\n32342,\n32385,\n32406,\n32507,\n32528,\n32529,\n32621,\n32908,\n33041,\n33376,\n33551,\n33607,\n33612,\n33639,\n33760,\n33801,\n33803,\n33806,\n33820,\n33826,\n33895,\n33920,\n33926,\n33927,\n33942,\n33975,\n34005,\n34028,\n34248,\n34273,\n34320,\n34334,\n34338,\n34416,\n34461,\n34462,\n34679,\n34700,\n34796,\n34835,\n34851,\n34930,\n34931,\n34949,\n34967,\n34971,\n35009,\n35016,\n35022,\n35073,\n35103,\n35128,\n35153,\n35154,\n35221,\n35272,\n35383,\n35416,\n35434,\n35498,\n35522,\n35561,\n35767,\n35933,\n36069,\n36174,\n36175,\n36178,\n36274,\n36334,\n36365,\n36415,\n36426,\n36473,\n36506,\n36507,\n36519,\n36521,\n36583,\n36616,\n36670,\n36708,\n36718,\n36751,\n36775,\n36791,\n36804,\n36827,\n36838,\n36849,\n36923,\n36963,\n36988,\n36989,\n36990,\n36991,\n37001,\n37008,\n37059,\n37063,\n37099,\n37198,\n37199,\n37213,\n37221,\n37239,\n37278,\n37292,\n37314,\n37333,\n37352,\n37392,\n37393,\n37397,\n37433,\n37527,\n37529,\n37531,\n37542,\n37575,\n37589,\n37631,\n37632,\n37685,\n37720,\n37723,\n37724,\n37726,\n37728,\n37782,\n37792,\n37809,\n37816,\n37838,\n37865,\n37880,\n37895,\n37948,\n38029,\n38030,\n38092,\n38099,\n38129,\n38151,\n38189,\n38194,\n38202,\n38250,\n38267,\n38322,\n38375,\n38379,\n38384,\n38405,\n38439,\n38442,\n38444,\n38447,\n38458,\n38473,\n38580,\n38581,\n38582,\n38592,\n38599,\n38672,\n38692,\n38713,\n38716,\n38717,\n38786,\n38814,\n38816,\n38829,\n38842,\n38852,\n38874,\n38875,\n38899,\n38907,\n38924,\n38936,\n38938,\n38960,\n38980,\n39005,\n39014,\n39062,\n39086,\n39120,\n39127,\n39140,\n39149,\n39151,\n39170,\n39226,\n39247,\n39267,\n39269,\n39325,\n39327,\n39346,\n39371,\n39373,\n39374,\n39388,\n39415,\n39435,\n39437,\n39439,\n39461,\n39492,\n39505,\n39506,\n39514,\n39555,\n39563,\n39567,\n39601,\n39612,\n39637,\n39641,\n39660,\n39670,\n39673,\n39721,\n39734,\n39738,\n39786,\n39838,\n39851,\n39873,\n39889,\n39911,\n39915,\n39933,\n39948,\n39960,\n39966,\n39976,\n39982,\n40005,\n40012,\n40028,\n40036,\n40044,\n40052,\n40116,\n40158,\n40209,\n40221,\n40246,\n40312,\n40324,\n40341,\n40348,\n40370,\n40377,\n40400,\n40401,\n40417,\n40434,\n40453,\n40522,\n40528,\n40550,\n40570,\n40593,\n40594,\n40608,\n40609,\n40629,\n40634,\n40641,\n40649,\n40668,\n40670,\n40675,\n40692,\n40694,\n40705,\n40706,\n40707,\n40709,\n40735,\n40737,\n40763,\n40773,\n40776,\n40777,\n40786,\n40806,\n40808,\n40814,\n40834,\n40837,\n40849,\n40856,\n40857,\n40871,\n40873,\n40883,\n40885,\n40886,\n40888,\n40889,\n40892,\n40903,\n40921,\n40941,\n40942,\n40976,\n41012,\n41023,\n41051,\n41053,\n41058,\n41059,\n41087,\n41105,\n41127,\n41148,\n41154,\n41156,\n41172,\n41196,\n41203,\n41231,\n41234,\n41249,\n41264,\n41268,\n41325,\n41336,\n41439,\n41501,\n41515,\n41537,\n41548,\n41550,\n41586,\n41610,\n41629,\n41642,\n41664,\n41706,\n41708,\n41740,\n41742,\n41753,\n41785,\n41842,\n41862,\n41918,\n41952,\n41972,\n41973,\n41974,\n19217,\n19496,\n29490,\n33615,\n34676,\n35444,\n36424,\n36585,\n36651,\n36745,\n36968,\n38015,\n38193,\n38910,\n39102,\n40126,\n10981,\n26258,\n27357,\n27452,\n29710,\n30397,\n32446,\n33630,\n35654,\n37256,\n37568,\n39375,\n40220,\n40242,\n41031,\n41139,\n41749,\n41750,\n2497,\n17005,\n21778,\n29533,\n32141,\n34871,\n35310,\n36200,\n37011,\n37112,\n37688,\n37922,\n38434,\n39378,\n40775,\n9552,\n11381,\n14675,\n21964,\n26252,\n32681,\n33287,\n36282,\n36894,\n37462,\n38027,\n39692,\n39701,\n40739,\n40965,\n40977,\n41608,\n19353,\n38345,\n39489,\n40185,\n41093,\n14686,\n34695,\n37713,\n38795,\n39699,\n40531,\n40850,\n41762,\n29287,\n33698,\n38025,\n38553,\n38884,\n40000,\n40502,\n40582,\n40727,\n41070,\n41635,\n25627,\n27497,\n38651,\n41062,\n41242,\n41259,\n10982,\n33164,\n35550,\n37073,\n39349,\n8572,\n37943,\n39741,\n40915,\n32750,\n38671,\n39691,\n39717,\n41295,\n28487,\n6279,\n14236,\n15497,\n20054,\n23956,\n37941,\n41152,\n41763,\n23254,\n27379,\n27551,\n28526,\n31278,\n33505,\n35255,\n35412,\n37237,\n40642)\norder by 9 desc",
+        "additionalFields": {}
+      },
+      "id": "f57a0a31-667e-4a8f-81ae-77edf8793711",
+      "name": "2nd Rejection",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        880,
+        280
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "trevodb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\"to\":[{\"email\":\"{{$json[\"email\"]}}\",\"name\":\"{{$json[\"host_name\"]}}\"}],\n\"templateId\":308,\"params\":{ \"CPHOSTNAME\":\"{{$json[\"host_name\"]}}\", \"AVAILABLE_DAYS\":\"{{$json[\"avai_days\"]}}\",\"REJECTED_BOOKING\":\"{{$json[\"rej_booking\"]}}\"}}\n\n",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API - Send 2nd Rejection Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1220,
+        180
+      ],
+      "id": "489cc4f8-3d96-4af8-91a1-d44629748c16",
+      "retryOnFail": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "5",
+          "name": "SendInBlue - Header Key"
+        },
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "continueOnFail": true
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "callerPolicy": "any",
+    "errorWorkflow": "11",
+    "saveExecutionProgress": "DEFAULT",
+    "saveManualExecutions": false
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds": [
+        36721,
+        38286,
+        35073,
+        26805,
+        20054,
+        27043,
+        26974,
+        39738,
+        36804,
+        33820,
+        41642,
+        21778,
+        30316,
+        34700,
+        1266,
+        39371,
+        39343,
+        2497,
+        37392,
+        6107,
+        35009,
+        6871,
+        40705,
+        38345,
+        32621,
+        31632,
+        12864,
+        40850,
+        41011,
+        40593,
+        28185,
+        33760,
+        31404,
+        38218,
+        37105,
+        40835,
+        39373,
+        40890,
+        40896,
+        25174,
+        37706,
+        35991,
+        29539,
+        27722,
+        39170,
+        27519,
+        32385,
+        41785,
+        39960,
+        19972,
+        63,
+        6,
+        1,
+        2,
+        3,
+        4,
+        5,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "node:Schedule Trigger1": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2023-01-02T02:56:10.650Z",
+  "versionId": "666ab5ef-a8fc-4555-bbd9-d5acc10cd1bc"
+}
