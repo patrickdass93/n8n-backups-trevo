@@ -1,0 +1,130 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2022-12-14T09:28:08.964Z",
+  "id": "8",
+  "name": "[KAVI] Weekly Update",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "71bab2ba-917c-4616-a15e-e8d7458df096",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select to_char(b.created_at,'IYYY-IW')as week, sum(b.gross_amount) as gross, max(a.gross) as prev_gross,\nround(((sum(b.gross_amount)-max(a.gross))/max(a.gross))*100,2) as wow\nfrom bookings b \nleft join listings l on l.id = b.listing_id \nleft join listing_location ll on ll.listing_id = l.id\nleft join (select to_char(DATE_TRUNC('week', CURRENT_DATE - 7),'IYYY-IW')as week, sum(b.gross_amount) as gross\nfrom bookings b\nleft join listings l on l.id = b.listing_id \nleft join listing_location ll on ll.listing_id = l.id\nwhere 1=1\nand b.created_at > DATE_TRUNC('week', CURRENT_DATE - 14)\nand ll.country = 'Malaysia'\nand b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')\nAND b.created_at < DATE_TRUNC('week', CURRENT_DATE - 7)\ngroup by 1) a on a.week = to_char(b.created_at,'IYYY-IW')\nwhere 1=1\nand b.created_at > DATE_TRUNC('week', CURRENT_DATE - 7)\nand ll.country = 'Malaysia'\nand b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')\nAND b.created_at < DATE_TRUNC('week', CURRENT_DATE)\ngroup by 1\norder by 1 \nlimit 3",
+        "additionalFields": {}
+      },
+      "id": "28eda104-50d2-478d-b5bd-8c46a1f215f8",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        20
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "trevodb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "channel": "kav_test",
+        "text": "={{ $json[\"week\"] }}\nFulfilled GMV (Current Week): RM {{ $json[\"gross\"] }}\nFulfilled GMV (Previous Week): RM {{ $json[\"prev_gross\"] }}\nWoW Growth: {{ $json[\"wow\"] }}%",
+        "otherOptions": {},
+        "attachments": []
+      },
+      "id": "2d7d1004-caed-4abe-8c7c-76079aa0d5eb",
+      "name": "Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        20,
+        20
+      ],
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "14",
+          "name": "Slack - N8N KAVI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "value": "={{ $json[\"date\"] }}",
+        "dataPropertyName": "date",
+        "custom": true,
+        "toFormat": "YYYY/MM/DD",
+        "options": {}
+      },
+      "id": "75dbf6c2-0ecb-4d6c-9a31-abab3c7383f7",
+      "name": "Date & Time",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        -180
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "any",
+    "executionTimeout": 3600,
+    "errorWorkflow": "2",
+    "saveExecutionProgress": "DEFAULT",
+    "saveDataSuccessExecution": "all"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2022-12-14T13:24:03.988Z",
+  "versionId": "c216ee35-2028-4d07-a5b5-b13df7f5bab0"
+}
