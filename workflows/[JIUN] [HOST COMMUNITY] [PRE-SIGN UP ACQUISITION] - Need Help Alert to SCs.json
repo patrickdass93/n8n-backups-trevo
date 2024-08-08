@@ -1,0 +1,622 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Function6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Central",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Northern",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Southern",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Eastern",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function6": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-06-09T03:02:12.143Z",
+  "id": "87",
+  "name": "[JIUN] [HOST COMMUNITY] [PRE-SIGN UP ACQUISITION] - Need Help Alert to SCs",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "c7d9f871-1fc0-4660-9c52-3191742b79f7",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1jc43nRg5gOWUy3FB7HQ1AvaDbcnqKnq0e0I5PXqkJXU",
+          "mode": "list",
+          "cachedResultName": "Help us understand (Responses)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jc43nRg5gOWUy3FB7HQ1AvaDbcnqKnq0e0I5PXqkJXU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1807391404,
+          "mode": "list",
+          "cachedResultName": "N8N Export",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jc43nRg5gOWUy3FB7HQ1AvaDbcnqKnq0e0I5PXqkJXU/edit#gid=1807391404"
+        },
+        "options": {}
+      },
+      "id": "cbffc130-0480-42de-a9ed-48fc356f9ab0",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        2000,
+        -80
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.City }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "Klang Valley"
+            },
+            {
+              "value2": "Negeri Sembilan"
+            },
+            {
+              "value2": "Pulau Pinang",
+              "output": 1
+            },
+            {
+              "value2": "Langkawi",
+              "output": 1
+            },
+            {
+              "value2": "Ipoh",
+              "output": 1
+            },
+            {
+              "value2": "Johor",
+              "output": 2
+            },
+            {
+              "value2": "Melaka",
+              "output": 2
+            },
+            {
+              "value2": "Kota Kinabalu",
+              "output": 3
+            },
+            {
+              "value2": "Kuching",
+              "output": 3
+            }
+          ]
+        }
+      },
+      "id": "c0846c02-8acc-4f3d-8e91-d4d9f0192dd9",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        2380,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAuAnAjjE",
+        "messageUi": {
+          "text": "=Hello Team, a potential host is in need of assistance. Please refer to response sheet link below\n\nEmail: {{ $json[\"Email Address\"] }}\nPhone Number: {{ $json[\"Your contact number\"] }}\nIssue Faced: {{ $json[\"Issues Faced\"] }}\nPreffered Time to be called: {{ $json[\"Preffered Time\"] }}\n\nhttps://docs.google.com/spreadsheets/d/1jc43nRg5gOWUy3FB7HQ1AvaDbcnqKnq0e0I5PXqkJXU/edit?usp=sharing "
+        },
+        "additionalFields": {}
+      },
+      "id": "0ff33e9a-268d-4e46-8d5e-e5f7fe919a41",
+      "name": "Central",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        2680,
+        -340
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAty2-MzA",
+        "messageUi": {
+          "text": "=Hello Team, a potential host is in need of assistance. Please refer to response sheet link below\n\nEmail: {{ $json[\"Email Address\"] }}\nPhone Number: {{ $json[\"Your contact number\"] }}\nIssue Faced: {{ $json[\"Issues Faced\"] }}\nPreffered Time to be called: {{ $json[\"Preffered Time\"] }}\n\nhttps://docs.google.com/spreadsheets/d/1jc43nRg5gOWUy3FB7HQ1AvaDbcnqKnq0e0I5PXqkJXU/edit?usp=sharing "
+        },
+        "additionalFields": {}
+      },
+      "id": "69d17368-6625-446a-b1f6-66c2c0559bc9",
+      "name": "Northern",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        2680,
+        -180
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAOZfALAA",
+        "messageUi": {
+          "text": "=Hello Team, a potential host is in need of assistance. Please refer to response sheet link below\n\nEmail: {{ $json[\"Email Address\"] }}\nPhone Number: {{ $json[\"Your contact number\"] }}\nIssue Faced: {{ $json[\"Issues Faced\"] }}\nPreffered Time to be called: {{ $json[\"Preffered Time\"] }}\n\nhttps://docs.google.com/spreadsheets/d/1jc43nRg5gOWUy3FB7HQ1AvaDbcnqKnq0e0I5PXqkJXU/edit?usp=sharing "
+        },
+        "additionalFields": {}
+      },
+      "id": "09e488d0-67da-4120-baeb-fa9e941df111",
+      "name": "Southern",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        2680,
+        20
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAgvG0aiA",
+        "messageUi": {
+          "text": "=Hello Team, a potential host is in need of assistance. Please refer to response sheet link below\n\nEmail: {{ $json[\"Email Address\"] }}\nPhone Number: {{ $json[\"Your contact number\"] }}\nIssue Faced: {{ $json[\"Issues Faced\"] }}\nPreffered Time to be called: {{ $json[\"Preffered Time\"] }}\n\nhttps://docs.google.com/spreadsheets/d/1jc43nRg5gOWUy3FB7HQ1AvaDbcnqKnq0e0I5PXqkJXU/edit?usp=sharing "
+        },
+        "additionalFields": {}
+      },
+      "id": "1573924e-e75b-4f0a-9d89-5260d4a8039e",
+      "name": "Eastern",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        2680,
+        220
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"Timestamp\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['Timestamp']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function6",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        2200,
+        -80
+      ],
+      "id": "006621d0-1dea-4712-b1f6-42ecad32a86a"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "callerPolicy": "any",
+    "errorWorkflow": "11",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds": [
+        "2/4/2024 12:44:11",
+        "2/4/2024 17:24:36",
+        "11/28/2023 13:34:39",
+        "11/20/2023 9:01:38",
+        "11/5/2023 15:37:17",
+        "11/5/2023 0:05:24",
+        "10/31/2023 12:13:00",
+        "10/31/2023 12:14:21",
+        "10/31/2023 14:38:27",
+        "10/31/2023 22:46:09",
+        "10/26/2023 1:08:44",
+        "10/26/2023 1:19:48",
+        "7/21/2023 1:07:34",
+        "4/7/2023 15:11:35",
+        "5/9/2023 15:24:58",
+        "6/9/2023 11:22:03",
+        "6/9/2023 11:44:11",
+        "Wern5802@gmail.com",
+        " jyz683@gmail.com",
+        "azraihakim@gmail.com",
+        "yapelvis9@gmail.com",
+        "Kchiakh@gmail.com",
+        "kumarvinnesh@gmail.com",
+        "ivanhao@gmail.com",
+        "nuratikah13@gmail.com",
+        "scalingupfitri@gmail.com",
+        "dell.adnan@yahoo.com",
+        "mohdhusnanibrahim@gmail.com",
+        "Top.infinity33@gmail.com",
+        "powforchai@gmail.com",
+        "Mohdaizuddinelias@gmail.com",
+        "outback-heirs0e@icloud.com",
+        "sitifatimahhhameer@gmail.com",
+        "saffiyyahfarhana@gmail.com",
+        "sharizalmalek@gmail.com",
+        "tharma_remo@yahoo.com",
+        " kriticarani@rocketmail.com",
+        "linges39@gmail.com",
+        "cpebizs@gmail.com",
+        19217,
+        20190,
+        23254,
+        27519,
+        27551,
+        32133,
+        33151,
+        35444,
+        35561,
+        36079,
+        36365,
+        36521,
+        37333,
+        38267,
+        38439,
+        39151,
+        40735,
+        40921,
+        41127,
+        41608,
+        41724,
+        41749,
+        42137,
+        42399,
+        42707,
+        42849,
+        12899,
+        19353,
+        23956,
+        26261,
+        27750,
+        28472,
+        29017,
+        31146,
+        31379,
+        33164,
+        33615,
+        33926,
+        35551,
+        36174,
+        36585,
+        37073,
+        37713,
+        37728,
+        38029,
+        38260,
+        38434,
+        38473,
+        39563,
+        39641,
+        39660,
+        39933,
+        40012,
+        40057,
+        40116,
+        40220,
+        40301,
+        40892,
+        41136,
+        41268,
+        41270,
+        41407,
+        41682,
+        42300,
+        42343,
+        42438,
+        42662,
+        42690,
+        42743,
+        34796,
+        39374,
+        41105,
+        20054,
+        36923,
+        27043,
+        19995,
+        39889,
+        26974,
+        39701,
+        38092,
+        41642,
+        18799,
+        39734,
+        1740,
+        40531,
+        36804,
+        38580,
+        26805,
+        14675,
+        34334,
+        40629,
+        21248,
+        28915,
+        41586,
+        41148,
+        41139,
+        39738,
+        35016,
+        27715,
+        39435,
+        26309,
+        35073,
+        2038,
+        36791,
+        39062,
+        37948,
+        38875,
+        30729,
+        39692,
+        32406,
+        24942,
+        40221,
+        38458,
+        38202,
+        37568,
+        32750,
+        35103,
+        41550,
+        39269,
+        37792,
+        36274,
+        35383,
+        25601,
+        12864,
+        41012,
+        37433,
+        32621,
+        33630,
+        27474,
+        38553,
+        21778,
+        2497,
+        40593,
+        28185,
+        31155,
+        35009,
+        1167,
+        41172,
+        34700,
+        17005,
+        41974,
+        39461,
+        39439,
+        40705,
+        33820,
+        10983,
+        1266,
+        39774,
+        34695,
+        40850,
+        36282,
+        35342,
+        40760,
+        1166,
+        14683,
+        840,
+        37105,
+        38286,
+        40753,
+        28301,
+        32796,
+        33760,
+        40946,
+        39536,
+        39717,
+        40502,
+        36721,
+        36427,
+        36069,
+        32385,
+        40786,
+        37724,
+        37392,
+        6871,
+        41785,
+        37198,
+        31404,
+        39170,
+        37529,
+        39371,
+        39373,
+        36415,
+        36968,
+        39960,
+        19972,
+        40670,
+        17984,
+        39343,
+        40835,
+        39622,
+        30316,
+        41135,
+        31632,
+        34878,
+        38573,
+        33659,
+        41011,
+        35567,
+        38925,
+        34917,
+        40896,
+        37706,
+        39999,
+        39279,
+        9708,
+        38912,
+        33302,
+        6107,
+        29539,
+        39837,
+        38311,
+        38218,
+        28724,
+        35373,
+        9552,
+        27319,
+        848,
+        28436,
+        6,
+        1,
+        2,
+        3,
+        4,
+        5,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "node:Schedule Trigger1": {
+      "recurrencyRules": [
+        96
+      ]
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-08-07T01:00:04.289Z",
+  "versionId": "2617db46-6ab8-4fb5-bdf7-353e27bcffc8"
+}
