@@ -1,0 +1,66 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HubSpot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-04-18T06:37:33.173Z",
+  "id": "66",
+  "name": "Jiun - Hubspot Test",
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "appToken",
+        "operation": "getAll",
+        "filters": {}
+      },
+      "id": "2c9dc93a-4787-4806-9aad-a53788352205",
+      "name": "HubSpot",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 1,
+      "position": [
+        800,
+        360
+      ],
+      "credentials": {
+        "hubspotAppToken": {
+          "id": "28",
+          "name": "HubSpot App Token Account (Kavi)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "0d84f24f-c8dc-4bd9-8cdb-c4fb273eabf9",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        600,
+        360
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-04-20T08:36:25.650Z",
+  "versionId": "850b81a4-62cf-4750-8799-5f799abbcfbd"
+}
