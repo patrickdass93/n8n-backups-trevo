@@ -1,0 +1,577 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Switch - STRIKE 1,2,3,4,5": {
+      "main": [
+        [],
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IF1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function - No Duplicates in Same Quarter": {
+      "main": [
+        [
+          {
+            "node": "Event - 1st Rejection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function - No Duplicates in Same Quarter2": {
+      "main": [
+        [
+          {
+            "node": "Event - 4th Violation (9th Rejection)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Switch - STRIKE 1,2,3,4,5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Function - No Duplicates in Same Quarter2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF1": {
+      "main": [
+        [
+          {
+            "node": "Function - No Duplicates in Same Quarter4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function - No Duplicates in Same Quarter4": {
+      "main": [
+        [
+          {
+            "node": "Event - 3rd Violation (6th Rejection)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-11-07T05:05:38.014Z",
+  "id": "EF930qGduIEe4OZ5",
+  "name": "[KAVI] HSP - Post Comms (3,4,5)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "50 07-23 * * *"
+            }
+          ]
+        }
+      },
+      "id": "7a183dd0-b473-409b-9681-e3a74e236a81",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        560,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E",
+          "mode": "list",
+          "cachedResultName": "HSP Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 759945530,
+          "mode": "list",
+          "cachedResultName": "Rejection - Confirmation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E/edit#gid=759945530"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRange",
+              "headerRow": 3,
+              "firstDataRow": 4
+            }
+          },
+          "outputFormatting": {
+            "values": {
+              "general": "UNFORMATTED_VALUE",
+              "date": "FORMATTED_STRING"
+            }
+          }
+        }
+      },
+      "id": "53d28e9b-1a73-486a-977f-0c279e85b4b5",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        780,
+        340
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json['Rejection Strike'] }}",
+              "operation": "equal",
+              "value2": 2
+            }
+          ]
+        }
+      },
+      "id": "7110086b-9be3-425c-b8c1-bf80e579aa94",
+      "name": "IF - Strike 1 OR 2",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        1500
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "value1": "={{ $json['Rejection Score'] }}",
+        "rules": {
+          "rules": [
+            {
+              "operation": "equal",
+              "value2": 5
+            },
+            {
+              "operation": "equal",
+              "value2": 4,
+              "output": 1
+            },
+            {
+              "operation": "equal",
+              "value2": 3,
+              "output": 2
+            }
+          ]
+        },
+        "fallbackOutput": 3
+      },
+      "id": "494df311-5a1a-4bcf-9212-083cb3e6fbab",
+      "name": "Switch - STRIKE 1,2,3,4,5",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"UUID\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_HSP_Rejections\",\n            \"evtData\": {\n                \"offence_no\": \"HSP_rejections_1\",\n                \"HSP_rejection_registration_no\": \"{{ $json[\"Registration No\"] }}\"\n\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "aff9dcaa-9cd8-4d85-846b-bebc07f60591",
+      "name": "Event - 1st Rejection",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1860,
+        1620
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"Quarter_ID\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['Quarter_ID']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function - No Duplicates in Same Quarter",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1660,
+        1620
+      ],
+      "id": "2c40089c-862c-4672-b5b1-20224548f35d",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## 1st & 2nd Violation"
+      },
+      "id": "a4c3a37a-df20-4238-859d-83ba3e82c4dc",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2140,
+        1520
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 3rd Violation"
+      },
+      "id": "4baceb99-1b9b-4af9-9eaf-34c83ff2d131",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2140,
+        940
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"key\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['key']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function - No Duplicates in Same Quarter2",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        132
+      ],
+      "id": "09cb1cfc-cd98-4d9a-8958-95c69745f467"
+    },
+    {
+      "parameters": {
+        "content": "## 4th Violation Ended Comms",
+        "height": 277.53738902763814,
+        "width": 665.4439802585332
+      },
+      "id": "a8818f24-62f3-42c1-9810-57175c4c4236",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1299.495144656952,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"UUID\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_HSP_Rejections\",\n            \"evtData\": {\n                \"offence_no\": \"HSP_rejections_9_post\",\n                \"HSP_rejection_registration_no\": \"{{ $json[\"Registration No\"] }}\"\n\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "a80ef580-7238-4646-b99e-2a4a3f91401f",
+      "name": "Event - 4th Violation (9th Rejection)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1740,
+        132
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 3rd Violation Ended Comms",
+        "height": 277.53738902763814,
+        "width": 663.1777729142901
+      },
+      "id": "0c7c3e19-63ec-4241-9175-72d988f52a2a",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1301.761352001195,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"UUID\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_HSP_Rejections\",\n            \"evtData\": {\n                \"offence_no\": \"HSP_rejections_6_post\",\n                \"HSP_rejection_registration_no\": \"{{ $json[\"Registration No\"] }}\"\n\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "2f5a9b52-83ca-48dd-a84b-f60f43b56fe4",
+      "name": "Event - 3rd Violation (6th Rejection)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1740,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "43ce60b1-6f89-4327-ae81-3dde6c422649",
+      "name": "Date & Time",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        780,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "multiplex",
+        "options": {}
+      },
+      "id": "59a5cede-cf22-4627-8eef-3ed4b1cab8b1",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        960,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "dateTime": [
+            {
+              "value1": "={{ $json['Reset Date'] }}",
+              "operation": "before",
+              "value2": "={{ $json.currentDate }}"
+            }
+          ]
+        }
+      },
+      "id": "20121e77-6670-45f3-84f3-4301bea0f5ce",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "dateTime": [
+            {
+              "value1": "={{ $json['Reset Date'] }}",
+              "operation": "before",
+              "value2": "={{ $json.currentDate }}"
+            }
+          ]
+        }
+      },
+      "id": "cdb1c08a-54ea-412c-9207-762d343a0d9a",
+      "name": "IF1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds_1 = items.map(item => item.json[\"key\"]);\nconst oldListingIds_1 = staticData.oldListingIds_1; \n\nif (!oldListingIds_1) {\n  staticData.oldListingIds_1 = newListingIds_1;\n  return items;\n}\n\nconst ActualNewListingIds_1 = newListingIds_1.filter(id => !oldListingIds_1.includes(id));\nconst actualNewListing_1 = items.filter(data => ActualNewListingIds_1.includes(data.json['key']));\nstaticData.oldListingIds_1 = [...ActualNewListingIds_1, ...oldListingIds_1];\n\nreturn actualNewListing_1;\n"
+      },
+      "name": "Function - No Duplicates in Same Quarter4",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        440
+      ],
+      "id": "557ef60a-0af9-4a3e-a4c4-b7f3b5ecc71a"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds_1": [
+        "#N/A (Did not find value '40028' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '45700' in VLOOKUP evaluation.)",
+        "SYV1734-2024-Q2-3",
+        "BRH826-2024-Q2-3",
+        "#N/A (Did not find value '54226' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '51513' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '50993' in VLOOKUP evaluation.)",
+        "SYQ2023-2024-Q2-3",
+        "QAA5248Q-2024-Q2-3",
+        "#N/A (Did not find value '52665' in VLOOKUP evaluation.)",
+        "SAC7384A-2024-Q2-3",
+        "#N/A (Did not find value '47942' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '48724' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '48868' in VLOOKUP evaluation.)",
+        "SYB1279-2024-Q2-3",
+        "SB2955G-2024-Q2-3",
+        "SYH291-2024-Q2-3",
+        "#N/A (Did not find value '34435' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '48170' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '48181' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '43267' in VLOOKUP evaluation.)",
+        "SWA9139-2024-Q1-3",
+        "TCT4004-2024-Q1-3",
+        "SD27N-2024-Q1-3",
+        "MDM8880-2024-Q1-3",
+        "#N/A (Did not find value '32453' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '40371' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '51636' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '52584' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '22600' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '32453' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '39767' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '44388' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '52022' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '39887' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '41608' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '41268' in VLOOKUP evaluation.)",
+        "SAC3056B-2024-Q1-3",
+        "ST563X-2024-Q1-3",
+        "VJU4622-2024-Q1-3",
+        "SAC8347F-2024-Q1-3",
+        "SWE5773-2024-Q1-3",
+        "SYN584-2024-Q1-3",
+        "ST563X-2024-Q1-3",
+        "SMD7796-2024-Q1-3",
+        "SS7026W-2024-Q1-3",
+        "W8288H-2024-Q1-3",
+        "SYK856-2024-Q1-3",
+        "SB9309C-2024-Q1-3",
+        "#N/A (Did not find value '36334' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '38231' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '48174' in VLOOKUP evaluation.)",
+        "VAH3493-2024-Q1-3",
+        "VCM4397-2023-Q4-3",
+        "VFN4756-2023-Q4-3"
+      ],
+      "oldListingIds": [
+        "#N/A (Did not find value '48181' in VLOOKUP evaluation.)",
+        "TCT4004-2024-Q2-4",
+        "#N/A (Did not find value '52664' in VLOOKUP evaluation.)",
+        "ST2522W-2024-Q2-4",
+        "ST7259Y-2024-Q2-4",
+        "#N/A (Did not find value '29418' in VLOOKUP evaluation.)"
+      ]
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-05-12T02:58:38.207Z",
+      "updatedAt": "2023-05-12T02:58:38.207Z",
+      "id": "8",
+      "name": "Host Community"
+    },
+    {
+      "createdAt": "2023-11-07T03:10:47.123Z",
+      "updatedAt": "2023-11-07T03:10:47.123Z",
+      "id": "jXdALFMnSoT0xTcb",
+      "name": "HSP"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-08-08T04:52:23.142Z",
+  "versionId": "8f107b01-f143-421d-8e92-bb3834dd7a23"
+}
