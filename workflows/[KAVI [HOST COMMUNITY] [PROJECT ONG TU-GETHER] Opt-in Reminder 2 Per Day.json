@@ -1,0 +1,151 @@
+{
+  "active": false,
+  "connections": {
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "LP API - Send PN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-01-16T05:33:06.136Z",
+  "id": "26",
+  "name": "[KAVI [HOST COMMUNITY] [PROJECT ONG TU-GETHER] Opt-in Reminder 2 Per Day",
+  "nodes": [
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.leanplum.com/api?action=startCampaign",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={ \"appId\" : \"app_BXrjE7dc15VWXDLRfh77tActhBhSkCHeQhETDE1mXfQ\", \"clientKey\" : \"dev_L9yBjOmwfR3fNiVjL9woIYfWzsy5hMcGDx0og8isAFw\", \"apiVersion\" : \"1.0.6\", \"userId\":\"{{ $json[\"uuid\"] }}\", \"campaignId\":\"6439996052013056\", \"createDisposition\" : \"CreateNever\"}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "LP API - Send PN",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        280
+      ],
+      "id": "692d6356-ec52-4f09-8059-65f32b58a8bc"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=select distinct(u.uuid) as uuid\nfrom listings l \njoin users u on u.id = l.user_id \njoin listing_location ll on ll.listing_id = l.id\nand l.status = 'approved'\nand ll.country = 'Malaysia'\nand l.deleted_at is null\nand l.registration_no not in ({{ $json[\"String\"] }})",
+        "additionalFields": {}
+      },
+      "id": "3828504c-c23b-4770-983b-9d53f893c25b",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        280
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "16",
+          "name": "trevodb_recreated"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1j07W-fwHDU5-2Ta8cYq9kvdOu0Uiqnu0D16zq2vab1U",
+          "mode": "list",
+          "cachedResultName": "Ong Tù-Gether Opt In (Responses)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1j07W-fwHDU5-2Ta8cYq9kvdOu0Uiqnu0D16zq2vab1U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 782357221,
+          "mode": "list",
+          "cachedResultName": "Registration No",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1j07W-fwHDU5-2Ta8cYq9kvdOu0Uiqnu0D16zq2vab1U/edit#gid=782357221"
+        },
+        "options": {}
+      },
+      "id": "a7444217-6322-450d-9a18-723e604ca25a",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        920,
+        280
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8-21/6 * * *"
+            }
+          ]
+        }
+      },
+      "id": "6956f282-090e-4e45-9a30-8fc3ff2e7e58",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        740,
+        280
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2023-01-18T02:24:17.611Z",
+  "versionId": "e79cc274-a552-4aca-8caf-d03137b28138"
+}
