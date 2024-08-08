@@ -1,0 +1,536 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Sheets Data Dump1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Sheets Data Dump2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Sheets Data Dump4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Sheets Data Dump6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Sheets Data Dump",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets Data Dump1": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets Data Dump2": {
+      "main": [
+        [
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "Sheets Data Dump3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets Data Dump4": {
+      "main": [
+        [
+          {
+            "node": "Postgres2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres2": {
+      "main": [
+        [
+          {
+            "node": "Sheets Data Dump5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets Data Dump6": {
+      "main": [
+        [
+          {
+            "node": "Postgres3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres3": {
+      "main": [
+        [
+          {
+            "node": "Sheets Data Dump7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-02-23T15:51:47.432Z",
+  "id": "32",
+  "name": "[KAVI] [STRATEGY] Low AFR Host Project",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "id": "04158dc3-ffa8-4409-92a5-6b4a42178471",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        620,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\nselect \ndistinct l.id, \nl.registration_no,\nl.approved_at::DATE,\nu.uuid,\nu.email,\nsubstring(u.phone_country_code from 2) || u.phone_number as host_phone_num,\nconcat(u.first_name, ' ', u.last_name) as name,\ncase when ll.city_id in (1) then '1. KV'   \n\t\twhen ll.city_id in (2,12) then '2. PG'\n\t\twhen ll.city_id in (3,19,20,21) then '3. KK'  \n\t\twhen ll.city_id in (4,15) then '4. JB' \n\t\twhen ll.city_id in (5) then '5. IP' \n\t\twhen ll.city_id in (47) then '6. NS'\n\t\twhen ll.city_id in (13) then '7. LGK'\n\t\telse '8. Others' end AS city,\nCASE WHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) <= 10 THEN '0. <= 10%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 10 AND 20 THEN '1. 10% - 20%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 20 AND 30 THEN '2. 20% - 30%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 30 AND 40 THEN '3. 30% - 40%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 40 AND 50 THEN '4. 40% - 50%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 50 AND 60 THEN '5. 50% - 60%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 60 AND 70 THEN '6. 60% - 70%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 70 AND 80 THEN '7. 70% - 80%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 80 AND 90 THEN '8. 80% - 90%'\nELSE '9. >90%' END AS bucket,\ncase when pm1.bucket is null then 'No Booking Requests' else pm1.bucket end as prevmonthbucket,\npm1.afr as prevmonthafr,\ncase when pm2.bucket is null then 'No Booking Requests' else pm2.bucket end as prevmonth2bucket,\npm2.afr as prevmonth2afr,\ncase when pm3.bucket is null then 'No Booking Requests' else pm3.bucket end as prevmonth3bucket,\npm3.afr as prevmonth3afr,\nCOUNT(DISTINCT CASE WHEN b.status NOT IN ('payment_failed')  THEN b.id END) AS req_booking,\nCOUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')) OR (b.status IN ('withdrawn','cancelled')  AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL))) THEN b.id END) as spec_req,\nCOUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END) AS fuld_booking,\nCOUNT(DISTINCT CASE WHEN b.status in ('completed') THEN b.id END) AS comp_booking,\nCOUNT(DISTINCT CASE WHEN b.status IN ('rejected') THEN b.id END) rej_booking,\nROUND(((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100)) AS afr,\nCASE WHEN (sum(CASE WHEN b.status = 'rejected' THEN d5.rental-(d5.rental*(percent/100)) END)) is NULL then '0'\nELSE sum(CASE WHEN b.status = 'rejected' THEN d5.rental-(d5.rental*(percent/100)) END) END AS est_lost,\nMAX(ct.active_age) as active_age\nFROM bookings b\nLEFT JOIN listings l ON b.listing_id = l.id\nLEFT JOIN (SELECT DISTINCT listing_id, country, city_id FROM listing_location) ll ON ll.listing_id = b.listing_id \nLEFT JOIN users u ON u.id = l.user_id\nLEFT JOIN companies c ON c.owner_id = l.user_id \nLEFT JOIN listing_commission_class lcc ON lcc.listing_id  = l.id \nLEFT JOIN commission_class cc ON cc.id = lcc.commission_id \nLEFT JOIN booking_lines bl ON bl.booking_id = b.id  AND bl.slug = 'rental-fee'\nLEFT JOIN\n(SELECT bl.booking_id, bl.amount AS del_pickup FROM booking_lines bl WHERE bl.slug = 'car-pick-up-fee') d1 \nON b.id = d1.booking_id \nLEFT JOIN \n(SELECT bl.booking_id, bl.amount AS del_dropoff FROM booking_lines bl WHERE bl.slug = 'car-drop-off-fee') d2 \nON b.id = d2.booking_id LEFT JOIN \n(SELECT bl.booking_id, bl.amount AS del_pickup_disc FROM booking_lines bl WHERE bl.slug = 'car-pick-up-discount-fee') d3 \nON b.id = d3.booking_id \nLEFT JOIN \n(SELECT bl.booking_id, bl.amount AS del_dropoff_disc FROM booking_lines bl WHERE bl.slug = 'car-drop-off-discount-fee') d4 \nON b.id = d4.booking_id\nLEFT JOIN \n(SELECT bl.booking_id, bl.amount AS rental FROM booking_lines bl WHERE bl.slug = 'rental-fee')  d5\nON b.id = d5.booking_id \nleft join (\nselect \ndistinct l.id,\nCASE WHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) <= 10 THEN '0. <= 10%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 10 AND 20 THEN '1. 10% - 20%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 20 AND 30 THEN '2. 20% - 30%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 30 AND 40 THEN '3. 30% - 40%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 40 AND 50 THEN '4. 40% - 50%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 50 AND 60 THEN '5. 50% - 60%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 60 AND 70 THEN '6. 60% - 70%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 70 AND 80 THEN '7. 70% - 80%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 80 AND 90 THEN '8. 80% - 90%'\nELSE '9. >90%' END AS bucket,\nROUND(((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100)) AS afr\nfrom listings l \nleft join bookings b on b.listing_id = l.id\nwhere b.request_end_at >= date_trunc('month', current_date) - interval '4 months'\nand b.request_end_at <= date_trunc('month', current_date) - interval '1 months'\ngroup by 1\nhaving COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')) OR (b.status IN ('withdrawn','cancelled')  AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL))) THEN b.id END) > 0\n) pm1 on pm1.id = l.id\nleft join (\nselect \ndistinct l.id,\nCASE WHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) <= 10 THEN '0. <= 10%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 10 AND 20 THEN '1. 10% - 20%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 20 AND 30 THEN '2. 20% - 30%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 30 AND 40 THEN '3. 30% - 40%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 40 AND 50 THEN '4. 40% - 50%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 50 AND 60 THEN '5. 50% - 60%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 60 AND 70 THEN '6. 60% - 70%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 70 AND 80 THEN '7. 70% - 80%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 80 AND 90 THEN '8. 80% - 90%'\nELSE '9. >90%' END AS bucket,\nROUND(((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100)) AS afr\nfrom listings l \nleft join bookings b on b.listing_id = l.id\nwhere b.request_end_at >= date_trunc('month', current_date) - interval '5 months'\nand b.request_end_at <= date_trunc('month', current_date) - interval '2 months'\ngroup by 1\nhaving COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')) OR (b.status IN ('withdrawn','cancelled')  AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL))) THEN b.id END) > 0\n) pm2 on pm2.id = l.id\nleft join (\nselect \ndistinct l.id,\nCASE WHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) <= 10 THEN '0. <= 10%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 10 AND 20 THEN '1. 10% - 20%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 20 AND 30 THEN '2. 20% - 30%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 30 AND 40 THEN '3. 30% - 40%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 40 AND 50 THEN '4. 40% - 50%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 50 AND 60 THEN '5. 50% - 60%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 60 AND 70 THEN '6. 60% - 70%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 70 AND 80 THEN '7. 70% - 80%'\nWHEN ((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100) BETWEEN 80 AND 90 THEN '8. 80% - 90%'\nELSE '9. >90%' END AS bucket,\nROUND(((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100)) AS afr\nfrom listings l \nleft join bookings b on b.listing_id = l.id\nwhere b.request_end_at >= date_trunc('month', current_date) - interval '6 months'\nand b.request_end_at <= date_trunc('month', current_date) - interval '3 months'\ngroup by 1\nhaving COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')) OR (b.status IN ('withdrawn','cancelled')  AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL))) THEN b.id END) > 0\n) pm3 on pm3.id = l.id\nleft join (\nselect distinct b.listing_id, \nMIN(b.request_start_at) as cft, \nMAX(b.request_start_at) as clt,\nEXTRACT(DAY FROM (MAX(b.request_start_at) - MIN(b.request_start_at))) as active_age\nfrom bookings b\nleft join listing_location ll on ll.listing_id = b.listing_id \nWHERE b.status = 'completed'\nand ll.country = 'Malaysia'\ngroup by 1) ct on ct.listing_id = l.id\nWHERE ll.country = 'Malaysia'\nAND ((c.owner_id IS NULL) OR (u.email IN ('addyazmin@gmail.com','seow@trevo.my','aaronleong1510@gmail.com')))\nAND l.status = 'approved'\nAND l.deleted_at IS null\nand b.request_end_at >= date_trunc('month', current_date) - interval '3 months'\nand b.request_end_at <= current_date\n--and b.request_end_at between '2022-12-02' and '2023-02-02'\ngroup by 1,2,3,4,5,6,7,8,10,11,12,13,14,15\norder by 20, 19 desc \n",
+        "additionalFields": {}
+      },
+      "id": "eb512233-c22e-4462-8514-e938976b096f",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        920,
+        280
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "trevodb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI",
+          "mode": "list",
+          "cachedResultName": "Host AFR Dashboard '23",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1009014493,
+          "mode": "list",
+          "cachedResultName": "[N8N] Monthly AFR Cohort",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI/edit#gid=1009014493"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "id",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "14de9b9f-2486-4026-bfd3-c4263c685b08",
+      "name": "Sheets Data Dump",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1060,
+        280
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI",
+          "mode": "list",
+          "cachedResultName": "Host AFR Dashboard '23",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1009014493,
+          "mode": "list",
+          "cachedResultName": "[N8N] Monthly AFR Cohort",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI/edit#gid=1009014493"
+        },
+        "clear": "specificRange",
+        "range": "A2:W"
+      },
+      "id": "fe76d6f3-6d13-4108-a3c5-8d3fafc0b5b3",
+      "name": "Sheets Data Dump1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        760,
+        280
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select distinct l.id,\nEXTRACT(DAY FROM (mft.mft_request_start - l.approved_at)) as request_start_lag,\nEXTRACT(DAY FROM (mft.mft_created_at - l.approved_at)) as request_created_lag\nfrom listings l \nleft join listing_location ll on ll.listing_id = l.id\nleft join bookings b on b.listing_id = l.id\nleft join (select b.listing_id, \nMIN(b.request_start_at) as mft_request_start,\nMIN(b.created_at) as mft_created_at\nfrom bookings b \nleft join listing_location ll on ll.listing_id = b.listing_id\nwhere ll.country = 'Malaysia'\nand b.status = 'completed'\ngroup by 1) mft on mft.listing_id = l.id\nwhere ll.country = 'Malaysia'\nand l.status = 'approved'\nand l.deleted_at is null\nand EXTRACT(DAY FROM (mft.mft_created_at - l.approved_at)) > 0\ngroup by 1,2,3",
+        "additionalFields": {}
+      },
+      "id": "3a51a3b8-d41a-47be-b9cb-76694a337f5c",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        920,
+        440
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "trevodb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI",
+          "mode": "list",
+          "cachedResultName": "Host AFR Dashboard '23",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2090845771,
+          "mode": "list",
+          "cachedResultName": "[N8N] CFT Lag",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI/edit#gid=2090845771"
+        },
+        "clear": "specificRange",
+        "range": "A2:C"
+      },
+      "id": "9865716d-d953-4436-b42f-c1483b73b79f",
+      "name": "Sheets Data Dump2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        760,
+        440
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI",
+          "mode": "list",
+          "cachedResultName": "Host AFR Dashboard '23",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2090845771,
+          "mode": "list",
+          "cachedResultName": "[N8N] CFT Lag",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI/edit#gid=2090845771"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "id",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "4cdd28af-3bc6-49e6-ad99-ca06fe4b88ce",
+      "name": "Sheets Data Dump3",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1060,
+        440
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI",
+          "mode": "list",
+          "cachedResultName": "Host AFR Dashboard '23",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 615560799,
+          "mode": "list",
+          "cachedResultName": "[N8N] Lifetime AFR",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI/edit#gid=615560799"
+        },
+        "clear": "specificRange",
+        "range": "A2:G"
+      },
+      "id": "665eb6dc-a64f-4970-818f-2b54bb48b056",
+      "name": "Sheets Data Dump4",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        760,
+        120
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select l.id\n, m1.afr as lastmonthafr\n, m2.afr as twomonthbackafr\n, m3.afr as threemonthbackafr\n, SUM(case when b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.gross_amount END) as lifetimeearnings\n, SUM(case when b.status = 'rejected' then b.gross_amount END) as lifetimeloss\n, ROUND(((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100)) AS lifetimeafr\nfrom listings l \nleft join bookings b on b.listing_id = l.id \nleft join listing_location ll on ll.listing_id = l.id\nleft join (select to_char(b.created_at, 'YYYY-MM') as month\n, b.listing_id\n, ROUND(((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100)) AS afr\nfrom bookings b \nleft join listing_location ll on ll.listing_id = b.listing_id \nwhere b.created_at >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '1 MONTH'\nand b.created_at < DATE_TRUNC('month', CURRENT_DATE)\nand ll.country = 'Malaysia'\ngroup by 1,2\norder by 1 asc) m1 on m1.listing_id = l.id\nleft join (select to_char(b.created_at, 'YYYY-MM') as month\n, b.listing_id\n, ROUND(((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100)) AS afr\nfrom bookings b \nleft join listing_location ll on ll.listing_id = b.listing_id \nwhere b.created_at >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '2 MONTHS'\nand b.created_at < DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '1 MONTH'\nand ll.country = 'Malaysia'\ngroup by 1,2\norder by 1 asc) m2 on m2.listing_id = l.id\nleft join (select to_char(b.created_at, 'YYYY-MM') as month\n, b.listing_id\n, ROUND(((COUNT(DISTINCT CASE WHEN b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') THEN b.id END))::DECIMAL/NULLIF(COUNT(DISTINCT CASE WHEN ((b.status IN ('accepted', 'completed','start_driving','waiting_for_inspection','return_car'))  OR (b.status IN ('withdrawn','cancelled') AND lower(b.reason) LIKE '(host|owner|avai|car)') OR (b.status = 'rejected' AND (lower(b.reason) not LIKE '(guest)' OR lower(b.reason) IS NULL)))  THEN b.id END),0)::DECIMAL*100)) AS afr\nfrom bookings b \nleft join listing_location ll on ll.listing_id = b.listing_id \nwhere b.created_at >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '3 MONTHS'\nand b.created_at < DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '2 MONTHS'\nand ll.country = 'Malaysia'\ngroup by 1,2\norder by 1 asc) m3 on m3.listing_id = l.id\nwhere ll.country = 'Malaysia'\ngroup by 1,2,3,4",
+        "additionalFields": {}
+      },
+      "id": "dd516040-5161-4a41-b529-4a058cea7e67",
+      "name": "Postgres2",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        920,
+        120
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "trevodb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI",
+          "mode": "list",
+          "cachedResultName": "Host AFR Dashboard '23",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 615560799,
+          "mode": "list",
+          "cachedResultName": "[N8N] Lifetime AFR",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI/edit#gid=615560799"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "id",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "6dd91b30-6c7b-48dc-a3c9-a0eb59fd8502",
+      "name": "Sheets Data Dump5",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1060,
+        120
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI",
+          "mode": "list",
+          "cachedResultName": "Host AFR Dashboard '23",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 169295382,
+          "mode": "list",
+          "cachedResultName": "[N8N] Availability",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI/edit#gid=169295382"
+        },
+        "clear": "specificRange",
+        "range": "A2:I"
+      },
+      "id": "292b3811-0c27-4081-8683-8e169004c3d9",
+      "name": "Sheets Data Dump6",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        760,
+        580
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select distinct l.id,\ncount(distinct dates_L7D.ymd) as L7_total_days,\n(count(distinct dates_L7D.ymd)::numeric/8)*100 as L7_total_days_percent,\ncount(distinct dates_L30D.ymd) as L30_total_days,\n(count(distinct dates_L30D.ymd)::numeric/31)*100 as L30_total_days_percent,\ncount(distinct dates_N7D.ymd) as N7_total_days,\n(count(distinct dates_N7D.ymd)::numeric/8)*100 as N7_total_days_percent,\ncount(distinct dates_N30D.ymd) as N30_total_days,\n(count(distinct dates_N30D.ymd)::numeric/31)*100 as N30_total_days_percent\nfrom listings l\nleft join listing_availability la on la.listing_id=l.id\nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = l.id\n--\nleft join (SELECT generate_series(NOW() - interval '7 days', NOW(), interval '1 day')::date ymd) dates_L7D on --CHANGE DATE HERE \ndates_L7D.ymd between la.start_date::date and la.end_date::date\n--\nleft join (SELECT generate_series(NOW() - interval '30 days', NOW(), interval '1 day')::date ymd) dates_L30D on --CHANGE DATE HERE \ndates_L30D.ymd between la.start_date::date and la.end_date::date\n--\nleft join (SELECT generate_series(NOW(), NOW() + interval '7 days', interval '1 day')::date ymd) dates_N7D on --CHANGE DATE HERE \ndates_N7D.ymd between la.start_date::date and la.end_date::date\n--\nleft join (SELECT generate_series(NOW(), NOW() + interval '30 days', interval '1 day')::date ymd) dates_N30D on --CHANGE DATE HERE \ndates_N30D.ymd between la.start_date::date and la.end_date::date\nwhere l.status='approved' and l.deleted_at is null and ll.country = 'Malaysia'\nGROUP BY 1",
+        "additionalFields": {}
+      },
+      "id": "e37becab-adb7-4619-a140-49da40b2b7f5",
+      "name": "Postgres3",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        920,
+        580
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "trevodb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI",
+          "mode": "list",
+          "cachedResultName": "Host AFR Dashboard '23",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 169295382,
+          "mode": "list",
+          "cachedResultName": "[N8N] Availability",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G4zyO9kz5ER7Kq8Qk1wBYdc6mR6BHs0lBMd1XApucGI/edit#gid=169295382"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "id",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "0882be62-fdc0-43de-ae5d-b2e91a93319d",
+      "name": "Sheets Data Dump7",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1060,
+        580
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveDataSuccessExecution": "all",
+    "saveExecutionProgress": "DEFAULT",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2023-05-28T03:35:53.537Z",
+  "versionId": "6d266fff-227d-4a55-8a5f-bbdba7a2cb7c"
+}
