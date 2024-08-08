@@ -1,0 +1,22 @@
+{
+  "active": false,
+  "connections": {},
+  "createdAt": "2023-04-15T02:34:21.007Z",
+  "id": "63",
+  "name": "[Pat] Playground",
+  "nodes": [],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2023-03-31T06:52:09.032Z",
+      "updatedAt": "2023-03-31T06:52:09.032Z",
+      "id": "5",
+      "name": "Patrick"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2023-11-23T06:15:36.329Z",
+  "versionId": "6b2f7760-2f3a-4b0e-8840-fd08908917d5"
+}
