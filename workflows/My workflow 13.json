@@ -1,0 +1,62 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-03-07T09:13:38.622Z",
+  "id": "7y2tFNfSqYwo7Oq1",
+  "name": "My workflow 13",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "f81527a8-e663-4378-ae87-14920c84a41f",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        820,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * \nFROM insurance_quotes",
+        "options": {}
+      },
+      "id": "76df007a-fe7a-472e-b4fc-c191c65fa3f5",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1040,
+        380
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-03-07T09:13:38.622Z",
+  "versionId": "1dc408f5-d52d-4863-b0d7-e77bd5e7adbc"
+}
