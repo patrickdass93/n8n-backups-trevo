@@ -1,0 +1,70 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HubSpot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-04-25T02:32:16.636Z",
+  "id": "eCWhey3SVqew7rvu",
+  "name": "My workflow 15",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "0bb1ef20-8351-4aa5-9fa6-f42294942bdc",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "appToken",
+        "resource": "deal",
+        "operation": "getAll",
+        "limit": 250,
+        "filters": {}
+      },
+      "id": "17767cd8-8320-42ef-83ad-c9b3a37008d8",
+      "name": "HubSpot",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        380
+      ],
+      "credentials": {
+        "hubspotAppToken": {
+          "id": "28",
+          "name": "HubSpot App Token Account (Kavi)"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-04-25T02:32:16.636Z",
+  "versionId": "c35dd078-2631-4c0c-902b-3bc3a6ae1e8f"
+}
