@@ -1,0 +1,357 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Daily Update - Fulfiled",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Daily Update - Comp",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Daily Update - MFT Fuld",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Daily Update - MFT Comp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Update - Fulfiled": {
+      "main": [
+        [
+          {
+            "node": "Merge - Daily Updates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Update - Comp": {
+      "main": [
+        [
+          {
+            "node": "Merge - Daily Updates",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Date & Time -  Daily Updates": {
+      "main": [
+        [
+          {
+            "node": "Google Chat - Daily Updates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge - Daily Updates": {
+      "main": [
+        [
+          {
+            "node": "Merge - Daily Updates2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Update - MFT Fuld": {
+      "main": [
+        [
+          {
+            "node": "Merge - Daily Updates1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Update - MFT Comp": {
+      "main": [
+        [
+          {
+            "node": "Merge - Daily Updates1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge - Daily Updates1": {
+      "main": [
+        [
+          {
+            "node": "Merge - Daily Updates2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge - Daily Updates2": {
+      "main": [
+        [
+          {
+            "node": "Date & Time -  Daily Updates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2022-12-06T09:40:49.107Z",
+  "id": "3",
+  "name": "[Pat] Daily Update",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "c4ba7473-3768-47a0-8b0f-56c4843727eb",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        -380,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=WITH \n    my_bookings AS (\n        SELECT DISTINCT ON (id)\n            created_at::DATE as date\n            , id as booking_id\n            , gross_amount as gmv\n            , CASE\n                WHEN reason ~~* '%test%' THEN 'test'\n                WHEN status IN ('cancelled','withdrawn')\n                    AND (reason ~~* '%host%'\n                        OR reason ~~* '%owner%'\n                        OR reason ~~* '%available%'\n                        OR reason ~~* '%car%'\n                        ) THEN 'rejected'\n                WHEN status IN ('rejected')\n                    AND (reason ~~* '%guest%') THEN 'withdrawn'                            \n                ELSE status END AS booking_status                \n        FROM bookings                \n        WHERE 1=1         \n            AND currency = 'myr'        \n            AND created_at > DATE_TRUNC('day', NOW() AT TIME ZONE 'Asia/Kuala_Lumpur') - INTERVAL '1 day'        \n            AND created_at < DATE_TRUNC('day', NOW() AT TIME ZONE 'Asia/Kuala_Lumpur')\n    )        \n    \n    , calculator AS (        \n        SELECT             \n            date            \n            , SUM(CASE WHEN booking_status IN ('accepted','waiting_for_inspection','start_driving','return_car','completed') THEN gmv END) as ful_gmv            \n            , COUNT(CASE WHEN booking_status IN ('accepted','waiting_for_inspection','start_driving','return_car','completed') THEN booking_id END) as ful_book            \n            , COUNT(DISTINCT CASE WHEN booking_status IN ('rejected') THEN booking_id END)::decimal AS rej            \n            , COUNT(DISTINCT CASE WHEN booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car','cancelled','rejected','requested') THEN booking_id END)::decimal AS req                \n        FROM my_bookings        \n        GROUP BY 1\n        )\n            \nSELECT\n    date    \n    , ful_gmv    \n    , ful_book    \n    , CONCAT(ROUND((rej/req)*100,2),'%') as rej_rate\nFROM calculator\n",
+        "additionalFields": {}
+      },
+      "id": "055578b2-2082-4bc3-aca4-d4db71b00c7e",
+      "name": "Daily Update - Fulfiled",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        20
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH \n    comp_bookings AS (\n        SELECT DISTINCT ON (id)\n            request_end_at::DATE as date\n            , id as booking_id\n            , gross_amount as gmv\n        FROM bookings                \n        WHERE 1=1         \n            AND currency = 'myr'\n            AND status = 'completed'\n            AND request_end_at::DATE =  DATE_TRUNC('day', NOW() AT TIME ZONE 'Asia/Kuala_Lumpur') - INTERVAL '1 day' \n    )\n    \n    , calculator AS (        \n        SELECT             \n            b.date            \n            , SUM(b.gmv) as comp_gmv\n            , COUNT(b.booking_id) as comp_book\n        FROM comp_bookings b\n        GROUP BY 1\n        )\n            \nSELECT\n    date    \n    , comp_gmv\n    , comp_book    \nFROM calculator\n",
+        "additionalFields": {}
+      },
+      "id": "7f2579a5-db62-4f0c-8280-2e568e340982",
+      "name": "Daily Update - Comp",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        200
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAtIW1dxg",
+        "messageUi": {
+          "text": "={{ $json[\"date\"] }}\nFulfilled Booking: {{ $json[\"ful_book\"] }}\nFulfilled GMV: RM{{ $json[\"ful_gmv\"] }}\nRejection Rate: {{ $json[\"rej_rate\"] }}\nCompleted GMV: RM{{ $json[\"comp_gmv\"] }}\nMFT Fuld: {{ $json[\"mft_fuld\"] }}\nMFT Comp: {{ $json[\"mft_comp\"] }}"
+        },
+        "additionalFields": {}
+      },
+      "id": "640daf17-dc2e-4638-bd22-30ffd447722c",
+      "name": "Google Chat - Daily Updates",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        740,
+        300
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "Google Chat [Pat]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "value": "={{ $json[\"date\"] }}",
+        "dataPropertyName": "date",
+        "custom": true,
+        "toFormat": "YYYY/MM/DD",
+        "options": {}
+      },
+      "id": "30a37c0d-f734-4df4-87b7-4c705c5c1cba",
+      "name": "Date & Time -  Daily Updates",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 1,
+      "position": [
+        560,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "date",
+              "field2": "date"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d43ae44a-45d6-4eae-8886-3d98290761dd",
+      "name": "Merge - Daily Updates",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        100,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH \n    my_bookings AS (\n        SELECT DISTINCT ON (id)\n            created_at::DATE as date\n            , user_id as member_id\n            , CASE WHEN b.status IN ('accepted','start_driving', 'waiting_for_inspection', 'return_car', 'completed')\n                    THEN ROW_NUMBER () OVER (PARTITION BY \n                        b.user_id\n                        , CASE WHEN b.status IN ('accepted','start_driving', 'waiting_for_inspection', 'return_car', 'completed') THEN 1 ELSE 0 END\n                        ORDER BY b.created_at ASC) \n                    ELSE 0 END AS member_fulfilled_no\n        FROM bookings b\n        WHERE 1=1         \n            AND currency = 'myr'        \n            /*AND created_at > DATE_TRUNC('day', NOW() AT TIME ZONE 'Asia/Kuala_Lumpur') - INTERVAL '1 day'        \n            AND created_at < DATE_TRUNC('day', NOW() AT TIME ZONE 'Asia/Kuala_Lumpur') */\n    )        \n    \n    , mft_fuld AS (\n        SELECT \n            date\n            , COUNT(DISTINCT member_id) as mft_fuld \n        FROM my_bookings\n        WHERE 1=1\n            AND member_fulfilled_no = 1\n        GROUP BY 1\n    )\n    \nSELECT *\nFROM mft_fuld\nWHERE 1=1\n    AND date = DATE_TRUNC('day', NOW() AT TIME ZONE 'Asia/Kuala_Lumpur') - INTERVAL '1 day'",
+        "additionalFields": {}
+      },
+      "id": "8bc4a1fa-275e-4792-9070-0327d3bf60af",
+      "name": "Daily Update - MFT Fuld",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        380
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH \n    my_bookings AS (\n        SELECT DISTINCT ON (id)\n            request_end_at::DATE as date\n            , user_id as member_id\n            , CASE WHEN b.status IN ('completed')\n                    THEN ROW_NUMBER () OVER (PARTITION BY \n                        b.user_id\n                        , CASE WHEN b.status IN ('completed') THEN 1 ELSE 0 END\n                        ORDER BY b.created_at ASC) \n                    ELSE 0 END AS member_completed_no\n        FROM bookings b\n        WHERE 1=1         \n            AND currency = 'myr'        \n            /*AND created_at > DATE_TRUNC('day', NOW() AT TIME ZONE 'Asia/Kuala_Lumpur') - INTERVAL '1 day'        \n            AND created_at < DATE_TRUNC('day', NOW() AT TIME ZONE 'Asia/Kuala_Lumpur') */\n    )        \n    \n    , mft_comp AS (\n        SELECT \n            date\n            , COUNT(DISTINCT member_id) as mft_comp\n        FROM my_bookings\n        WHERE 1=1\n            AND member_completed_no = 1\n        GROUP BY 1\n    )\n    \nSELECT *\nFROM mft_comp\nWHERE 1=1\n    AND date = DATE_TRUNC('day', NOW() AT TIME ZONE 'Asia/Kuala_Lumpur') - INTERVAL '1 day'\n\n",
+        "additionalFields": {}
+      },
+      "id": "c12353e7-3834-4793-a8c6-8c6c772d3745",
+      "name": "Daily Update - MFT Comp",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        560
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "date",
+              "field2": "date"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d243217d-a8bd-4854-bc54-83426f5eea75",
+      "name": "Merge - Daily Updates1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        100,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "date",
+              "field2": "date"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f50c22e3-3a7f-41c2-be82-f82db9bfc1ff",
+      "name": "Merge - Daily Updates2",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        360,
+        300
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "any",
+    "executionTimeout": 3600,
+    "errorWorkflow": "11",
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-03-31T06:52:09.032Z",
+      "updatedAt": "2023-03-31T06:52:09.032Z",
+      "id": "5",
+      "name": "Patrick"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-07-02T05:54:13.726Z",
+  "versionId": "8162f47a-0f70-4b22-849a-4980b29c18e6"
+}
