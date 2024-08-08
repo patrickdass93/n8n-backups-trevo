@@ -1,0 +1,358 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function1": {
+      "main": [
+        [
+          {
+            "node": "CENTRAL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Function1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-04-18T03:45:14.402Z",
+  "id": "65",
+  "name": "[JIUN] [SUPPLY] [SLACK] Catalyst 5.0 Sign Up Notification",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "id": "1b4f26a3-3500-4a75-976d-ef184ebba880",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        880,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"TREVO Email\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['TREVO Email']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        180
+      ],
+      "id": "ce3a594b-10bb-4d0c-a1d6-fe9ee443f490"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "13P8ZEymgrBU4o1WlAGI80XteaCnrEiM1r1ZAe_rP5YE",
+          "mode": "list",
+          "cachedResultName": "TREVO Catalyst 5.0 Sign Up Form (Responses)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13P8ZEymgrBU4o1WlAGI80XteaCnrEiM1r1ZAe_rP5YE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 649082093,
+          "mode": "list",
+          "cachedResultName": "Form Responses 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13P8ZEymgrBU4o1WlAGI80XteaCnrEiM1r1ZAe_rP5YE/edit#gid=649082093"
+        },
+        "options": {}
+      },
+      "id": "86faf48b-0f96-4c21-a8a5-604dc4cb23c2",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1080,
+        180
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAuhVvBvo",
+        "messageUi": {
+          "text": "=NEW CATALYST 5.0 SIGN UP:\n\nEmail: {{ $json[\"Email Address\"] }}\nLocation: {{ $json[\"Location\"] }}\nPhone Number: {{ $json[\"Phone Number\"] }}\n\nPlease react with a ✅ if approved. Kavi or me will create the tag for this catalyst. "
+        },
+        "additionalFields": {}
+      },
+      "id": "0b8c317c-fc79-4bbe-8afe-5131e426a604",
+      "name": "CENTRAL",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        1460,
+        180
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.Location }}",
+        "rules": {
+          "rules": [
+            {
+              "operation": "=equal",
+              "value2": "KV"
+            },
+            {
+              "value2": "NEGERI SEMBILAN"
+            },
+            {
+              "value2": "PENANG",
+              "output": 1
+            },
+            {
+              "value2": "IPOH",
+              "output": 1
+            },
+            {
+              "value2": "LANGKAWI",
+              "output": 1
+            },
+            {
+              "value2": "JB",
+              "output": 2
+            },
+            {
+              "value2": "MELAKA",
+              "output": 2
+            },
+            {
+              "value2": "KK",
+              "output": 3
+            },
+            {
+              "value2": "KUCHING",
+              "output": 3
+            }
+          ]
+        },
+        "fallbackOutput": 3
+      },
+      "id": "8898821d-e0a6-4781-be74-1b8048b05594",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        -80
+      ],
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11",
+    "saveDataSuccessExecution": "all"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds": [
+        "peaceinlove90@gmail.com",
+        "peaceinlove90@gmail.com",
+        "timoyx@gmail.com",
+        "samuel.thkim@gmail.com",
+        "alvinlimyx@gmail.com",
+        "apamise@gmail.com",
+        "rosellarose1989@gmail.com",
+        "xavierlee6358@gmail.com",
+        "brendanwong.aden95@gmail.com",
+        "flowerqueen2505@gmail.com",
+        "jayviertan@gmail.com",
+        "Jayviertan@gmail.com",
+        "l_nicholas@rocketmail.com",
+        "rachelsim83@gmail.com",
+        "jinghwa88@gmail.com",
+        "supercute@live.com.my",
+        "rscarrentalborneo@gmail.com",
+        "sunnycschang20@gmail.com",
+        "suhaimi.ramli10.sr@gmail.com",
+        "test2@gmail.com",
+        "hongohee1649@gmail.com",
+        "Chunhoe90@hotmail.com",
+        "kooliew@hotmail.com",
+        "whun_95@hotmail.com",
+        "wjkkcarrent@gmail.com",
+        "johorgrab@gmail.com",
+        "davidpan3388@gmail.com",
+        "yeoyi_2@hotmail.com",
+        "erison90@gmail.com",
+        "norhain91@gmail.com",
+        "razaleiy@yahoo.com",
+        "jayden_chai@hotmail.com",
+        "azriproton@yahoo.com",
+        "kinsmanresources@gmail.com",
+        "peigangcvi@gmail.com",
+        "sammychan860@gmail.com",
+        "thomas_seng89@hotmail.com",
+        "albeejovita90@hotmail.com",
+        "ytan831113@gmail.com",
+        "amelyalee@ymail.com",
+        "toknadorg@yahoo.com",
+        "toknadorg@yahoo.com",
+        "hamiroh.trevo@gmail.com",
+        "hamiroh.trevo@gmail.com",
+        "wynnie2695@gmail.com",
+        "kennethpatrickcornelius@gmail.com",
+        "suhaimumim@gmail.com",
+        "arafjer@gmail.com",
+        "karthikrajaseheran@gmail.com",
+        "yun5543@gmail.com",
+        "haslinakamil@yahoo.com",
+        "lanajovie903@gmail.com",
+        "aku_aindaud@live.com",
+        "nanchester7@gmail.com",
+        "nazrulamin145@gmail.com",
+        "geniushoo@yahoo.com.hk",
+        "aaronleong1510@gmail.com",
+        "peigangcvi@gmail.com",
+        "tinglim9678@gmail.com",
+        "jeremmylee0308@hotmail.com",
+        "luqmnhqim@gmail.com",
+        "derekeng85@hotmail.com",
+        "enixman96@gmail.com",
+        "susieting@scwelite.com",
+        "test@gmail.com",
+        "money92chenwang@gmail.com",
+        "jium0821@gmail.com",
+        "huisiong@gmail.com",
+        "enixman96@gmail.com",
+        "toh.clement@gmail.com",
+        "suhaimumim@gmail.com",
+        "sweekimleong11@gmail.com",
+        "aku_aindaud@live.com",
+        "jianwei0505@gmail.com",
+        "karthikrajaseheran@gmail.com",
+        "haslinakamil@yahoo.com",
+        "shaharifmdshah@gmail.com",
+        "ketemuiz4u@gmail.com",
+        "kevinyoong92@gmail.com",
+        "hongohee1649@gmail.com",
+        "stanley.chu@outlook.my",
+        "fhempireventures@gmail.com",
+        "jymoo30@hotmail.com",
+        "azeeb96@gmail.com",
+        "shahizanahmad@yahoo.com",
+        "tommy_2068@hotmail.com",
+        "davidsiaw@hotmail.my",
+        "chunhoe90@hotmail.com",
+        "erison90@gmail.com",
+        "unaahmad@live.com",
+        "zackkuan27@gmail.com",
+        "peigangcvi@gmail.com",
+        "eliascsy28@gmail.com",
+        "ahmadshamsulfitri@gmail.com",
+        "mohamadatiq94@gmail.com",
+        "mohamadkharisma@gmail.com",
+        "izlan190199@icloud.com",
+        "lanajovie903@gmail.com",
+        "kinsmanresources@gmail.com",
+        "ahrm1975@yahoo.com",
+        "data_suresh@hotmail.com",
+        "hamiroh.trevo@gmail.com",
+        "albeejovita90@hotmail.com",
+        "snowtixx25@gmail.com",
+        "faqhazirulbasharey@gmail.com",
+        "maisarah.mdz12@gmail.com",
+        "bssrm2628@gmail.com",
+        "kooliew@hotmail.com",
+        "joachan79@gmail.com",
+        "nazren917@gmail.com",
+        "mhdkhairul15@icloud.com",
+        "arafjer@gmail.com",
+        "asmizatulasmieza.psp@gmail.com",
+        "natashaazrah@hotmail.com",
+        "megarahju@live.com",
+        "ittm85@gmail.com",
+        "gmreservation@gmail.com",
+        "leongchangfai@gmail.com",
+        "toknadorg@yahoo.com",
+        "eswar89@hotmail.com",
+        "mrusdi66@yahoo.co.uk",
+        "nadiey162@gmail.com",
+        "",
+        "",
+        "",
+        "2023-04-22PLE9040",
+        "2023-04-21BRA8494",
+        "2023-04-21VHW4223",
+        "2023-04-20SY6485",
+        "2023-04-20JUJ4744",
+        "2023-04-15AKB8974",
+        "2023-04-16VEE1349",
+        "2023-04-20PNY5021",
+        "2023-04-15VGY2922",
+        "2023-04-21VDB1206",
+        "2023-04-14WB7344W",
+        "2023-04-20WYB1538",
+        "2023-04-27VGV3520",
+        "2023-04-22VGV9583",
+        "2023-03-26CDK1238",
+        "2023-04-21BNT5978",
+        "2023-03-18JVR106",
+        "2023-03-18WVM6152",
+        "2023-03-18JQJ8934",
+        "2023-03-17MCN387",
+        "2023-03-17VAH903",
+        "2023-03-27SAC9868B",
+        "2023-03-17BNT5978"
+      ]
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2023-11-28T03:32:19.098Z",
+  "versionId": "b6d23e11-6957-4c7a-a145-ca8810dd8a68"
+}
