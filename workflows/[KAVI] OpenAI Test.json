@@ -1,0 +1,258 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "OpenAI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI1": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-10-03T06:54:47.463Z",
+  "id": "bNyWHXgTjkMhOqGR",
+  "name": "[KAVI] OpenAI Test",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "34edc77b-0ad7-427a-92e9-119aba36272b",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        820,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1mvI35XyZ82l_1cYf_AWxOcJBgIMnSke7V84fOKPXSUM",
+          "mode": "list",
+          "cachedResultName": "Host Ethnicity",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mvI35XyZ82l_1cYf_AWxOcJBgIMnSke7V84fOKPXSUM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2107429707,
+          "mode": "list",
+          "cachedResultName": "Sheet2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mvI35XyZ82l_1cYf_AWxOcJBgIMnSke7V84fOKPXSUM/edit#gid=2107429707"
+        },
+        "options": {}
+      },
+      "id": "687aecb4-3bc4-4a3f-986d-6aeb57697c45",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1040,
+        340
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gpt-3.5-turbo",
+        "prompt": "=A person with the name {{ $('Google Sheets').item.json[\"user_name\"] }} is currently residing in Malaysia. Mention the ethnicity that this person belongs to. The answer should be only the ethnicity. Only mention 1 ethnicity with the highest probability that this person belongs to eg: Indian. ",
+        "options": {}
+      },
+      "id": "a0bb108d-81fe-4105-bc96-f9a01a951bf1",
+      "name": "OpenAI",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        80
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "E0juBqUclO0Ow2kO",
+          "name": "OpenAi - Kavi"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "prompt": "=A person with the name {{ $('Google Sheets').item.json[\"user_name\"] }} is currently residing in Malaysia. Mention the ethnicity that this person belongs to. The answer should be only the ethnicity. Only mention 1 ethnicity with the highest probability that this person belongs to eg: Indian. The name could also be a company, if so say its a company.",
+        "options": {
+          "maxTokens": 60
+        }
+      },
+      "id": "b4b3fcbb-dfa0-484e-82dc-3578e62df19d",
+      "name": "OpenAI1",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        1220,
+        340
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "E0juBqUclO0Ow2kO",
+          "name": "OpenAi - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1mvI35XyZ82l_1cYf_AWxOcJBgIMnSke7V84fOKPXSUM",
+          "mode": "list",
+          "cachedResultName": "Host Ethnicity",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mvI35XyZ82l_1cYf_AWxOcJBgIMnSke7V84fOKPXSUM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1525124624,
+          "mode": "list",
+          "cachedResultName": "Sheet3",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mvI35XyZ82l_1cYf_AWxOcJBgIMnSke7V84fOKPXSUM/edit#gid=1525124624"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "UserId"
+          ],
+          "schema": [
+            {
+              "id": "UserId",
+              "displayName": "UserId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ethnicity",
+              "displayName": "Ethnicity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "845e6f81-f109-4db5-90f5-b056a0a7bde5",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1620,
+        340
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "UserId",
+              "value": "={{ $('Google Sheets').item.json.user_id }}"
+            },
+            {
+              "name": "Name",
+              "value": "={{ $('Google Sheets').item.json.user_name }}"
+            },
+            {
+              "name": "Ethnicity",
+              "value": "={{ $json.text }}"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": true
+        }
+      },
+      "id": "76b8a42e-a1b5-4ca1-9f24-84a7dab24626",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        340
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-10-03T07:22:19.743Z",
+  "versionId": "bcab6679-847c-4038-b7da-1b421fc53841"
+}
