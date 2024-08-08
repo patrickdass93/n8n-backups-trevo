@@ -1,0 +1,34 @@
+{
+  "active": false,
+  "connections": {},
+  "createdAt": "2023-07-02T04:45:08.903Z",
+  "id": "99",
+  "name": "[KAVI] [MARKETING] Alerts",
+  "nodes": [],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2022-12-15T07:35:21.640Z",
+      "updatedAt": "2022-12-15T07:35:21.640Z",
+      "id": "2",
+      "name": "MY"
+    },
+    {
+      "createdAt": "2023-07-02T04:45:21.573Z",
+      "updatedAt": "2023-07-02T04:45:21.573Z",
+      "id": "11",
+      "name": "Marketing"
+    },
+    {
+      "createdAt": "2023-07-02T04:45:26.645Z",
+      "updatedAt": "2023-07-02T04:45:26.645Z",
+      "id": "12",
+      "name": "Alert"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2023-07-02T04:45:29.390Z",
+  "versionId": "552ddf78-6567-4d96-ae1c-b1c78dd99295"
+}
