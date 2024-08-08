@@ -1,0 +1,894 @@
+{
+  "active": false,
+  "connections": {
+    "Rejections - Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Rejections - Clear Sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Rejections - Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rejections - Query": {
+      "main": [
+        [
+          {
+            "node": "Rejections - Format Date",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Rejections - Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rejections - Format Date": {
+      "main": [
+        [
+          {
+            "node": "Rejections - Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Rejections - Merge": {
+      "main": [
+        [
+          {
+            "node": "Rejections - Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ratings - Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Ratings - Query",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Ratings - Clear Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ratings - Query": {
+      "main": [
+        [
+          {
+            "node": "Rejections - Format Date1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Rejections - Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Reviews - Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Reviews - Clear Sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Reviews - Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rejections - Format Date1": {
+      "main": [
+        [
+          {
+            "node": "Rejections - Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rejections - Merge1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reviews - Query": {
+      "main": [
+        [
+          {
+            "node": "Reviews - Format Date",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Rejections - Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Reviews - Format Date": {
+      "main": [
+        [
+          {
+            "node": "Rejections - Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rejections - Merge2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-10-25T07:14:11.022Z",
+  "id": "bdBGxL7Ju60ruE0G",
+  "name": "[Pat] [Supply] HSP -- BACKUP",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Rejections\n",
+        "height": 403.77720314386875,
+        "width": 1062.545454545454
+      },
+      "id": "e7eb5681-8dbd-4ccc-9630-49944393b40b",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Ratings\n",
+        "height": 398.4614531691681,
+        "width": 1062.545454545454
+      },
+      "id": "8c67cfc6-e344-46e3-8995-95d8776ce84d",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Rejections Raw",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E/edit#gid=0"
+        },
+        "keepFirstRow": true
+      },
+      "id": "07793e87-fea8-42fd-a14f-291b4fe8134d",
+      "name": "Rejections - Clear Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        140,
+        100
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "20 07-23 * * *"
+            }
+          ]
+        }
+      },
+      "id": "c81dc6b3-af39-42c9-bee5-3024aa6f2423",
+      "name": "Rejections - Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH\n    my_listings AS (\n        SELECT \n            l.id as listing_id\n            , l.user_id as host_id\n            , CASE \n                WHEN city_id = 1 THEN 'KV'\n                WHEN city_id = 2 OR city_id = 48 THEN 'PG'\n                WHEN city_id = 3 THEN 'KK'\n                WHEN city_id = 4 THEN 'JB'\n                WHEN city_id = 1 THEN 'KV'\n                WHEN city_id = 5 THEN 'IP'\n                WHEN city_id = 12 THEN 'KDH'\n                WHEN city_id = 13 THEN 'LGK'\n                WHEN city_id = 14 THEN 'PLS'\n                WHEN city_id = 15 THEN 'MLK'\n                WHEN city_id = 16 THEN 'PHG'\n                WHEN city_id = 17 THEN 'TRG'\n                WHEN city_id = 18 THEN 'KLT'\n                WHEN city_id = 19 THEN 'LBN'\n                WHEN city_id = 20 THEN 'SDK'\n                WHEN city_id = 21 THEN 'TWU'\n                WHEN city_id = 22 THEN 'KCH'\n                WHEN city_id = 23 THEN 'MRI'\n                WHEN city_id = 47 THEN 'NS'\n                ELSE NULL END as city\n        FROM listings l\n        JOIN listing_location ll on ll.listing_id = l.id\n            AND country = 'Malaysia'\n        WHERE 1=1\n            AND l.deleted_at IS NULL\n            AND l.status = 'approved'\n    )\n    \n    , my_bookings AS (\n        SELECT \n            b.id as booking_id\n            , b.listing_id\n            ,CASE \n                WHEN (b.status = 'rejected' AND (b.reason !~* '(guest)' OR b.reason IS NULL)) \n                    OR (\n                        b.status IN ('withdrawn', 'cancelled') \n                        AND b.reason ~* '(host|owner|avai|car)' \n                        AND b.reason !~* '(after i read|dont need|extended|rebook|rebooking|\n                        wrong date|wrong time|I didnt|manual|I want|I need|sorry|I would|mistake|my own car|wrong|change)') \n                    OR (\n                        b.reason = 'Host is taking a long time to respond' \n                        AND ((EXTRACT(EPOCH FROM b.updated_at::timestamp) \n                            - EXTRACT(EPOCH FROM b.created_at::timestamp))/3600::integer) < '2')\n                    OR (\n                        b.reason = 'Host is taking a long time to respond' \n                        AND (EXTRACT(EPOCH FROM (b.updated_at - b.created_at)) / 3600) < 8 \n                        AND (EXTRACT(HOUR FROM b.created_at) >= 23 OR EXTRACT(HOUR FROM b.created_at) <= 8) \n                        AND ((EXTRACT(EPOCH FROM (b.updated_at - b.created_at)) / 60) / 60) <= 6)\n                    OR (\n                        (EXTRACT(EPOCH FROM (b.updated_at - b.created_at)) / 3600) < 8 \n                        AND (EXTRACT(HOUR FROM b.created_at) >= 23 AND EXTRACT(HOUR FROM b.request_start_at) <= 7) \n                        AND ((EXTRACT(EPOCH FROM (b.updated_at - b.created_at)) / 60) / 60) <= 6)\n            THEN 'rejected' ELSE b.status END as status\n            , b.created_at::DATE as request_date\n            , to_char(b.created_at, 'YYYY-\"Q\"Q') as period\n    \n        FROM bookings b\n        \n        WHERE 1=1\n            AND currency = 'myr'\n            AND b.status IN ('rejected','withdrawn','cancelled')\n            AND b.created_at > '2023-07-01'\n    )\n    \n    , data AS (\n        SELECT \n            booking_id\n            , l.listing_id\n            , request_date\n            , period\n            , ROW_NUMBER () OVER (PARTITION BY b.listing_id, b.period ORDER BY b.request_date ASC)  AS quarterly_reject_count\n        FROM my_bookings b\n        JOIN my_listings l on l.listing_id = b.listing_id\n        WHERE 1=1\n            AND b.status = 'rejected'\n    )\n\nSELECT \n    listing_id\n    , period\n    , request_date\n    , booking_id\n    , quarterly_reject_count\nFROM data",
+        "options": {}
+      },
+      "id": "cb66e9a3-a039-4d84-b108-b572c8bb1e7e",
+      "name": "Rejections - Query",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        140,
+        260
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $json.request_date }}",
+        "options": {}
+      },
+      "id": "bd75073b-ebd4-462c-bea2-924efc615502",
+      "name": "Rejections - Format Date",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        340,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "d1eab5e1-ecc7-4022-8d96-4d3ed60eb848",
+      "name": "Rejections - Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        520,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Rejections Raw",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "listing_id": "={{ $json.listing_id }}",
+            "period": "={{ $json.period }}",
+            "request_date": "={{ $json.formattedDate }}",
+            "quarterly_reject_count": "={{ $json.quarterly_reject_count }}",
+            "booking_id": "={{ $json.booking_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "listing_id",
+              "displayName": "listing_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "period",
+              "displayName": "period",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "request_date",
+              "displayName": "request_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "booking_id",
+              "displayName": "booking_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "quarterly_reject_count",
+              "displayName": "quarterly_reject_count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "052ba640-36cf-4593-b008-c71dec9c765d",
+      "name": "Rejections - Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        680,
+        260
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 4,
+              "triggerAtMinute": 20
+            }
+          ]
+        }
+      },
+      "id": "4ba1644e-0563-4d11-baa3-6e9375909efb",
+      "name": "Ratings - Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH\n    rated_bookings AS (\n        SELECT\n            listing_id\n            , COUNT(DISTINCT br.id) as rated_bookings\n        FROM booking_reviews br\n        JOIN bookings b on b.id = br.booking_id\n        \n        WHERE 1=1\n            AND br.type = 'renter'\n            AND br.deleted_at IS NULL\n            AND br.created_at > '2023-07-01'\n        \n        GROUP BY 1\n    )\n        \n    , my_bookings AS (\n        SELECT \n            b.id as booking_id\n            , b.listing_id\n            , b.request_end_at::DATE as date\n            , to_char(b.created_at, 'YYYY-\"Q\"Q') as period\n            , rating\n            , ROW_NUMBER () OVER (PARTITION BY b.listing_id, to_char(b.created_at, 'YYYY-\"Q\"Q') ORDER BY b.request_end_at ASC) AS bookings\n    \n        FROM rated_bookings l\n        JOIN bookings b on b.listing_id = l.listing_id\n            AND currency = 'myr'\n            AND b.status IN ('completed')\n            AND b.created_at > '2023-07-01'\n        JOIN booking_reviews br on br.booking_id = b.id\n            AND br.type = 'renter'\n            AND br.deleted_at IS NULL\n            AND br.created_at > '2023-07-01'\n        \n        WHERE 1=1\n            AND rating IS NOT NULL\n            AND l.rated_bookings >4\n\n    )\n    \n    , data AS (\n        SELECT \n            listing_id\n            , booking_id\n            , period\n            , date\n            , rating\n            , ROUND(coalesce(avg(rating) over (partition by listing_id order by date)),1) as rollingAvg\n        FROM my_bookings b\n        WHERE 1=1\n\n    )\n\nSELECT \n    listing_id\n    , booking_id\n    , period\n    , date\n    , rating\n    , rollingAvg\nFROM data\nWHERE 1=1\n    AND rollingAvg < 4.45\nORDER BY 1",
+        "options": {}
+      },
+      "id": "5f76f101-7d86-4b85-b68f-5ed2b472129b",
+      "name": "Ratings - Query",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        140,
+        700
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Reviews\n",
+        "height": 518.5974025974023,
+        "width": 1062.545454545454
+      },
+      "id": "3bd9cb6f-6cac-4af9-8a29-c7ffa721ab7c",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        880
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 922422680,
+          "mode": "list",
+          "cachedResultName": "Review Raw",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E/edit#gid=922422680"
+        },
+        "clear": "specificRange",
+        "range": "A2:F"
+      },
+      "id": "8074a926-bc6e-4e17-9ea2-59ea04c8ca84",
+      "name": "Reviews - Clear Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        100,
+        1000
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH\n    my_bookings AS (\n        SELECT DISTINCT ON (b.id,br.reason)\n            b.id as booking_id\n            , b.listing_id\n            , b.created_at::DATE as request_date\n            , to_char(b.created_at, 'YYYY-\"Q\"Q') as period\n            , br.reason\n            , REGEXP_REPLACE(br.comment, '\\s+$', '') as comment\n    \n        FROM bookings b\n        JOIN booking_reports br on br.user_id = b.user_id \n            AND br.booking_id = b.id\n        \n        WHERE 1=1\n            AND currency = 'myr'\n            AND b.status = 'completed'\n            AND b.created_at > '2023-07-01'\n            AND br.reason NOT IN ('report_popup_car_has_an_accident')\n            /* Cleanliness */\n            AND (comment LIKE ('%dirty%') OR comment LIKE ('%clean%') OR comment LIKE ('%clean up%') OR comment LIKE ('%kotor%')\n            OR comment LIKE ('%cockroach%') OR comment LIKE ('%Cleanliness%') \n            /* Maintenance */\n            -- Tyre\n            OR comment LIKE ('%worn out%') OR comment LIKE ('%tyre%') OR comment LIKE ('%tire%') OR comment LIKE ('%tayar%') \n            OR comment LIKE ('%botak%') OR comment LIKE ('%no air%')\n            -- Glass\n            OR comment LIKE ('%windscreen%') OR comment LIKE ('%window%') OR comment LIKE ('%crack%') OR comment LIKE ('%retak%')\n            -- Air Conditioning\n            OR comment LIKE ('%air cond%') OR comment LIKE ('%aircon%') OR comment LIKE ('%air conditioning%') OR comment LIKE ('%not cold%')\n            -- Lights\n            OR comment LIKE ('%lights%') OR comment LIKE ('%lampu%') OR comment LIKE ('% light%') \n            -- Steering\n            OR comment LIKE ('%alignment%') OR comment LIKE ('%steering%') OR comment LIKE ('%brake%') \n            -- Misc\n            OR comment LIKE ('%torn%') OR comment LIKE ('%noise%') OR comment LIKE ('%torn%') OR comment LIKE ('%bunyi%')\n            OR comment LIKE ('%battery%') OR comment LIKE ('%damaged%') OR comment LIKE ('%engine%') OR comment LIKE ('%funtioning%')\n            OR comment LIKE ('%good condition%') OR comment LIKE ('%broken%') OR comment LIKE ('%breakdown%') OR comment LIKE ('%broke down%')\n            OR comment LIKE ('%not well maintained%') OR comment LIKE ('%not suitable for rent%') OR comment LIKE ('%meter%')\n\n            /*AND comment NOT LIKE ('%deliver%') AND comment NOT LIKE ('%delivery%') AND comment NOT LIKE ('%refund%')\n            AND comment NOT LIKE ('%return%') AND comment NOT LIKE ('%excess oil%') AND comment NOT LIKE ('%inspection%')\n            AND comment NOT LIKE ('%gambar%') AND comment NOT LIKE ('%ejen%') AND comment NOT LIKE ('%agent%')\n            AND comment NOT LIKE ('%dasher%')*/\n    ))\n    \nSELECT * FROM my_bookings",
+        "options": {}
+      },
+      "id": "27e57e28-151e-49de-95ad-b857972db0e0",
+      "name": "Reviews - Query",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        100,
+        1160
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "20 07-23 * * *"
+            }
+          ]
+        }
+      },
+      "id": "bf658b87-0398-41de-979d-1b79d2e8c2ce",
+      "name": "Reviews - Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        1160
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E",
+          "mode": "list",
+          "cachedResultName": "HSP",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 417522499,
+          "mode": "list",
+          "cachedResultName": "Ratings Raw",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E/edit#gid=417522499"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "listing_id": "={{ $json.listing_id }}",
+            "period": "={{ $json.period }}",
+            "rating": "={{ $json.rating }}",
+            "trigger_date": "=",
+            "date": "={{ $json.formattedDate }}",
+            "booking_id": "={{ $json.booking_id }}",
+            "rolling_avg": "={{ $json.rollingavg }}"
+          },
+          "matchingColumns": [
+            "listing_id"
+          ],
+          "schema": [
+            {
+              "id": "listing_id",
+              "displayName": "listing_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "booking_id",
+              "displayName": "booking_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "period",
+              "displayName": "period",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "rating",
+              "displayName": "rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "rolling_avg",
+              "displayName": "rolling_avg",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "booking_count",
+              "displayName": "booking_count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "0f4b151a-118b-424f-a36f-cc34fa13958f",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        720,
+        700
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $json.date }}",
+        "options": {}
+      },
+      "id": "0d400616-f9e1-473b-b17e-87c6a9d5c517",
+      "name": "Rejections - Format Date1",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        360,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 417522499,
+          "mode": "list",
+          "cachedResultName": "Ratings Raw",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E/edit#gid=417522499"
+        },
+        "clear": "specificRange",
+        "range": "A2:F"
+      },
+      "id": "d60469e8-51f4-4a83-8ae2-314ade9dc4e9",
+      "name": "Ratings - Clear Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        140,
+        520
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "83f7000b-68f5-458e-bb6e-c59601d2084b",
+      "name": "Rejections - Merge1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        520,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $json.request_date }}",
+        "options": {}
+      },
+      "id": "7c9347c0-5974-4678-a3f2-1a61181b11dd",
+      "name": "Reviews - Format Date",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        380,
+        1020
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "c0e7ceb4-1c86-4857-bae6-9db56844ac68",
+      "name": "Rejections - Merge2",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        540,
+        1160
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E",
+          "mode": "list",
+          "cachedResultName": "HSP",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 922422680,
+          "mode": "list",
+          "cachedResultName": "Reviews Raw",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E/edit#gid=922422680"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "request_date": "={{ $json.formattedDate }}",
+            "booking_id": "={{ $json.booking_id }}",
+            "listing_id": "={{ $json.listing_id }}",
+            "period": "={{ $json.period }}",
+            "reason": "={{ $json.reason }}",
+            "comment": "={{ $json.comment }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "listing_id",
+              "displayName": "listing_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "booking_id",
+              "displayName": "booking_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "request_date",
+              "displayName": "request_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "period",
+              "displayName": "period",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reason",
+              "displayName": "reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "comment",
+              "displayName": "comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "#REF!",
+              "displayName": "#REF!",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "3374aa25-c10c-41f4-baef-3ff86e1ceab1",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        720,
+        1160
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 1800,
+    "executionOrder": "v1",
+    "errorWorkflow": "11"
+  },
+  "staticData": {
+    "node:Rejections - Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "node:Ratings - Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "node:Reviews - Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-03-31T06:52:09.032Z",
+      "updatedAt": "2023-03-31T06:52:09.032Z",
+      "id": "5",
+      "name": "Patrick"
+    },
+    {
+      "createdAt": "2023-05-12T02:58:38.207Z",
+      "updatedAt": "2023-05-12T02:58:38.207Z",
+      "id": "8",
+      "name": "Host Community"
+    }
+  ],
+  "triggerCount": 3,
+  "updatedAt": "2023-10-25T07:14:11.022Z",
+  "versionId": "45c76704-0a38-4db7-b99c-662a0a6f46e1"
+}
