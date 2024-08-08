@@ -1,0 +1,252 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "IB WA wo-H wo-B",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "IB WA w-H-IMG wo-Button",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "IB WA w-H-IMG w-Button",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ID|UserTag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-06-07T02:22:07.292Z",
+  "id": "82",
+  "name": "Yuska Sample 2",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ej52vr.api.infobip.com/whatsapp/1/message/template",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\t\"messages\":[{\n\t\t\"from\":\"{{$json[\"from\"]}}\",\n\t\t\"to\":\"{{$json[\"to\"]}}\",\n\t\t\"messageId\":\"{{$json[\"messageId\"]}}\",\n\t\t\"content\":{\n\t\t\t\"templateName\":\"{{$json[\"templateName\"]}}\",\n\t\t\t\"templateData\":{\n\t\t\t\t\"body\":{\"placeholders\":[{{$json[\"placeholders\"] ? $json[\"placeholders\"] : \"\"}}]},\n\t\t\t\t\"header\":{\n\t\t\t\t\t\"type\":\"{{$json[\"headerType\"]}}\",\n\t\t\t\t\t\"mediaUrl\":\"{{$json[\"headerTypeMediaUrl\"]}}\"\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"language\":\"{{$json[\"language\"]}}\"\n\t\t}\n\t}]\n}",
+        "options": {}
+      },
+      "id": "7bb8d48a-cf95-4538-b105-b7795fd870be",
+      "name": "IB WA w-H-IMG wo-Button",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        460,
+        660
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 300,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "20",
+          "name": "Infobip SMS [Kavi]"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ej52vr.api.infobip.com/whatsapp/1/message/template",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"messages\":[{\n\"from\":\"{{$json[\"from\"]}}\",\n\"to\":\"{{$json[\"to\"]}}\",\n\"messageId\":\"{{$json[\"messageId\"]}}\",\n\"content\":{\n\"templateName\":\"{{$json[\"templateName\"]}}\",\n\"templateData\":{\n\"body\":{\"placeholders\":[{{$json[\"placeholders\"]||\"\"}}]},\n\"header\":{\n\"type\":\"{{$json[\"headerType\"]}}\",\n\"mediaUrl\":\"{{$json[\"headerTypeMediaUrl\"]}}\"\n},\n\"buttons\": [{\n\"type\": \"URL\",\n\"parameter\": \"{{$json[\"button\"]}}\"\n}]\n},\n\"language\":\"{{$json[\"language\"]}}\"\n}\n}]\n}",
+        "options": {}
+      },
+      "id": "568bdbde-22e0-414c-a38e-2a72f7ad4133",
+      "name": "IB WA w-H-IMG w-Button",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        460,
+        860
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 300,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "20",
+          "name": "Infobip SMS [Kavi]"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxvle.api.infobip.com/whatsapp/1/message/template",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\t\"messages\":[{\n\t\t\"from\":\"{{$json[\"from\"]}}\",\n\t\t\"to\":\"{{$json[\"to\"]}}\",\n\t\t\"messageId\":\"{{$json[\"messageId\"]}}\",\n\t\t\"content\":{\n\t\t\t\"templateName\":\"{{$json[\"templateName\"]}}\",\n\t\t\t\"templateData\":{\n\t\t\t\t\"body\":{\"placeholders\":[{{$json[\"placeholders\"||\"\"]}}]}\n\t\t\t},\n\t\t\t\"language\":\"{{$json[\"language\"]}}\"\n\t\t}\n\t}]\n}",
+        "options": {}
+      },
+      "id": "67c384a2-768f-4491-96aa-b2bb1f9bcbad",
+      "name": "IB WA wo-H wo-B",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        460,
+        460
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 300,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "20",
+          "name": "Infobip SMS [Kavi]"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "id": "d600709a-1f67-4d24-ab52-08541fc52c7c",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        660
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT * FROM users WHERE email = 'yukey0708@yahoo.com'",
+        "options": {}
+      },
+      "id": "d99af623-ade3-404f-941f-bc4304dcb093",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.1,
+      "position": [
+        20,
+        660
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "trevodb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "from",
+              "value": "60192052803"
+            },
+            {
+              "name": "to",
+              "value": "=62{{$json.phone_number}}"
+            },
+            {
+              "name": "placeholders",
+              "value": "={{ $json.first_name }}, {{ $json.last_name }}"
+            },
+            {
+              "name": "listing_url",
+              "value": "https://ayo.trevo.id"
+            },
+            {
+              "name": "templateName",
+              "value": "rejected_booking_suggestion"
+            },
+            {
+              "name": "headerType"
+            },
+            {
+              "name": "headerTypeMediaUrl"
+            },
+            {
+              "name": "language",
+              "value": "en_MY"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c2dfe5e3-315c-4a38-bc4e-3dcb583a5e5f",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        220,
+        660
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.trevo.my/v1/web-hook/lean-plum/user-tag",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n\"Authorization\":\"Basic c29jYXJfbW9iaWxpdHk6UWZUalduWnI0dTd3IXolQw==\",\n\"Content-Type\":\"application/json\",\n\"Accept-Encoding\":\"gzip, deflate, br\",\n\"User-Agent\":\"Leanplum-Webhook\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"userId\":\"{{ $json[\"uuid\"] }}\",\n\"action\":\"add\",\n\"secretKey\":\"4E635266556A586E5A7234753778214125442A472D4B6150645367566B597033\",\n\"userTagSlug\":\"<input tagslug>\",\n\"campaignName\":\"<input tag logs/campaign>\"\n} ",
+        "options": {}
+      },
+      "id": "41aea2a0-5763-41a4-b376-827eb5b108bb",
+      "name": "ID|UserTag",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        460,
+        1100
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-06-07T06:56:59.358Z",
+  "versionId": "3f99b7f7-da51-443f-b006-b3408a5b4aad"
+}
