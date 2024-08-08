@@ -1,0 +1,470 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-04-23T07:13:58.475Z",
+  "id": "aIzfv0DhO3MXKWL8",
+  "name": "[KENNY][SUPPLY] HOST REJECTIONS NATIONWIDE",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 3
+            }
+          ]
+        }
+      },
+      "id": "c3f86153-92b4-434f-b940-ecf15b3fe9c1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        620,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1dlojxA3HBhPYknCoWawNBdEUNiZfJf3IYNKevsWeS6c",
+          "mode": "list",
+          "cachedResultName": "[Central & Southern] Rejections host - 2024",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dlojxA3HBhPYknCoWawNBdEUNiZfJf3IYNKevsWeS6c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 712688114,
+          "mode": "list",
+          "cachedResultName": "UTD Rejection (N8N Import)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dlojxA3HBhPYknCoWawNBdEUNiZfJf3IYNKevsWeS6c/edit#gid=712688114"
+        },
+        "clear": "specificRange",
+        "range": "A2:AC"
+      },
+      "id": "d338349b-90b0-4bff-b021-2d6d73192c3e",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        840,
+        220
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\nselect \nA.city,\nA.pfp_name,\nTO_CHAR(A.rejected_at, 'YYYY-MM-DD HH24:MI') AS rejected_at,\nA.reason,\nA.host_name,\nA.brand,\nA.model,\nA.base_price,\nA.gross_amount,\nA.net_amount,\nA.host_email, \nA.host_phone_num,\nA.host_id,\nA.status, \nA.guest_id,\nA.guest_name, \nA.guest_email, \nA.guest_phone_num, \nA.listing_id,\nA.ref_no,\nB.host_requested, \nB.host_fulfilled, \nTO_CHAR(A.created_at, 'YYYY-MM-DD HH24:MI') AS created_at,\nTO_CHAR(A.request_start_at, 'YYYY-MM-DD HH24:MI') AS request_start_at,\nTO_CHAR(A.request_end_at, 'YYYY-MM-DD HH24:MI') AS request_end_at,\nA.resp_minutes,\nA.created_at_hours_to_trip_start,\nA.listing_age_days,\nA.listing_created_at\nfrom\n(select b.ref_no,\ncase when ll.city_id in (1) then 'KV'   \nwhen ll.city_id in (2,12) then 'PGM' when ll.city_id in (48) then 'PGI'\nwhen ll.city_id in (3,19,20,21) then 'KK'   when ll.city_id in (4) then 'JB' \nwhen ll.city_id in (5) then 'IP'   when ll.city_id in (47) then 'NS'\nwhen ll.city_id in (13) then 'LGK' \nwhen ll.city_id in (14) then 'PRLS'\nwhen ll.city_id in (15) then 'MLK'\nwhen ll.city_id in (16) then 'PHG'\nwhen ll.city_id in (17) then 'TRGN'\nwhen ll.city_id in (18) then 'KLT'\nwhen ll.city_id in (22,23) then 'KCH'\nelse 'Others' end as City,\ncase when c.owner_id is null then 'Organic'\nelse 'PFP' end as \"HostType\",\nb.status,\nc.\"name\" as pfp_name,\nb.reason,\nb.gross_amount,\nb.net_amount,\nb.user_id as guest_id,\nconcat(u2.first_name, ' ',u2.last_name) as guest_name, \nu2.email as guest_email, \n--concat(u2.phone_country_code, ' ', u2.phone_number) as guest_phone_num,\nconcat('wa.me/60',u2.phone_number) as guest_phone_num,\nl.id as listing_id,\nl.user_id as host_id,\nconcat(u.first_name, ' ',u.last_name) as host_name, \nu.email as host_email, \n--concat(u.phone_country_code, ' ', u.phone_number) as host_phone_num,\nconcat('wa.me/60',u.phone_number) as host_phone_num,\nm.name as model,\nbr.name as brand,\nlp.base_price, \nb.created_at::timestamp, \nb.request_start_at::timestamp,\nb.request_end_at::timestamp,\nb.updated_at::timestamp as rejected_at,\nl.created_at as listing_created_at,\nceil((EXTRACT(EPOCH FROM b.request_start_at::timestamp) - EXTRACT(EPOCH FROM b.created_at::timestamp))/3600::integer) as created_at_hours_to_trip_start,\n(DATE_PART('day', b.updated_at - b.created_at)* 24 + DATE_PART('hour', b.updated_at - b.created_at ))*60 + DATE_PART('minute', b.updated_at - b.created_at ) as resp_minutes,\n--(DATE_PART('day', b.updated_at - l.created_at)* 24 + DATE_PART('hour', b.updated_at - l.created_at ))*60 + DATE_PART('minute', b.updated_at - l.created_at ) as listing_age\n(DATE_PART('day', NOW() - l.created_at)) as listing_age_days\n--(DATE_TRUNC('day',l.created_at) = CURRENT_DATE - interval '1 day') as listing_age_minutes\nfrom bookings b \nleft join listings l on l.id = b.listing_id \nleft join models m on m.id = l.model_id \nleft join brands br on br.id = m.brand_id \nleft join listing_pricing lp on lp.listing_id = l.id \nleft join users u on u.id = l.user_id \nleft join users u2 on u2.id = b.user_id \nleft join listing_location ll on ll.listing_id = l.id\nleft join companies c on c.owner_id = l.user_id \nleft join\n                (select distinct b.ref_no,\n                case when\n                ((EXTRACT(HOUR FROM b.created_at) in (23,0,1,2,3,4,5,6,7)) and\n                (EXTRACT(HOUR FROM b.request_start_at) in (6,7,8,9)) and\n                ((EXTRACT(EPOCH FROM (b.request_start_at - b.created_at)) / 3600) < 12)) then 'yes' else 'no' end as nightowl\n                from bookings b)no\n        on no.ref_no = b.ref_no\nwhere 1=1 \nand ((b.status = 'rejected' AND (b.reason !~* '(guest)' OR b.reason IS NULL) and no.nightowl = 'no') OR --exclude rejected with guest fault reasons and nightowl \n(b.status IN ('withdrawn', 'cancelled') AND b.reason ~* '(host|owner|avai|car)' and no.nightowl = 'no' AND b.reason !~* '(after i read|dont need|extended|rebook|rebooking|wrong date|wrong time|I didnt|manual|I want|I need|sorry|I would|mistake|my own car|wrong|change)'))\n--and ll.city_id in (1,47,4)\nand ll.country !~ 'Indonesia'\nand b.created_at::timestamp >= '2024-01-01 00:00'\n) A\njoin\n(select l.user_id, \ncount(distinct case when b.status not in ('payment_failed') then b.id end) as host_requested,\ncount(distinct case when b.status in ('accepted', 'completed') then b.id end) as host_fulfilled\nfrom bookings b \nleft join listings l on l.id = b.listing_id \ngroup by 1)B\non A.host_id = B.user_id\norder by 3 desc",
+        "options": {}
+      },
+      "id": "eb901e91-b906-4cb1-82ef-6067baed94e7",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1060,
+        220
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1dlojxA3HBhPYknCoWawNBdEUNiZfJf3IYNKevsWeS6c",
+          "mode": "list",
+          "cachedResultName": "[Central & Southern] Rejections host - 2024",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dlojxA3HBhPYknCoWawNBdEUNiZfJf3IYNKevsWeS6c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 712688114,
+          "mode": "list",
+          "cachedResultName": "UTD Rejection (N8N Import)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dlojxA3HBhPYknCoWawNBdEUNiZfJf3IYNKevsWeS6c/edit#gid=712688114"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "ref_no"
+          ],
+          "schema": [
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "pfp_name",
+              "displayName": "pfp_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "rejected_at",
+              "displayName": "rejected_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reason",
+              "displayName": "reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "host_name",
+              "displayName": "host_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "brand",
+              "displayName": "brand",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "model",
+              "displayName": "model",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "base_price",
+              "displayName": "base_price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "gross_amount",
+              "displayName": "gross_amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "net_amount",
+              "displayName": "net_amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "host_email",
+              "displayName": "host_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "host_phone_num",
+              "displayName": "host_phone_num",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "host_id",
+              "displayName": "host_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "guest_id",
+              "displayName": "guest_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "guest_name",
+              "displayName": "guest_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "guest_email",
+              "displayName": "guest_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "guest_phone_num",
+              "displayName": "guest_phone_num",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "listing_id",
+              "displayName": "listing_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ref_no",
+              "displayName": "ref_no",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "host_requested",
+              "displayName": "host_requested",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "host_fulfilled",
+              "displayName": "host_fulfilled",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "request_start_at",
+              "displayName": "request_start_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "request_end_at",
+              "displayName": "request_end_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "resp_minutes",
+              "displayName": "resp_minutes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "created_at_hours_to_trip_start",
+              "displayName": "created_at_hours_to_trip_start",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "listing_age_days",
+              "displayName": "listing_age_days",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "listing_created_at",
+              "displayName": "listing_created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6e2c1f65-e407-4aa8-a17e-bedfa2ab817c",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1280,
+        220
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": [
+        13
+      ]
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-08-08T05:00:00.194Z",
+  "versionId": "1c1f9212-2aa8-4931-8b52-8869e396ac31"
+}
