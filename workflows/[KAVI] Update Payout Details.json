@@ -1,0 +1,30 @@
+{
+  "active": false,
+  "connections": {},
+  "createdAt": "2024-01-11T03:50:39.216Z",
+  "id": "heLnkRQcsxLq6lJ1",
+  "name": "[KAVI] Update Payout Details",
+  "nodes": [],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2023-05-12T02:58:32.100Z",
+      "updatedAt": "2023-05-12T02:58:32.100Z",
+      "id": "7",
+      "name": "Host CRM"
+    },
+    {
+      "createdAt": "2022-12-15T07:35:21.640Z",
+      "updatedAt": "2022-12-15T07:35:21.640Z",
+      "id": "2",
+      "name": "MY"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2024-01-11T03:50:51.478Z",
+  "versionId": "c5716222-96b6-4988-9c1a-61fd80808f7c"
+}
