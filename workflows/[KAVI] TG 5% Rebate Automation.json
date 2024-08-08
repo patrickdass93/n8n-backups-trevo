@@ -1,0 +1,316 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-01-17T03:41:59.687Z",
+  "id": "4Q2W6EeOCCXpSgLl",
+  "name": "[KAVI] TG 5% Rebate Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "ad483229-b0c5-4cb5-a4e4-2a24efa43699",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        660,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1X8UFplMJBHk2Nfxh8AqptSjUs_fMPC7V-jRFp9KFR1I",
+          "mode": "list",
+          "cachedResultName": "YXXXX - WXX TG 5% Rebate (XXth - XXth) - Automated Main Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1X8UFplMJBHk2Nfxh8AqptSjUs_fMPC7V-jRFp9KFR1I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1415702456,
+          "mode": "list",
+          "cachedResultName": "(RAW) TREVO GUARD Import",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1X8UFplMJBHk2Nfxh8AqptSjUs_fMPC7V-jRFp9KFR1I/edit#gid=1415702456"
+        },
+        "options": {}
+      },
+      "id": "9dc6b506-eec0-42e2-98df-84e880e2f1fc",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1060,
+        360
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    DISTINCT l.registration_no,\n    CONCAT(u.first_name, ' ', u.last_name) AS name,\n    u.email,\n    CONCAT(u.phone_country_code, u.phone_number) AS mobile,\n    pa.\"name\" AS beneficiary_name,\n    pa.bank,\n    pa.account_type,\n    pa.account_number,\n    pa.bank_code\nFROM listings l\nLEFT JOIN users u ON u.id = l.user_id\nLEFT JOIN payout_accounts pa ON pa.user_id = u.id AND pa.deleted_at IS NULL\nWHERE l.registration_no = $1\n",
+        "options": {
+          "queryBatching": "single",
+          "queryReplacement": "={{ $json['Car Plate Number'] }}"
+        }
+      },
+      "id": "da928f47-d3bb-4cd9-9222-eaf6b23bdc3a",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1260,
+        360
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1X8UFplMJBHk2Nfxh8AqptSjUs_fMPC7V-jRFp9KFR1I",
+          "mode": "list",
+          "cachedResultName": "YXXXX - WXX TG 5% Rebate (XXth - XXth) - Automated Main Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1X8UFplMJBHk2Nfxh8AqptSjUs_fMPC7V-jRFp9KFR1I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 938210875,
+          "mode": "list",
+          "cachedResultName": "[N8N] Import Host Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1X8UFplMJBHk2Nfxh8AqptSjUs_fMPC7V-jRFp9KFR1I/edit#gid=938210875"
+        },
+        "clear": "specificRange",
+        "range": "A2:I"
+      },
+      "id": "61793eba-d7af-4727-80fe-dc3b9e457797",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        860,
+        360
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1X8UFplMJBHk2Nfxh8AqptSjUs_fMPC7V-jRFp9KFR1I",
+          "mode": "list",
+          "cachedResultName": "YXXXX - WXX TG 5% Rebate (XXth - XXth) - Automated Main Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1X8UFplMJBHk2Nfxh8AqptSjUs_fMPC7V-jRFp9KFR1I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 938210875,
+          "mode": "list",
+          "cachedResultName": "[N8N] Import Host Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1X8UFplMJBHk2Nfxh8AqptSjUs_fMPC7V-jRFp9KFR1I/edit#gid=938210875"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "registration_no"
+          ],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mobile",
+              "displayName": "mobile",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "registration_no",
+              "displayName": "registration_no",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "beneficiary_name",
+              "displayName": "beneficiary_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "bank",
+              "displayName": "bank",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "account_type",
+              "displayName": "account_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "account_number",
+              "displayName": "account_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "bank_code",
+              "displayName": "bank_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "b98f402f-5c1e-4b0d-bbcf-bc691cb5a60f",
+      "name": "Google Sheets2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1460,
+        360
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11",
+    "saveDataSuccessExecution": "all"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2024-06-13T09:00:07.228Z",
+      "updatedAt": "2024-06-13T09:00:07.228Z",
+      "id": "qyitjXnM7vfQk24X",
+      "name": "TG"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-06-13T09:00:24.934Z",
+  "versionId": "13604cf5-0836-4237-8191-9e3177d94836"
+}
