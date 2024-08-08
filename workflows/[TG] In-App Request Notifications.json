@@ -1,0 +1,113 @@
+{
+  "active": true,
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-06-13T09:07:28.851Z",
+  "id": "8Vp0L0mwLBQq3XKm",
+  "name": "[TG] In-App Request Notifications",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1-kq_ufeX-Kw5f92mLpSTGlwHJpgOc8GrxkVVMC0CrAE",
+          "mode": "list",
+          "cachedResultName": "Trevo APP - TG Form (Responses)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-kq_ufeX-Kw5f92mLpSTGlwHJpgOc8GrxkVVMC0CrAE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1922465935,
+          "mode": "list",
+          "cachedResultName": "Form Responses 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-kq_ufeX-Kw5f92mLpSTGlwHJpgOc8GrxkVVMC0CrAE/edit#gid=1922465935"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "id": "969119bd-20f2-4d5e-b0c2-e8f739ec9418",
+      "name": "Google Sheets Trigger",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        640,
+        300
+      ],
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "yB9dhbWX1rLhSVKv",
+          "name": "Google Sheets Trigger [Pat]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAzbcIW4I",
+        "messageUi": {
+          "text": "=New TG Request\n\nVehicle Registration Number:  {{ $json['Vehicle registration number '] }}\nSC:  {{ $json['Has a supply consultant from TREVO contacted you before? If yes, please check their name below:  '] }}\nCity:  {{ $json['In which state is your car currently based?'] }}"
+        },
+        "additionalFields": {}
+      },
+      "id": "55211acb-1e43-4951-aa9a-2046b1f731e6",
+      "name": "Google Chat",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        820,
+        300
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "Google Chat [Pat]"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Google Sheets Trigger": {
+      "documentId": "1-kq_ufeX-Kw5f92mLpSTGlwHJpgOc8GrxkVVMC0CrAE",
+      "sheetId": 1922465935,
+      "lastIndexChecked": 61
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2024-06-13T09:00:07.228Z",
+      "updatedAt": "2024-06-13T09:00:07.228Z",
+      "id": "qyitjXnM7vfQk24X",
+      "name": "TG"
+    },
+    {
+      "createdAt": "2023-03-31T06:52:09.032Z",
+      "updatedAt": "2023-03-31T06:52:09.032Z",
+      "id": "5",
+      "name": "Patrick"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-08-06T02:10:12.659Z",
+  "versionId": "d0977fc8-d393-48b7-9053-1756ea233aea"
+}
