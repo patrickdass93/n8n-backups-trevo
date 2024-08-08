@@ -1,0 +1,2362 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "60D",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Function6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "60D": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "30D",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "30D": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "7D",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Code11",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code8",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code9",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "7D": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "1D",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch3": {
+      "main": [
+        [
+          {
+            "node": "Code15",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code12",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code13",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code14",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1D": {
+      "main": [
+        [
+          {
+            "node": "Switch3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "CENTRAL",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "NORTHERN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "CENTRAL2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code5": {
+      "main": [
+        [
+          {
+            "node": "NORTHERN2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code6": {
+      "main": [
+        [
+          {
+            "node": "SOUTHERN2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code7": {
+      "main": [
+        [
+          {
+            "node": "EASTERN2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code8": {
+      "main": [
+        [
+          {
+            "node": "NORTHERN3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code9": {
+      "main": [
+        [
+          {
+            "node": "SOUTHERN3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code10": {
+      "main": [
+        [
+          {
+            "node": "EASTERN3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code11": {
+      "main": [
+        [
+          {
+            "node": "CENTRAL3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code12": {
+      "main": [
+        [
+          {
+            "node": "NORTHERN4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code13": {
+      "main": [
+        [
+          {
+            "node": "SOUTHERN4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code14": {
+      "main": [
+        [
+          {
+            "node": "EASTERN4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code15": {
+      "main": [
+        [
+          {
+            "node": "CENTRAL4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Function6": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "SOUTHERN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "EASTERN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "CENTRAL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-06-13T06:34:52.774Z",
+  "id": "91",
+  "name": "[JIUN] [HOST COMMUNITY] [TREVO Insurance] [SLACK]- INSRUANCE TEST",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "4e7f00b5-7aac-4b89-bd2b-06c28aedee59",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        340,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=select distinct l.id, \nl.registration_no, \nconcat('https://gearbox.trevo.my/trevo-listings/?id=',l.id) as GB_link,\ncase when ht.host_type is null then 'Organic' else ht.host_type end as host_type,\nbr.name as brand, \ncase when POSITION(' ' IN trim(regexp_replace(regexp_replace(INITCAP(m.name),'^([a-z]{1,3})-','\\1'),'([a-z]{3,})-','\\1 '))) > 0 \nthen trim(SUBSTR(trim(regexp_replace(regexp_replace(INITCAP(m.name),'^([a-z]{1,3})-','\\1'),'([a-z]{3,})-','\\1 ')),1, \nPOSITION(' ' IN trim(regexp_replace(regexp_replace(INITCAP(m.name),'^([a-z]{1,3})-','\\1'),'([a-z]{3,})-','\\1 ')))))\nelse trim(regexp_replace(regexp_replace(INITCAP(m.name),'^([a-z]{1,3})-','\\1'),'([a-z]{3,})-','\\1 ')) end as car_model_regex,\ncase when ll.city_id in (1) then 'KV'   \nwhen ll.city_id in (2,12) then 'PGM' when ll.city_id in (48) then 'PGI'\nwhen ll.city_id in (3,19,20,21) then 'KK'   when ll.city_id in (4,15) then 'JB' \nwhen ll.city_id in (5) then 'IP'   when ll.city_id in (47) then 'NS'\nwhen ll.city_id in (13) then 'LGK' else 'Others' end as City,\nl.user_id, \nconcat(u.first_name,' ',u.last_name)as host_name, \nu.email, \nu.phone_number, \nl.status, \nl.created_at, \nli.name,\nli.expiry,\nDATE_PART('day', li.expiry - NOW()) as days_left_expiry,\ncc.name as comm,\nsc.name as SC_PIC,\ncase \n  when ((DATE_PART('day', li.expiry - NOW())) <= 60 and (DATE_PART('day', li.expiry - NOW()))>= 31) then '<=60'\n  when ((DATE_PART('day', li.expiry - NOW())) <= 30 and (DATE_PART('day', li.expiry - NOW()))>= 8) then '<=30'\n  when ((DATE_PART('day', li.expiry - NOW())) <= 7 and (DATE_PART('day', li.expiry - NOW()))>= 2) then '<=7'\n  when ((DATE_PART('day', li.expiry - NOW())) <= 1) then '<=1'\n  else 'Others' \nend as expiring_group\nfrom listings l \nleft join users u on u.id = l.user_id\nleft join listing_insurance li on li.listing_id = l.id\nleft join models m on m.id = l.model_id\nleft join brands br on br.id = m.brand_id\nleft join listing_commission_class lcc on lcc.listing_id = l.id\nleft join commission_class cc on cc.id = lcc.commission_id\nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = l.id\nleft join companies c on c.owner_id = l.user_id\n--\n        left join \n        (select distinct b.listing_id,\n        max(b.created_at) as clt\n        from bookings b \n        where b.status = 'completed'\n        and b.request_start_at between (NOW() - interval'90 days') and NOW()\n        group by 1)A\n        on A.listing_id = l.id\n--\n        left join\n        (select distinct l.user_id, l.id, t.name as host_type\n        from listings l\n        left join tag_taggables tt on tt.taggable_id = l.user_id \n        left join tags t on t.id = tt.tag_id\n        where t.name ~* '(entrepreneur|commercial)')ht\n        on ht.user_id = l.user_id\n--\n\t\tleft join \n        (select distinct l.id, \n        t.name\n        from listings l \n        left join tag_taggables tt on tt.taggable_id = l.id \n        left join tags t on t.id = tt.tag_id \n        where t.name like 'SC -%')SC\n        on SC.id = l.id\n--\nwhere l.status = 'approved'\nand l.deleted_at is null\nand ll.country = 'Malaysia'\nand li.expiry >= NOW()\ngroup by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19\nhaving (case when ht.host_type is null then 'Organic' else ht.host_type end) != 'Commercial Host' \nand DATE_PART('day', li.expiry - NOW()) <= '60'\norder by 15",
+        "additionalFields": {}
+      },
+      "id": "95c66482-984f-454f-b8fb-a192dc797980",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        560,
+        280
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "trevodb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.expiring_group }}",
+              "value2": "<=60"
+            }
+          ]
+        }
+      },
+      "id": "760cfb4a-924a-4baf-8ce7-a6f22c07f11c",
+      "name": "60D",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        840,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.expiring_group }}",
+              "value2": "<=30"
+            }
+          ]
+        }
+      },
+      "id": "df6f7598-02aa-4086-b572-cd3987e4a128",
+      "name": "30D",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1480,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.expiring_group }}",
+              "value2": "<=7"
+            }
+          ]
+        }
+      },
+      "id": "c1f1f019-7881-4126-988f-75399786c626",
+      "name": "7D",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        2180,
+        760
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.city }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "KV"
+            },
+            {
+              "value2": "NS"
+            },
+            {
+              "value2": "PGI",
+              "output": 1
+            },
+            {
+              "value2": "PGM",
+              "output": 1
+            },
+            {
+              "value2": "LGK",
+              "output": 1
+            },
+            {
+              "value2": "IP",
+              "output": 1
+            },
+            {
+              "value2": "JB",
+              "output": 2
+            },
+            {
+              "value2": "KK",
+              "output": 3
+            }
+          ]
+        }
+      },
+      "id": "1677969c-3589-4fa7-897c-407e6014041e",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.city }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "KV"
+            },
+            {
+              "value2": "NS"
+            },
+            {
+              "value2": "PGI",
+              "output": 1
+            },
+            {
+              "value2": "PGM",
+              "output": 1
+            },
+            {
+              "value2": "LGK",
+              "output": 1
+            },
+            {
+              "value2": "IP",
+              "output": 1
+            },
+            {
+              "value2": "JB",
+              "output": 2
+            },
+            {
+              "value2": "KK",
+              "output": 3
+            }
+          ]
+        }
+      },
+      "id": "2573ad7c-fa1c-4da2-bf4f-853310eb0919",
+      "name": "Switch1",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.city }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "KV"
+            },
+            {
+              "value2": "NS"
+            },
+            {
+              "value2": "PGI",
+              "output": 1
+            },
+            {
+              "value2": "PGM",
+              "output": 1
+            },
+            {
+              "value2": "LGK",
+              "output": 1
+            },
+            {
+              "value2": "IP",
+              "output": 1
+            },
+            {
+              "value2": "JB",
+              "output": 2
+            },
+            {
+              "value2": "KK",
+              "output": 3
+            }
+          ]
+        }
+      },
+      "id": "8ee59966-8ca2-4925-885d-8a6bd0f24446",
+      "name": "Switch2",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        2440,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.city }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "KV"
+            },
+            {
+              "value2": "NS"
+            },
+            {
+              "value2": "PGI",
+              "output": 1
+            },
+            {
+              "value2": "PGM",
+              "output": 1
+            },
+            {
+              "value2": "LGK",
+              "output": 1
+            },
+            {
+              "value2": "IP",
+              "output": 1
+            },
+            {
+              "value2": "JB",
+              "output": 2
+            },
+            {
+              "value2": "KK",
+              "output": 3
+            }
+          ]
+        }
+      },
+      "id": "6f83786a-ae96-4927-9fee-1a6f6dbc490b",
+      "name": "Switch3",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        3120,
+        680
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.expiring_group }}",
+              "value2": "<=1"
+            }
+          ]
+        }
+      },
+      "id": "e5af914d-fadd-4dc0-970f-24aa6f2ed49e",
+      "name": "1D",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        2860,
+        1020
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1LW8u7WSA0LCV1aDiF51Fq1NbVXPZBAuglIDfsuX_uGM",
+          "mode": "list",
+          "cachedResultName": "TREVO Listings Insurance Expiry Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LW8u7WSA0LCV1aDiF51Fq1NbVXPZBAuglIDfsuX_uGM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "[N8N Import] RAW Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LW8u7WSA0LCV1aDiF51Fq1NbVXPZBAuglIDfsuX_uGM/edit#gid=0"
+        },
+        "dataMode": "autoMapInputData",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "63120695-dc22-4d7d-9cf4-51e9b32088c3",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        860,
+        100
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      results: items.length,\n    }\n  }\n];"
+      },
+      "id": "ddb0ac7e-3900-49b6-a167-3ef5f9c15815",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      results: items.length,\n    }\n  }\n];"
+      },
+      "id": "52d0c3de-26c2-4257-b5d5-584426cc5565",
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      results: items.length,\n    }\n  }\n];"
+      },
+      "id": "523d4711-67ff-43b8-a087-1552d48724a3",
+      "name": "Code2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      results: items.length,\n    }\n  }\n];"
+      },
+      "id": "893b0876-8aef-474b-867e-9f9e31d46b82",
+      "name": "Code3",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      results: items.length,\n    }\n  }\n];"
+      },
+      "id": "06c5698a-bc82-42e1-8894-751dd6b867b7",
+      "name": "Code4",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        2020,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      results: items.length,\n    }\n  }\n];"
+      },
+      "id": "ced4963c-a971-42d5-bd44-330a556c4b13",
+      "name": "Code5",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        2020,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      results: items.length,\n    }\n  }\n];"
+      },
+      "id": "9ebf1ad3-5306-4ff5-a2ba-165fe8f63a8c",
+      "name": "Code6",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        2020,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      results: items.length,\n    }\n  }\n];"
+      },
+      "id": "30e04c1f-8282-4aa7-b7cc-17c8b9652716",
+      "name": "Code7",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        2020,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      results: items.length,\n    }\n  }\n];"
+      },
+      "id": "b4c3ebb9-e701-49af-8944-8a307a4f687a",
+      "name": "Code8",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        2680,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      results: items.length,\n    }\n  }\n];"
+      },
+      "id": "ef8a6b60-01a9-43a3-8933-f659ddd33dc3",
+      "name": "Code9",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        2680,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      results: items.length,\n    }\n  }\n];"
+      },
+      "id": "1b98a578-c9fb-45f1-b778-296712776eca",
+      "name": "Code10",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        2680,
+        680
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      results: items.length,\n    }\n  }\n];"
+      },
+      "id": "46a75e7b-42e9-4b97-9fa5-ad575204ed11",
+      "name": "Code11",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        2680,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      results: items.length,\n    }\n  }\n];"
+      },
+      "id": "ff9a39d4-76e3-4f3b-91cf-dbc8b247933b",
+      "name": "Code12",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        3340,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      results: items.length,\n    }\n  }\n];"
+      },
+      "id": "7d3fa977-1114-4ee4-a367-e569e374cb5e",
+      "name": "Code13",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        3340,
+        760
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      results: items.length,\n    }\n  }\n];"
+      },
+      "id": "10827c6f-4fc2-41e1-8c79-ca4a18bae3b3",
+      "name": "Code14",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        3340,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      results: items.length,\n    }\n  }\n];"
+      },
+      "id": "bc93e127-6bf9-4c47-9bb7-bc8d16068b8c",
+      "name": "Code15",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        3340,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"id\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['id']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function6",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        720,
+        100
+      ],
+      "id": "b44ce4dc-216f-4a7a-a8a9-116b80c2bf46"
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAuAnAjjE",
+        "messageUi": {
+          "text": "=THERE ARE {{ $json[\"results\"] }} LISTINGS WITH INSURANCE EXPIRING IN 60D.  \n\nPlease keep track of each conversion via: https://docs.google.com/spreadsheets/d/1LW8u7WSA0LCV1aDiF51Fq1NbVXPZBAuglIDfsuX_uGM/edit?usp=sharing"
+        },
+        "additionalFields": {}
+      },
+      "id": "23fb2f0a-0863-4e80-96ad-f943ea5f55b2",
+      "name": "CENTRAL",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        -260
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAty2-MzA",
+        "messageUi": {
+          "text": "=THERE ARE {{ $json[\"results\"] }} LISTINGS WITH INSURANCE EXPIRING IN 60D.  \n\nPlease keep track of each conversion via: https://docs.google.com/spreadsheets/d/1LW8u7WSA0LCV1aDiF51Fq1NbVXPZBAuglIDfsuX_uGM/edit?usp=sharing"
+        },
+        "additionalFields": {}
+      },
+      "id": "cdc66a3e-df61-4830-bb50-23454744d070",
+      "name": "NORTHERN",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        -80
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAOZfALAA",
+        "messageUi": {
+          "text": "=THERE ARE {{ $json[\"results\"] }} LISTINGS WITH INSURANCE EXPIRING IN 60D.  \n\nPlease keep track of each conversion via: https://docs.google.com/spreadsheets/d/1LW8u7WSA0LCV1aDiF51Fq1NbVXPZBAuglIDfsuX_uGM/edit?usp=sharing"
+        },
+        "additionalFields": {}
+      },
+      "id": "12bee706-7400-4270-898e-54b9bc936ac9",
+      "name": "SOUTHERN",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        80
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAgvG0aiA",
+        "messageUi": {
+          "text": "=THERE ARE {{ $json[\"results\"] }} LISTINGS WITH INSURANCE EXPIRING IN 60D.  \n\nPlease keep track of each conversion via: https://docs.google.com/spreadsheets/d/1LW8u7WSA0LCV1aDiF51Fq1NbVXPZBAuglIDfsuX_uGM/edit?usp=sharing"
+        },
+        "additionalFields": {}
+      },
+      "id": "b8c67392-396d-4d10-aae8-bba2a0beab10",
+      "name": "EASTERN",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        280
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAuAnAjjE",
+        "messageUi": {
+          "text": "=THERE ARE {{ $json[\"results\"] }} LISTINGS WITH INSURANCE EXPIRING IN 30D. \n\nPlease keep track of each conversion via:\nhttps://docs.google.com/spreadsheets/d/1LW8u7WSA0LCV1aDiF51Fq1NbVXPZBAuglIDfsuX_uGM/edit?usp=sharing"
+        },
+        "additionalFields": {}
+      },
+      "id": "1a894b94-c887-4439-8ecf-15f8f4a225fe",
+      "name": "CENTRAL2",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        2200,
+        -100
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAty2-MzA",
+        "messageUi": {
+          "text": "=THERE ARE {{ $json[\"results\"] }} LISTINGS WITH INSURANCE EXPIRING IN 30D.  \n\nPlease keep track of each conversion via: https://docs.google.com/spreadsheets/d/1LW8u7WSA0LCV1aDiF51Fq1NbVXPZBAuglIDfsuX_uGM/edit?usp=sharing"
+        },
+        "additionalFields": {}
+      },
+      "id": "d82db265-29f9-4fe2-bf22-664aecf1c4da",
+      "name": "NORTHERN2",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        2200,
+        80
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAOZfALAA",
+        "messageUi": {
+          "text": "=THERE ARE {{ $json[\"results\"] }} LISTINGS WITH INSURANCE EXPIRING IN 30D.  \n\nPlease keep track of each conversion via: https://docs.google.com/spreadsheets/d/1LW8u7WSA0LCV1aDiF51Fq1NbVXPZBAuglIDfsuX_uGM/edit?usp=sharing"
+        },
+        "additionalFields": {}
+      },
+      "id": "162db1d6-5d4c-4bb9-85d2-6a4e756ce958",
+      "name": "SOUTHERN2",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        2200,
+        240
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAgvG0aiA",
+        "messageUi": {
+          "text": "=THERE ARE {{ $json[\"results\"] }} LISTINGS WITH INSURANCE EXPIRING IN 30D.  \n\nPlease keep track of each conversion via: https://docs.google.com/spreadsheets/d/1LW8u7WSA0LCV1aDiF51Fq1NbVXPZBAuglIDfsuX_uGM/edit?usp=sharing"
+        },
+        "additionalFields": {}
+      },
+      "id": "8ffaa677-8f38-42cd-851a-b3ce08e81572",
+      "name": "EASTERN2",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        2200,
+        440
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAuAnAjjE",
+        "messageUi": {
+          "text": "=THERE ARE {{ $json[\"results\"] }} LISTINGS WITH INSURANCE EXPIRING IN 7D. \n\nPlease keep track of each conversion via:\nhttps://docs.google.com/spreadsheets/d/1LW8u7WSA0LCV1aDiF51Fq1NbVXPZBAuglIDfsuX_uGM/edit?usp=sharing"
+        },
+        "additionalFields": {}
+      },
+      "id": "6cca9a2e-0689-406a-9a47-1283fe93b976",
+      "name": "CENTRAL3",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        2860,
+        140
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAty2-MzA",
+        "messageUi": {
+          "text": "=THERE ARE {{ $json[\"results\"] }} LISTINGS WITH INSURANCE EXPIRING IN 7D.  \n\nPlease keep track of each conversion via: https://docs.google.com/spreadsheets/d/1LW8u7WSA0LCV1aDiF51Fq1NbVXPZBAuglIDfsuX_uGM/edit?usp=sharing"
+        },
+        "additionalFields": {}
+      },
+      "id": "7a9f97e8-51a4-4b69-9b05-d97e32be6733",
+      "name": "NORTHERN3",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        2860,
+        320
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAOZfALAA",
+        "messageUi": {
+          "text": "=THERE ARE {{ $json[\"results\"] }} LISTINGS WITH INSURANCE EXPIRING IN 7D.  \n\nPlease keep track of each conversion via: https://docs.google.com/spreadsheets/d/1LW8u7WSA0LCV1aDiF51Fq1NbVXPZBAuglIDfsuX_uGM/edit?usp=sharing"
+        },
+        "additionalFields": {}
+      },
+      "id": "27f8bef8-a04f-4dec-b289-4aa0c9e08305",
+      "name": "SOUTHERN3",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        2860,
+        480
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAgvG0aiA",
+        "messageUi": {
+          "text": "=THERE ARE {{ $json[\"results\"] }} LISTINGS WITH INSURANCE EXPIRING IN 7D.  \n\nPlease keep track of each conversion via: https://docs.google.com/spreadsheets/d/1LW8u7WSA0LCV1aDiF51Fq1NbVXPZBAuglIDfsuX_uGM/edit?usp=sharing"
+        },
+        "additionalFields": {}
+      },
+      "id": "544bd4f9-4005-467e-8974-77200d470d43",
+      "name": "EASTERN3",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        2860,
+        680
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAuAnAjjE",
+        "messageUi": {
+          "text": "=THERE ARE {{ $json[\"results\"] }} LISTINGS WITH INSURANCE EXPIRING IN 1D. \n\nPlease keep track of each conversion via:\nhttps://docs.google.com/spreadsheets/d/1LW8u7WSA0LCV1aDiF51Fq1NbVXPZBAuglIDfsuX_uGM/edit?usp=sharing"
+        },
+        "additionalFields": {}
+      },
+      "id": "14ce021a-8fcd-4dcd-a8c1-9c2a4459d94a",
+      "name": "CENTRAL4",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        3520,
+        420
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAty2-MzA",
+        "messageUi": {
+          "text": "=THERE ARE {{ $json[\"results\"] }} LISTINGS WITH INSURANCE EXPIRING IN 1D.  \n\nPlease keep track of each conversion via: https://docs.google.com/spreadsheets/d/1LW8u7WSA0LCV1aDiF51Fq1NbVXPZBAuglIDfsuX_uGM/edit?usp=sharing"
+        },
+        "additionalFields": {}
+      },
+      "id": "dfe4e620-0ff6-4302-840d-44b8b2cda1e8",
+      "name": "NORTHERN4",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        3520,
+        600
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAOZfALAA",
+        "messageUi": {
+          "text": "=THERE ARE {{ $json[\"results\"] }} LISTINGS WITH INSURANCE EXPIRING IN 1D.  \n\nPlease keep track of each conversion via: https://docs.google.com/spreadsheets/d/1LW8u7WSA0LCV1aDiF51Fq1NbVXPZBAuglIDfsuX_uGM/edit?usp=sharing"
+        },
+        "additionalFields": {}
+      },
+      "id": "bb0179a5-1f6a-46e4-acfb-769c7e22c99d",
+      "name": "SOUTHERN4",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        3520,
+        760
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAgvG0aiA",
+        "messageUi": {
+          "text": "=THERE ARE {{ $json[\"results\"] }} LISTINGS WITH INSURANCE EXPIRING IN 1D.  \n\nPlease keep track of each conversion via: https://docs.google.com/spreadsheets/d/1LW8u7WSA0LCV1aDiF51Fq1NbVXPZBAuglIDfsuX_uGM/edit?usp=sharing"
+        },
+        "additionalFields": {}
+      },
+      "id": "6e0df727-b4e2-4867-80ff-64b82f20218d",
+      "name": "EASTERN4",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        3520,
+        960
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "id": "2545398f-e738-4ff8-8297-ec2a5b4de5ab",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        3040,
+        -580
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "b5cdcacb-4e1f-4acf-9623-518a0d15130c",
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        3040,
+        -440
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "248b23d6-f2c0-4b41-9cb7-f3fc869d63a8",
+      "name": "Merge2",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        3280,
+        -560
+      ]
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAuAnAjjE",
+        "messageUi": {
+          "text": "=THERE ARE {{ $json[\"results\"] }} LISTINGS WITH INSURANCE EXPIRING IN 60D.  \n\nPlease keep track of each conversion via: https://docs.google.com/spreadsheets/d/1LW8u7WSA0LCV1aDiF51Fq1NbVXPZBAuglIDfsuX_uGM/edit?usp=sharing"
+        },
+        "additionalFields": {}
+      },
+      "id": "b0b9a006-6a54-485e-9eaf-6fc31ade3373",
+      "name": "CENTRAL1",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        3460,
+        -560
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds": [
+        47115,
+        47141,
+        47073,
+        47060,
+        47161,
+        30397,
+        47061,
+        47153,
+        46844,
+        37045,
+        38160,
+        44435,
+        37854,
+        37856,
+        37994,
+        37994,
+        38000,
+        38000,
+        38002,
+        38002,
+        38210,
+        38397,
+        41289,
+        42833,
+        43882,
+        44814,
+        37630,
+        40668,
+        44413,
+        38007,
+        38045,
+        38090,
+        38163,
+        40776,
+        46744,
+        38308,
+        38375,
+        38871,
+        39265,
+        39664,
+        40309,
+        40394,
+        40761,
+        41968,
+        44182,
+        44201,
+        44872,
+        45041,
+        45344,
+        45344,
+        45991,
+        599,
+        37437,
+        38006,
+        38345,
+        38526,
+        39012,
+        40602,
+        43086,
+        43398,
+        42389,
+        46051,
+        46949,
+        46762,
+        37636,
+        46755,
+        46852,
+        46348,
+        42962,
+        37638,
+        37880,
+        38995,
+        43193,
+        43700,
+        31714,
+        41196,
+        41916,
+        42498,
+        44303,
+        10983,
+        37783,
+        40173,
+        40227,
+        40941,
+        37726,
+        38104,
+        39719,
+        44625,
+        37982,
+        24765,
+        25226,
+        36069,
+        38842,
+        40907,
+        42115,
+        37222,
+        37864,
+        38202,
+        38672,
+        43366,
+        44224,
+        45132,
+        46368,
+        46526,
+        46511,
+        46720,
+        46655,
+        46427,
+        46565,
+        46585,
+        46573,
+        6107,
+        40702,
+        42146,
+        44844,
+        46284,
+        35416,
+        36849,
+        37314,
+        37394,
+        37531,
+        38111,
+        40522,
+        41467,
+        41743,
+        43498,
+        43598,
+        46660,
+        29135,
+        37424,
+        37660,
+        38028,
+        38189,
+        38902,
+        40765,
+        40947,
+        41166,
+        41664,
+        44094,
+        44891,
+        45319,
+        6611,
+        32406,
+        37257,
+        37500,
+        37568,
+        37867,
+        38151,
+        38404,
+        38447,
+        41577,
+        42838,
+        43859,
+        44147,
+        44195,
+        46527,
+        28257,
+        35006,
+        37188,
+        37438,
+        37594,
+        37632,
+        37666,
+        37704,
+        37838,
+        38439,
+        40177,
+        41798,
+        43728,
+        43759,
+        46487,
+        36772,
+        37518,
+        37539,
+        37542,
+        37631,
+        37780,
+        37886,
+        37966,
+        38015,
+        38924,
+        39081,
+        40136,
+        40421,
+        42810,
+        43230,
+        43563,
+        44281,
+        45062,
+        45675,
+        45860,
+        45871,
+        35498,
+        37462,
+        43386,
+        46259,
+        46104,
+        46409,
+        46465,
+        46519,
+        828,
+        46216,
+        31155,
+        37381,
+        43577,
+        45400,
+        22789,
+        34548,
+        37199,
+        37221,
+        44018,
+        19887,
+        27319,
+        37202,
+        37817,
+        37817,
+        37918,
+        37932,
+        37955,
+        38468,
+        39011,
+        39121,
+        39607,
+        41529,
+        43736,
+        45043,
+        24781,
+        37112,
+        37589,
+        37919,
+        38063,
+        43475,
+        45814,
+        46447,
+        37333,
+        37529,
+        37811,
+        38116,
+        38522,
+        42791,
+        42792,
+        43210,
+        44333,
+        29996,
+        36994,
+        37218,
+        37357,
+        37640,
+        37733,
+        41408,
+        42698,
+        44387,
+        46214,
+        25384,
+        37392,
+        37567,
+        37706,
+        44419,
+        45786,
+        46313,
+        46018,
+        46219,
+        45983,
+        46001,
+        35929,
+        44000,
+        41007,
+        43048,
+        45563,
+        39890,
+        41063,
+        37059,
+        37123,
+        44234,
+        35602,
+        37616,
+        37625,
+        37626,
+        37890,
+        41688,
+        43211,
+        36982,
+        37237,
+        39961,
+        43400,
+        46266,
+        37688,
+        42206,
+        44815,
+        45951,
+        46143,
+        46085,
+        45389,
+        46050,
+        43703,
+        36770,
+        37747,
+        37965,
+        41796,
+        28123,
+        30210,
+        30398,
+        36791,
+        36998,
+        40679,
+        40692,
+        41548,
+        42404,
+        4739,
+        36670,
+        37049,
+        37492,
+        37740,
+        38754,
+        39727,
+        22600,
+        36751,
+        36898,
+        37063,
+        38208,
+        42336,
+        42731,
+        42744,
+        43117,
+        43842,
+        36890,
+        36918,
+        38261,
+        40847,
+        44437,
+        5912,
+        38714,
+        45624,
+        45875,
+        29448,
+        37719,
+        39950,
+        45023,
+        45929,
+        32260,
+        36389,
+        36397,
+        36424,
+        36426,
+        36486,
+        36525,
+        36745,
+        36920,
+        42305,
+        43464,
+        44271,
+        36629,
+        36718,
+        37246,
+        38907,
+        41642,
+        42934,
+        44386,
+        44520,
+        44638,
+        44906,
+        44964,
+        34001,
+        36473,
+        36506,
+        36507,
+        36519,
+        36565,
+        36614,
+        36619,
+        36642,
+        36672,
+        36675,
+        36813,
+        36926,
+        37036,
+        37728,
+        37743,
+        37952,
+        38135,
+        38364,
+        38690,
+        38925,
+        40302,
+        41527,
+        42124,
+        42204,
+        42382,
+        42888,
+        43343,
+        44444,
+        44592,
+        44882,
+        45586,
+        5386,
+        12617,
+        18950,
+        32750,
+        36894,
+        36964,
+        37000,
+        37075,
+        37176,
+        37637,
+        37705,
+        37865,
+        38069,
+        38560,
+        38874,
+        40682,
+        40780,
+        41337,
+        41780,
+        44255,
+        30729,
+        32133,
+        36889,
+        39859,
+        40550,
+        41025,
+        43514,
+        44764,
+        39014,
+        40319,
+        42933,
+        44528,
+        18980,
+        19008,
+        33696,
+        33760,
+        33803,
+        35566,
+        35786,
+        36145,
+        37249,
+        41714,
+        41726,
+        41984,
+        44628,
+        19288,
+        28180,
+        33831,
+        33920,
+        34026,
+        34028,
+        34172,
+        35110,
+        35343,
+        36039,
+        36583,
+        37895,
+        38311,
+        38361,
+        39433,
+        40642,
+        40704,
+        41100,
+        41366,
+        42081,
+        43369,
+        43878,
+        44971,
+        45022,
+        31951,
+        34639,
+        35383,
+        36969,
+        37527,
+        38030,
+        38583,
+        38991,
+        40224,
+        40569,
+        40745,
+        43531,
+        44769,
+        45079,
+        5107,
+        29471,
+        30212,
+        32344,
+        33801,
+        33955,
+        34530,
+        36079,
+        36144,
+        37003,
+        38099,
+        38233,
+        40001,
+        40084,
+        40851,
+        41258,
+        43281,
+        43866,
+        44154,
+        20085,
+        33967,
+        34209,
+        35514,
+        37792,
+        38679,
+        44332,
+        3548,
+        24863,
+        36045,
+        43255,
+        34334,
+        34521,
+        34945,
+        8309,
+        20013,
+        36547,
+        38540,
+        39612,
+        44157,
+        33945,
+        34441,
+        36175,
+        36858,
+        37581,
+        40291,
+        41783,
+        44789,
+        39239,
+        43495,
+        33979,
+        33987,
+        33988,
+        34126,
+        34280,
+        36095,
+        37179,
+        38613,
+        39557,
+        40519,
+        40532,
+        41104,
+        34584,
+        35105,
+        35250,
+        36850,
+        37495,
+        44469,
+        20035,
+        34186,
+        35125,
+        35444,
+        35561,
+        37956,
+        38686,
+        41987,
+        42363,
+        43001,
+        43619,
+        10499,
+        36020,
+        38970,
+        42576,
+        45088,
+        35258,
+        36274,
+        37178,
+        38381,
+        39485,
+        42678,
+        18455,
+        34421,
+        39776,
+        34679,
+        34899,
+        35345,
+        38282,
+        40633,
+        41861,
+        43565,
+        33594,
+        34582,
+        34815,
+        35209,
+        35373,
+        37243,
+        40285,
+        40910,
+        41053,
+        43937,
+        44016,
+        44453,
+        33975,
+        34687,
+        34851,
+        34871,
+        37404,
+        38967,
+        40283,
+        40481,
+        43554,
+        43692,
+        43776,
+        44183,
+        45750,
+        34911,
+        34932,
+        36379,
+        37729,
+        40360,
+        41012,
+        42784,
+        44296,
+        44301,
+        35005,
+        39307,
+        42655,
+        43000,
+        34717,
+        35447,
+        39705,
+        15397,
+        33911,
+        36738,
+        38124,
+        38592,
+        39738,
+        41550,
+        42434,
+        44467,
+        34968,
+        37018,
+        37741,
+        38194,
+        38378,
+        38382,
+        38573,
+        38580,
+        39170,
+        39728,
+        43135,
+        43191,
+        45595,
+        45609,
+        34970,
+        36350,
+        36571,
+        36573,
+        21778,
+        34324,
+        34917,
+        34971,
+        35273,
+        36356,
+        37992,
+        38193,
+        41937,
+        45667,
+        1507,
+        27829,
+        35434,
+        36549,
+        37546,
+        40247,
+        42844,
+        43540,
+        7368,
+        14636,
+        22570,
+        33293,
+        34854,
+        35260,
+        35562,
+        35565,
+        36050,
+        37737,
+        37782,
+        37813,
+        37902,
+        38260,
+        41101,
+        41915,
+        44143,
+        45384,
+        36580,
+        38318,
+        38546,
+        40579,
+        44761,
+        24086,
+        27465,
+        35114,
+        35153,
+        35222,
+        35330,
+        35428,
+        36209,
+        36345,
+        42690,
+        42856,
+        42998,
+        43583,
+        44351,
+        44553,
+        45670,
+        9872,
+        35399,
+        35491,
+        35916,
+        35933,
+        36585,
+        37644,
+        38025,
+        39569,
+        40130,
+        40854,
+        41158,
+        42745,
+        42948,
+        43691,
+        44709,
+        45746,
+        33641,
+        34004,
+        35355,
+        35370,
+        35809,
+        40323,
+        41109,
+        42787,
+        42918,
+        44659,
+        45401,
+        45535,
+        45754,
+        35340,
+        35588,
+        36263,
+        37475,
+        34723,
+        35272,
+        35651,
+        38694,
+        41043,
+        41105,
+        32453,
+        40367,
+        35412,
+        35556,
+        44178,
+        38755,
+        38910,
+        40104,
+        35522,
+        41903,
+        35478,
+        35599,
+        36981,
+        38649,
+        39567,
+        39917,
+        35654,
+        36284,
+        40572,
+        41205,
+        41786,
+        43316,
+        24772,
+        35939,
+        37094,
+        37490,
+        40890,
+        40954,
+        42376,
+        44294,
+        38115,
+        42800,
+        45683,
+        34416,
+        36027,
+        36550,
+        37957,
+        38200,
+        39430,
+        44966,
+        5085,
+        36666,
+        37699,
+        38879,
+        41257,
+        43999,
+        44021,
+        41629,
+        42964,
+        43248,
+        44924,
+        36004,
+        36056,
+        36122,
+        36206,
+        36317,
+        36378,
+        36588,
+        36916,
+        38161,
+        38184,
+        38952,
+        42017,
+        44963,
+        36093,
+        36218,
+        39537,
+        41449,
+        41867,
+        36487,
+        39824,
+        45027,
+        39534,
+        28722,
+        36178,
+        36755,
+        36902,
+        37713,
+        42420,
+        5763,
+        36320,
+        37467,
+        38139,
+        38373,
+        39766,
+        40608,
+        41160,
+        41198,
+        41842,
+        42372,
+        6281,
+        37270,
+        38812,
+        39346,
+        40446,
+        41951,
+        42848,
+        44594,
+        45040,
+        36334,
+        36404,
+        36420,
+        39829,
+        41839,
+        43429,
+        44779,
+        45306,
+        36700,
+        40034,
+        41319,
+        45016,
+        45608,
+        29572,
+        36514,
+        36521
+      ]
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-06-13T06:34:51.202Z",
+      "updatedAt": "2023-06-13T06:34:51.202Z",
+      "id": "9",
+      "name": "Test"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2023-06-13T09:51:41.497Z",
+  "versionId": "9ede816b-92bd-4661-8374-d6ecb8c83b1c"
+}
