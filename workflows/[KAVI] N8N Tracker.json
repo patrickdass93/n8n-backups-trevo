@@ -1,0 +1,88 @@
+{
+  "active": false,
+  "connections": {
+    "n8n": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2022-12-13T13:06:54.245Z",
+  "id": "7",
+  "name": "[KAVI] N8N Tracker",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "upsert",
+        "sheetId": "1akRBCYF5NfTHpMefgQocnPIKtjp3HiZoGfzWfBKeMnk",
+        "range": "A:K",
+        "key": "ID",
+        "options": {
+          "valueInputMode": "RAW"
+        }
+      },
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        580,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "82c29e9a-98ae-47c4-8b50-9e1b801abafd",
+      "credentials": {
+        "googleApi": {
+          "id": "12",
+          "name": "Google account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "webhook",
+        "responseMode": "lastNode",
+        "responseData": "allEntries",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        180,
+        280
+      ],
+      "typeVersion": 1,
+      "id": "519b6269-57ec-4df7-9a25-9e089eb34031"
+    },
+    {
+      "parameters": {
+        "filters": {}
+      },
+      "id": "6021c928-dea5-4ece-ae84-bec740c3f63e",
+      "name": "n8n",
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        400,
+        240
+      ],
+      "credentials": {
+        "n8nApi": {
+          "id": "13",
+          "name": "n8n account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2022-12-22T10:03:10.397Z",
+  "versionId": "945c8036-62e3-4765-8ec1-895a7a9c8906"
+}
