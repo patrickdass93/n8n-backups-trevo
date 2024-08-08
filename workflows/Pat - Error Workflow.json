@@ -1,0 +1,40 @@
+{
+  "active": false,
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "createdAt": "2022-12-06T04:34:54.681Z",
+  "id": "2",
+  "name": "Pat - Error Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "9067aa57-fb66-4080-9960-2f56cf0f83f3",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        300,
+        320
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2023-03-31T06:52:09.032Z",
+      "updatedAt": "2023-03-31T06:52:09.032Z",
+      "id": "5",
+      "name": "Patrick"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2024-01-15T08:17:49.131Z",
+  "versionId": "6e5ad323-cedd-4096-81e1-b0281f445882"
+}
