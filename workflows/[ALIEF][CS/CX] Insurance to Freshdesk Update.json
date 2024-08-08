@@ -1,0 +1,118 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Function1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function1": {
+      "main": [
+        [
+          {
+            "node": "Freshdesk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-03-07T09:15:50.274Z",
+  "id": "EgXZE9ftdmiw0tt7",
+  "name": "[ALIEF][CS/CX] Insurance to Freshdesk Update",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "80f5caf5-9ded-46ea-8ec6-638750978037",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        820,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * \nFROM quotes\nLIMIT 10 ",
+        "options": {}
+      },
+      "id": "be424a5d-4d33-4c44-b77a-b9743e12adb2",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1040,
+        380
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "TFYiAORQ3udUJg8q",
+          "name": "Insurance DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "description": "="
+        }
+      },
+      "id": "ee8d3646-d693-47e6-90e5-115affa58553",
+      "name": "Freshdesk",
+      "type": "n8n-nodes-base.freshdesk",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        380
+      ],
+      "credentials": {
+        "freshdeskApi": {
+          "id": "22",
+          "name": "SOCAR CS Freshdesk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"id\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['id']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        380
+      ],
+      "id": "eb31beb4-0f56-4d2a-aade-704d76937926"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-03-08T09:10:57.779Z",
+  "versionId": "1f27a94c-659e-4e38-8370-d2a44e850b29"
+}
