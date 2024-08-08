@@ -1,0 +1,175 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Postgres - JB Bookings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - JB Bookings": {
+      "main": [
+        [
+          {
+            "node": "Function1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function1": {
+      "main": [
+        [
+          {
+            "node": "Google Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-03-01T04:25:11.380Z",
+  "id": "qn2aRgLbFu9WTlQ1",
+  "name": "[KAVI][SOCAR][CS/CX] Booking at High Risk Zone",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 3
+            }
+          ]
+        }
+      },
+      "id": "0c25c979-80fa-4e16-acbc-86b4d77146ed",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        700,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "\nSELECT *\nFROM bookings b \nWHERE 1=1 \nAND b.status IN ('accepted', 'processing')\nAND (b.request_end_at BETWEEN '2024-03-01 18:00:00' AND '2024-03-02 04:00:00'\nOR b.request_start_at BETWEEN '2024-03-01 18:00:00' AND '2024-03-02 04:00:00')\nAND b.zone_id IN \n  ('ad7522e8-6820-4d8d-b034-b58b15572e00',\n 'fcaacf4f-0bd3-4a75-b6a7-1622b5727c60',\n '4e217e53-3879-4c45-bdc1-146c0a63eb45',\n '3cfc2bd1-5b92-4212-86d1-c41cd333d66f',\n '120155fe-a123-4808-b144-b0292a8af78a',\n '604b6cac-dc56-49ea-8eb5-09fe923d0c6c',\n 'db31aa48-68da-48a5-8734-87b1e3d8cc2f',\n '735e1f95-e551-45b1-90e7-6d0aaf7b1180',\n '399f3111-fcc2-4ee2-8fa6-0d0637a22898',\n '46da4e04-f8f7-4b4b-bc3b-9d069ef10c88',\n 'f688c800-bc9d-4fcd-b19d-0c260f47b097',\n '01314156-4393-462f-b2df-075f629fef5a',\n 'b4b3f3a6-6164-46a3-b406-d624513fd297',\n 'cb710133-3a2d-41e2-a339-e36d5e2dd21d',\n'76edb5ad-d28e-46a0-ab1f-a4f5bee3c46c')\nORDER BY 9 DESC",
+        "options": {}
+      },
+      "id": "36933c4a-79f3-4329-a2da-36bc28be8167",
+      "name": "Postgres - JB Bookings",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        920,
+        360
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "32",
+          "name": "Booking DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"id\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['id']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        360
+      ],
+      "id": "58eac1f3-3725-4123-af01-b0dfc6b2eaa0"
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAFlxVyeU",
+        "messageUi": {
+          "text": "=*-- ALERT BOOKING NEEDS ATTENTION --*\n\n*BOOKING REF*: {{ $json[\"ref_no\"] }}\n*BOOKING ID*: {{ $json[\"id\"] }}\n*USER ID*: {{ $json[\"user_id\"] }}\n*STATUS*: {{ $json[\"status\"] }}\n*TYPE*: {{ $json[\"type\"] }}\n*SOURCE*: {{ $json[\"source\"] }}\n\n*REQUEST START*: {{ $json[\"request_start_at\"] }}\n*REQUEST END*: {{ $json[\"request_end_at\"] }}\n*ZONE ID*: {{ $json[\"zone_id\"] }}"
+        },
+        "additionalFields": {}
+      },
+      "id": "40130e4c-7b4a-418b-b534-cf4ce6f9ebd1",
+      "name": "Google Chat",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        360
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds": [
+        "22498b4f-b33d-46b5-98af-5dc10fb1e006",
+        "c1a626b4-987f-4a96-a3c3-88e0fd58c118",
+        "735c3c31-4c59-45e9-9fd7-f463a1f58cf7",
+        "016f3cf1-ace6-4cf8-8a95-67209f46e712",
+        "dfb55950-3282-4143-9fc8-4789d02015b2",
+        "ef5cedcb-8394-43ce-9c0d-2a98e7a9625e",
+        "5336f5e3-60d2-4ea4-94ba-ec2d74b7d69e",
+        "4d62e7b5-a132-459b-a1bc-4cc8e96b5e55",
+        "b4890b0e-248f-4201-ab4f-6db2d2bb9e78",
+        "dcdcf1be-3594-448f-9555-a4b33b032dee",
+        "90db20df-eee2-44a2-80fb-cecc0e1adbb3",
+        "e8d1d923-085f-47f9-a4ea-a2fc2ba91e81",
+        "5a323ee3-9894-481f-b5d0-cb520c504556",
+        "9f59e187-7386-4622-94d3-da6b0a5510a9",
+        "dabe7dd3-b032-4e19-87d3-80e3fe82855e",
+        "4d4c2237-9cb6-4d66-9c75-22f8140de8dd",
+        "b08d7064-60b1-450b-b88c-3ee91a5ba563",
+        "ce81e8c1-5664-4d0e-a275-664eab930019",
+        "60e9859a-8844-43f2-9956-4eaf6f558ec0",
+        "c1bbdab9-6b46-4b4a-9f9a-cc7e5332501f",
+        "070ecb3f-af22-4d7b-ad2b-e5b25ae1e3a2",
+        "3a57fda1-d036-43be-b884-0e43d5532792",
+        "7e0f815b-005e-421f-bf7b-2235989366cc",
+        "92808abc-52f7-4cca-92ac-bea01a450dc4",
+        "e3f63afd-a084-49ff-9585-3c606e83a00a",
+        "24376ef0-5813-47c2-ab62-0bb34c52c10b",
+        "82a0cfb6-a99f-4db5-a602-920a2fe4145e",
+        "c1de8592-d5fa-403f-8dc4-485823dee12f",
+        "6966f820-9f5b-43c1-b90d-b540dbf707ac",
+        "6364471b-cb88-4ede-8c94-50d1eb42076b",
+        "cc903825-481d-4d24-af4c-1c2e9da3a5b0",
+        "386acba6-1073-41d7-91f2-f7f5ff52dcd0",
+        "d3e9a0e2-4041-45fe-93a0-3fd40e1b1bd2",
+        "7233ef2d-9a47-48ab-8405-9ef78f904354",
+        "cf117bee-ffc1-4ba0-bf09-2d8c5d824efc"
+      ]
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-03-02T02:32:22.442Z",
+  "versionId": "057d0904-ef82-4f51-9280-73b5cf1b0c29"
+}
