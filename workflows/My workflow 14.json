@@ -1,0 +1,66 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "n8n",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-03-25T09:52:18.561Z",
+  "id": "3KLoq4XhPf869oQM",
+  "name": "My workflow 14",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "a4231842-f2d3-42b5-abd7-a1b14aca887d",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        700,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "filters": {}
+      },
+      "id": "2a7c5008-d83a-45d6-8499-0527c1cc393f",
+      "name": "n8n",
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        880,
+        360
+      ],
+      "credentials": {
+        "n8nApi": {
+          "id": "13",
+          "name": "n8n account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-03-25T09:52:18.561Z",
+  "versionId": "caa1e2d4-5b3f-48bd-a1ff-f40d2a866240"
+}
