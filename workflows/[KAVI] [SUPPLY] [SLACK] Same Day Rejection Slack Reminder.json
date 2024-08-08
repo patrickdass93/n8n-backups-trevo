@@ -1,0 +1,390 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Function1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "KV",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "KK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "JB",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "PG, LGK, IP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-03-16T01:44:23.189Z",
+  "id": "40",
+  "name": "[KAVI] [SUPPLY] [SLACK] Same Day Rejection Slack Reminder",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "d204909d-ea79-4463-94f0-9b10a80c3148",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        700,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select l.user_id\n, CONCAT(u.first_name, ' ', u.last_name) as host_name\n, l.id\n, l.registration_no\n, case when ll.city_id in (1) then 'KV'   \nwhen ll.city_id in (2,12) then 'PGM' when ll.city_id in (48) then 'PGI'\nwhen ll.city_id in (3,19,20,21) then 'KK'   when ll.city_id in (4,15) then 'JB' \nwhen ll.city_id in (5) then 'IP'   when ll.city_id in (47) then 'NS'\nwhen ll.city_id in (13) then 'LGK' else 'Others' end as city\n, to_char(b.request_start_at, 'YYYY-MM-DD') as request_start_day\n, concat(to_char(b.request_start_at, 'YYYY-MM-DD'), l.registration_no) as string\n, count(distinct case when (b.status in ('withdrawn','cancelled') and b.reason ~* '(host|owner|avai|car)') or (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) then b.id end) as rej_booking\nfrom listings l \nleft join users u on u.id = l.user_id \nleft join listing_location ll on ll.listing_id = l.id\nleft join bookings b on b.listing_id = l.id \nwhere l.status = 'approved'\nand l.deleted_at is null\nand ll.country = 'Malaysia'\nand b.request_start_at >= NOW()\ngroup by 1,2,3,4,5,6\nhaving count(distinct case when (b.status in ('withdrawn','cancelled') and b.reason ~* '(host|owner|avai|car)') or (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) then b.id end) >= 3\n",
+        "additionalFields": {}
+      },
+      "id": "4cd5ab17-1fcb-4acf-9888-c0363f9ae808",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        840,
+        280
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.city }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "KV"
+            },
+            {
+              "value2": "NS"
+            },
+            {
+              "value2": "KK",
+              "output": 1
+            },
+            {
+              "value2": "JB",
+              "output": 2
+            }
+          ]
+        },
+        "fallbackOutput": 3
+      },
+      "id": "5913a85b-4464-4f25-ac33-301a6c434ad5",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "channel": "n8n-central-alerts",
+        "text": "=3 OR MORE REJECTIONS ON THE SAME DAY:\n\nGB Link: https://gearbox.trevo.my/trevo-listings/?id={{ $json[\"id\"] }}\nRegistration No: {{ $json[\"registration_no\"] }}\nDay Rejected: {{ $json[\"request_start_day\"] }}\nHost Name: {{ $json[\"host_name\"]}}\nHost ID: {{ $json[\"user_id\"] }}\nRej Count: {{ $json[\"rej_booking\"] }}",
+        "otherOptions": {},
+        "attachments": []
+      },
+      "id": "4161f9c7-27e8-4bee-8378-2c6093d84d74",
+      "name": "KV",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        -20
+      ],
+      "credentials": {
+        "slackApi": {
+          "id": "24",
+          "name": "Slack - SMM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "n8n-eastern-alerts",
+        "text": "=3 OR MORE REJECTIONS ON THE SAME DAY:\n\nGB Link: https://gearbox.trevo.my/trevo-listings/?id={{ $json[\"id\"] }}\nRegistration No: {{ $json[\"registration_no\"] }}\nDay Rejected: {{ $json[\"request_start_day\"] }}\nHost Name: {{ $json[\"host_name\"]}}\nHost ID: {{ $json[\"user_id\"] }}\nRej Count: {{ $json[\"rej_booking\"] }}",
+        "otherOptions": {},
+        "attachments": []
+      },
+      "id": "c6699688-a1b0-4079-9e57-60ec7a2f181c",
+      "name": "KK",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        140
+      ],
+      "credentials": {
+        "slackApi": {
+          "id": "24",
+          "name": "Slack - SMM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "n8n-southern-alerts",
+        "text": "=3 OR MORE REJECTIONS ON THE SAME DAY:\n\nGB Link: https://gearbox.trevo.my/trevo-listings/?id={{ $json[\"id\"] }}\nRegistration No: {{ $json[\"registration_no\"] }}\nDay Rejected: {{ $json[\"request_start_day\"] }}\nHost Name: {{ $json[\"host_name\"]}}\nHost ID: {{ $json[\"user_id\"] }}\nRej Count: {{ $json[\"rej_booking\"] }}",
+        "otherOptions": {},
+        "attachments": []
+      },
+      "id": "4c9085c5-2133-4e2d-94ae-1cdb4616d396",
+      "name": "JB",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        300
+      ],
+      "credentials": {
+        "slackApi": {
+          "id": "24",
+          "name": "Slack - SMM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "n8n-northern-alerts",
+        "text": "=3 OR MORE REJECTIONS ON THE SAME DAY:\n\nGB Link: https://gearbox.trevo.my/trevo-listings/?id={{ $json[\"id\"] }}\nRegistration No: {{ $json[\"registration_no\"] }}\nDay Rejected: {{ $json[\"request_start_day\"] }}\nHost Name: {{ $json[\"host_name\"]}}\nHost ID: {{ $json[\"user_id\"] }}\nRej Count: {{ $json[\"rej_booking\"] }}",
+        "otherOptions": {},
+        "attachments": []
+      },
+      "id": "2f38ff5b-84cb-4db5-8098-69825400a95b",
+      "name": "PG, LGK, IP",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        460
+      ],
+      "credentials": {
+        "slackApi": {
+          "id": "24",
+          "name": "Slack - SMM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"string\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['string']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        280
+      ],
+      "id": "ef3e1be0-a6cc-4141-bcf8-a805c3a3ae92"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11",
+    "saveDataSuccessExecution": "all"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds": [
+        "2023-10-12AKU2079",
+        "2023-09-22WYX7717",
+        "2023-09-14ST563X",
+        "2023-09-06SAC203A",
+        "2023-09-02VKE1003",
+        "2023-08-31VDR2788",
+        "2023-08-27VHL6798",
+        "2023-08-26VKQ1174",
+        "2023-08-25JNR8882",
+        "2023-08-23SB443G",
+        "2023-08-22VHR2207",
+        "2023-08-19WC5716M",
+        "2023-08-21WC5716M",
+        "2023-08-04VKD5256",
+        "2023-08-05WD54E",
+        "2023-07-24WD54E",
+        "2023-07-23VGV9583",
+        "2023-07-21WYX7717",
+        "2023-07-13SD50",
+        "2023-07-10QAA9488V",
+        "2023-07-09VGV9583",
+        "2023-06-30VEE1349",
+        "2023-06-10VGV9583",
+        "2023-06-05VBJ2747",
+        "2023-06-03QAA909R",
+        "2023-06-03PNW3416",
+        "2023-06-02JVQ3894",
+        "2023-06-01VX2219",
+        "2023-06-02VAX2390",
+        "2023-05-30SMA7752",
+        "2023-05-27WNR22",
+        "2023-05-25W9455C",
+        "2023-05-20VJK6442",
+        "2023-05-19WC1845G",
+        "2023-05-19WYE4338",
+        "2023-05-19VDR2788",
+        "2023-05-18JTT5117",
+        "2023-05-16SAB5867Y",
+        "2023-05-14W9455C",
+        "2023-05-14VGV9583",
+        "2023-05-16VFT3580",
+        "2023-05-13SMB3309",
+        "2023-05-12JPV3628",
+        "2023-05-06VFN4756",
+        "2023-04-30JVR705",
+        "2023-04-29AKB8974",
+        "2023-04-29JSX2837",
+        "2023-04-24SYU1229",
+        "2023-04-23JRQ9966",
+        "2023-04-23JVR705",
+        "2023-04-23VDT8946",
+        "2023-04-23VHP8035",
+        "2023-04-23SYP9979",
+        "2023-04-23VEY8225",
+        "2023-04-22WD6331C",
+        "2023-04-22VAJ6696",
+        "2023-04-23BNK1373",
+        "2023-04-23VEW479",
+        "2023-04-22SMF3280",
+        "2023-04-23VBF5687",
+        "2023-04-22VFH7340",
+        "2023-04-22VJL5484",
+        "2023-04-22VEE1349",
+        "2023-04-22RAJ696",
+        "2023-04-22WC8015H",
+        "2023-04-22JVR705",
+        "2023-04-22SU3834G",
+        "2023-04-21VGJ6424",
+        "2023-04-21VBN178",
+        "2023-04-21BQB2194",
+        "2023-04-21VEY8225",
+        "2023-04-22VDT8632",
+        "2023-04-21BNV7051",
+        "2023-04-22VDT8946",
+        "2023-04-21VEB9994",
+        "2023-04-22VEY4232",
+        "2023-04-21BMC7403",
+        "2023-04-21JVR705",
+        "2023-04-23RAJ696",
+        "2023-04-21VEW479",
+        "2023-04-21VFK992",
+        "2023-04-21PMJ8116",
+        "2023-04-20VDF4281",
+        "2023-04-20VEF984",
+        "2023-04-20NDT9993",
+        "2023-04-21JVG6501",
+        "2023-04-21VEF984",
+        "2023-04-22VEF984",
+        "2023-04-21CDD5551",
+        "2023-04-19ST563X",
+        "2023-04-20VHW4223",
+        "2023-04-20VGE1472",
+        "2023-04-22VDS1669",
+        "2023-04-22BNK1373",
+        "2023-04-21VDT8946",
+        "2023-04-21BNK1373",
+        "2023-04-22VCW1563",
+        "2023-04-20VJY2434",
+        "2023-04-22PLE9040",
+        "2023-04-21BRA8494",
+        "2023-04-21VHW4223",
+        "2023-04-20SY6485",
+        "2023-04-20JUJ4744",
+        "2023-04-15AKB8974",
+        "2023-04-16VEE1349",
+        "2023-04-20PNY5021",
+        "2023-04-15VGY2922",
+        "2023-04-21VDB1206",
+        "2023-04-14WB7344W",
+        "2023-04-20WYB1538",
+        "2023-04-27VGV3520",
+        "2023-04-22VGV9583",
+        "2023-03-26CDK1238",
+        "2023-04-21BNT5978",
+        "2023-03-18JVR106",
+        "2023-03-18WVM6152",
+        "2023-03-18JQJ8934",
+        "2023-03-17MCN387",
+        "2023-03-17VAH903",
+        "2023-03-27SAC9868B",
+        "2023-03-17BNT5978"
+      ]
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2023-11-28T03:32:28.582Z",
+  "versionId": "a527766c-c0c2-4d50-8a9b-781e35bee72c"
+}
