@@ -1,0 +1,48 @@
+{
+  "active": false,
+  "connections": {},
+  "createdAt": "2024-02-15T07:39:13.446Z",
+  "id": "hRG0M71CmKQBH09B",
+  "name": "My workflow 11",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour",
+              "minute": 13
+            }
+          ]
+        },
+        "authentication": "serviceAccount",
+        "filters": {
+          "sender": "jiun"
+        }
+      },
+      "id": "4c75d897-330d-4758-9b3a-59479421b155",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1,
+      "position": [
+        700,
+        360
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "12",
+          "name": "Google account - Kavi"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-02-15T07:39:13.446Z",
+  "versionId": "1dd76f1f-a7f4-4e46-89b3-68fd6a9dd311"
+}
