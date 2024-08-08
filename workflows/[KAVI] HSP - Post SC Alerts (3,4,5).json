@@ -1,0 +1,747 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Switch - STRIKE 1,2,3,4,5": {
+      "main": [
+        [],
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IF1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function - No Duplicates in Same Quarter2": {
+      "main": [
+        [
+          {
+            "node": "Switch - Local Region",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch - Local Region": {
+      "main": [
+        [
+          {
+            "node": "NORTHERN4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SOUTHERN4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "EASTERN4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CENTRAL4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function - No Duplicates in Same Quarter3": {
+      "main": [
+        [
+          {
+            "node": "Switch - Local Region1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch - Local Region1": {
+      "main": [
+        [
+          {
+            "node": "NORTHERN",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SOUTHERN",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "EASTERN",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CENTRAL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Function - No Duplicates in Same Quarter3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF1": {
+      "main": [
+        [
+          {
+            "node": "Function - No Duplicates in Same Quarter2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Switch - STRIKE 1,2,3,4,5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-11-07T05:06:50.754Z",
+  "id": "pBfNCzfZWP92Xrj2",
+  "name": "[KAVI] HSP - Post SC Alerts (3,4,5)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "50 07-23 * * *"
+            }
+          ]
+        }
+      },
+      "id": "070c2d51-f75f-4c68-b3d8-d86ecfb880e6",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        620,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E",
+          "mode": "list",
+          "cachedResultName": "HSP Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 759945530,
+          "mode": "list",
+          "cachedResultName": "Rejection - Confirmation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E/edit#gid=759945530"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRange",
+              "headerRow": 3,
+              "firstDataRow": 4
+            }
+          },
+          "outputFormatting": {
+            "values": {
+              "general": "UNFORMATTED_VALUE",
+              "date": "FORMATTED_STRING"
+            }
+          }
+        }
+      },
+      "id": "d1e0167f-87f2-49ae-adbe-0bc7006edf33",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        800,
+        340
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "value1": "={{ $json['Rejection Score'] }}",
+        "rules": {
+          "rules": [
+            {
+              "operation": "equal",
+              "value2": 5
+            },
+            {
+              "operation": "equal",
+              "value2": 4,
+              "output": 1
+            },
+            {
+              "operation": "equal",
+              "value2": 3,
+              "output": 2
+            }
+          ]
+        }
+      },
+      "id": "7e878137-0de3-43f2-91eb-26b15bccec3d",
+      "name": "Switch - STRIKE 1,2,3,4,5",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        1180,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds_1 = items.map(item => item.json[\"key\"]);\nconst oldListingIds_1 = staticData.oldListingIds_1; \n\nif (!oldListingIds_1) {\n  staticData.oldListingIds_1 = newListingIds_1;\n  return items;\n}\n\nconst ActualNewListingIds_1 = newListingIds_1.filter(id => !oldListingIds_1.includes(id));\nconst actualNewListing_1 = items.filter(data => ActualNewListingIds_1.includes(data.json['key']));\nstaticData.oldListingIds_1 = [...ActualNewListingIds_1, ...oldListingIds_1];\n\nreturn actualNewListing_1;\n"
+      },
+      "name": "Function - No Duplicates in Same Quarter2",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1640,
+        660
+      ],
+      "id": "7aff3717-dec5-4782-a53f-3efb94f1b9f0"
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.Region }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "NORTH"
+            },
+            {
+              "value2": "SOUTH",
+              "output": 1
+            },
+            {
+              "value2": "EAST",
+              "output": 2
+            }
+          ]
+        },
+        "fallbackOutput": 3
+      },
+      "id": "25afefdb-4064-417a-8312-5e57944c1f55",
+      "name": "Switch - Local Region",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        1860,
+        660
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"key\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['key']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function - No Duplicates in Same Quarter3",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1640,
+        -20
+      ],
+      "id": "0cd0b96a-ef4c-4069-9e99-04437866f401"
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.Region }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "NORTH"
+            },
+            {
+              "value2": "SOUTH",
+              "output": 1
+            },
+            {
+              "value2": "EAST",
+              "output": 2
+            }
+          ]
+        },
+        "fallbackOutput": 3
+      },
+      "id": "7e576a3e-7513-4015-82c4-c2255fd9773c",
+      "name": "Switch - Local Region1",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        1860,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 3rd Violation Remove Gchat",
+        "height": 667.826077119885,
+        "width": 994.0598968392069
+      },
+      "id": "d9ad66c4-30c6-4495-b6dd-f7dc8a3f26a1",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1340.6603338034133,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 4th Violation Remove Gchat",
+        "height": 664.3478163176942,
+        "width": 992.2755082372385
+      },
+      "id": "0b0a26dd-9142-4bb3-bfb8-c7b2e82787d9",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1348.3891979661228,
+        -280
+      ]
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAuAnAjjE",
+        "messageUi": {
+          "text": "=*HSP VIOLATION RESOLUTION - SECOND OFFENSE - Registration Number: {{ $json[\"Registration No\"] }}*\n\nThe registration number {{ $json[\"Registration No\"] }} has completed its one-month suspension, which ended on {{ $json[\"Reset Date\"] }}. Please reactivate the availability of this listing.\n\nFor additional details, please refer to the 'Rejection - Confirmation' sub-sheet in the following document:\n\nhttps://docs.google.com/spreadsheets/d/1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E/edit#gid=759945530"
+        },
+        "additionalFields": {}
+      },
+      "id": "94aae2f0-ce13-4ce8-b221-e2ba7a065c59",
+      "name": "CENTRAL4",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        920
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAty2-MzA",
+        "messageUi": {
+          "text": "=*HSP VIOLATION RESOLUTION - SECOND OFFENSE - Registration Number: {{ $json[\"Registration No\"] }}*\n\nThe registration number {{ $json[\"Registration No\"] }} has completed its one-month suspension, which ended on {{ $json[\"Reset Date\"] }}. Please reactivate the availability of this listing.\n\nFor additional details, please refer to the 'Rejection - Confirmation' sub-sheet in the following document:\n\nhttps://docs.google.com/spreadsheets/d/1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E/edit#gid=759945530"
+        },
+        "additionalFields": {}
+      },
+      "id": "08026ef1-7500-46f9-93f6-056b7007ce66",
+      "name": "NORTHERN4",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        480
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAOZfALAA",
+        "messageUi": {
+          "text": "=*HSP VIOLATION RESOLUTION - SECOND OFFENSE - Registration Number: {{ $json[\"Registration No\"] }}*\n\nThe registration number {{ $json[\"Registration No\"] }} has completed its one-month suspension, which ended on {{ $json[\"Reset Date\"] }}. Please reactivate the availability of this listing.\n\nFor additional details, please refer to the 'Rejection - Confirmation' sub-sheet in the following document:\n\nhttps://docs.google.com/spreadsheets/d/1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E/edit#gid=759945530"
+        },
+        "additionalFields": {}
+      },
+      "id": "ca45c392-c5d3-4703-b12c-8e30fd782e72",
+      "name": "SOUTHERN4",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        620
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAgvG0aiA",
+        "messageUi": {
+          "text": "=*HSP VIOLATION RESOLUTION - SECOND OFFENSE - Registration Number: {{ $json[\"Registration No\"] }}*\n\nThe registration number {{ $json[\"Registration No\"] }} has completed its one-month suspension, which ended on {{ $json[\"Reset Date\"] }}. Please reactivate the availability of this listing.\n\nFor additional details, please refer to the 'Rejection - Confirmation' sub-sheet in the following document:\n\nhttps://docs.google.com/spreadsheets/d/1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E/edit#gid=759945530"
+        },
+        "additionalFields": {}
+      },
+      "id": "99a111c9-7d52-4b3e-8956-dae63794f9b9",
+      "name": "EASTERN4",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        760
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAty2-MzA",
+        "messageUi": {
+          "text": "=*HSP VIOLATION RESOLUTION - THIRD OFFENSE - Registration Number: {{ $json[\"Registration No\"] }}*\n\nThe registration number {{ $json[\"Registration No\"] }} has completed its two-month suspension, which ended on {{ $json[\"Reset Date\"] }}. Please reactivate the this listing.\n\nFor additional details, please refer to the 'Rejection - Confirmation' sub-sheet in the following document:\n\nhttps://docs.google.com/spreadsheets/d/1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E/edit#gid=759945530"
+        },
+        "additionalFields": {}
+      },
+      "id": "e2ee2598-945b-4ab4-ae98-3f5238a70241",
+      "name": "NORTHERN",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        -220
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAOZfALAA",
+        "messageUi": {
+          "text": "=*HSP VIOLATION RESOLUTION - THIRD OFFENSE - Registration Number: {{ $json[\"Registration No\"] }}*\n\nThe registration number {{ $json[\"Registration No\"] }} has completed its two-month suspension, which ended on {{ $json[\"Reset Date\"] }}. Please reactivate the this listing.\n\nFor additional details, please refer to the 'Rejection - Confirmation' sub-sheet in the following document:\n\nhttps://docs.google.com/spreadsheets/d/1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E/edit#gid=759945530"
+        },
+        "additionalFields": {}
+      },
+      "id": "0eebc935-1c15-49ed-9c5c-c67740caf046",
+      "name": "SOUTHERN",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        -80
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAgvG0aiA",
+        "messageUi": {
+          "text": "=*HSP VIOLATION RESOLUTION - THIRD OFFENSE - Registration Number: {{ $json[\"Registration No\"] }}*\n\nThe registration number {{ $json[\"Registration No\"] }} has completed its two-month suspension, which ended on {{ $json[\"Reset Date\"] }}. Please reactivate the this listing.\n\nFor additional details, please refer to the 'Rejection - Confirmation' sub-sheet in the following document:\n\nhttps://docs.google.com/spreadsheets/d/1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E/edit#gid=759945530"
+        },
+        "additionalFields": {}
+      },
+      "id": "1891e65e-315b-44d1-b41f-935e7b12f6d6",
+      "name": "EASTERN",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        60
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAuAnAjjE",
+        "messageUi": {
+          "text": "=*HSP VIOLATION RESOLUTION - THIRD OFFENSE - Registration Number: {{ $json[\"Registration No\"] }}*\n\nThe registration number {{ $json[\"Registration No\"] }} has completed its two-month suspension, which ended on {{ $json[\"Reset Date\"] }}. Please reactivate the this listing.\n\nFor additional details, please refer to the 'Rejection - Confirmation' sub-sheet in the following document:\n\nhttps://docs.google.com/spreadsheets/d/1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E/edit#gid=759945530"
+        },
+        "additionalFields": {}
+      },
+      "id": "3f70fa62-52d3-49b8-8c66-3cc60cb2e54c",
+      "name": "CENTRAL",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        220
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "dateTime": [
+            {
+              "value1": "={{ $json['Reset Date'] }}",
+              "operation": "before",
+              "value2": "={{ $json.currentDate }}"
+            }
+          ]
+        }
+      },
+      "id": "38ac776d-89ec-4ff7-9e0b-9a38fe9b356d",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1460,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "dateTime": [
+            {
+              "value1": "={{ $json['Reset Date'] }}",
+              "operation": "before",
+              "value2": "={{ $json.currentDate }}"
+            }
+          ]
+        }
+      },
+      "id": "61f2b3fb-84c7-495d-b0b1-82009fefab75",
+      "name": "IF1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1460,
+        660
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "dc644b0d-77c9-4b5b-ae8c-a809f708c627",
+      "name": "Date & Time",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        800,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "multiplex",
+        "options": {}
+      },
+      "id": "47ab402c-1ad0-4779-9c42-c8d115ecb8c2",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        1000,
+        260
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds_1": [
+        "#N/A (Did not find value '40028' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '45700' in VLOOKUP evaluation.)",
+        "SYV1734-2024-Q2-3",
+        "BRH826-2024-Q2-3",
+        "#N/A (Did not find value '54226' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '51513' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '50993' in VLOOKUP evaluation.)",
+        "SYQ2023-2024-Q2-3",
+        "QAA5248Q-2024-Q2-3",
+        "#N/A (Did not find value '52665' in VLOOKUP evaluation.)",
+        "SAC7384A-2024-Q2-3",
+        "#N/A (Did not find value '47942' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '48724' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '48868' in VLOOKUP evaluation.)",
+        "SYB1279-2024-Q2-3",
+        "SB2955G-2024-Q2-3",
+        "SYH291-2024-Q2-3",
+        "#N/A (Did not find value '34435' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '48170' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '48181' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '43267' in VLOOKUP evaluation.)",
+        "SWA9139-2024-Q1-3",
+        "TCT4004-2024-Q1-3",
+        "SD27N-2024-Q1-3",
+        "MDM8880-2024-Q1-3",
+        "#N/A (Did not find value '39887' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '41608' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '41268' in VLOOKUP evaluation.)",
+        "SAC3056B-2024-Q1-3",
+        "SYK856-2024-Q1-3",
+        "SB9309C-2024-Q1-3",
+        "#N/A (Did not find value '32453' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '40371' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '51636' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '52584' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '22600' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '32453' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '39767' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '44388' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '52022' in VLOOKUP evaluation.)",
+        "SYN584-2024-Q1-3",
+        "SMD7796-2024-Q1-3",
+        "SS7026W-2024-Q1-3",
+        "W8288H-2024-Q1-3",
+        "SAC8347F-2024-Q1-3",
+        "SWE5773-2024-Q1-3",
+        "VJU4622-2024-Q1-3",
+        "ST563X-2024-Q1-3",
+        "#N/A (Did not find value '36334' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '38231' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '48174' in VLOOKUP evaluation.)",
+        "VAH3493-2024-Q1-3",
+        "VCM4397-2023-Q4-3",
+        "VFN4756-2023-Q4-3"
+      ],
+      "oldListingIds": [
+        "#N/A (Did not find value '48181' in VLOOKUP evaluation.)",
+        "TCT4004-2024-Q2-4",
+        "#N/A (Did not find value '52664' in VLOOKUP evaluation.)",
+        "ST2522W-2024-Q2-4",
+        "ST7259Y-2024-Q2-4",
+        "#N/A (Did not find value '29418' in VLOOKUP evaluation.)",
+        "VAQ7624-2023-Q4-4"
+      ]
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-05-12T02:58:38.207Z",
+      "updatedAt": "2023-05-12T02:58:38.207Z",
+      "id": "8",
+      "name": "Host Community"
+    },
+    {
+      "createdAt": "2023-11-07T03:10:47.123Z",
+      "updatedAt": "2023-11-07T03:10:47.123Z",
+      "id": "jXdALFMnSoT0xTcb",
+      "name": "HSP"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-08-08T04:52:26.866Z",
+  "versionId": "2bdd3779-d80a-4d5f-af59-66e788d453fc"
+}
