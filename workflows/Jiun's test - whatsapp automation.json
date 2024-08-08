@@ -1,0 +1,397 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "IB WA wo-H wo-B",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Postgres2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres2": {
+      "main": [
+        [
+          {
+            "node": "Function6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function6": {
+      "main": [
+        [
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-06-07T03:53:50.644Z",
+  "id": "84",
+  "name": "Jiun's test - whatsapp automation",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ej52vr.api.infobip.com/whatsapp/1/message/template",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\t\"messages\":[{\n\t\t\"from\":\"{{$json[\"from\"]}}\",\n\t\t\"to\":\"{{$json[\"to\"]}}\",\n\t\t\"messageId\":\"{{$json[\"messageId\"]}}\",\n\t\t\"content\":{\n\t\t\t\"templateName\":\"{{$json[\"templateName\"]}}\",\n\t\t\t\"templateData\":{\n\t\t\t\t\"body\":{\"placeholders\":[{{$json[\"placeholders\"] ? $json[\"placeholders\"] : \"\"}}]},\n\t\t\t\t\"header\":{\n\t\t\t\t\t\"type\":\"{{$json[\"headerType\"]}}\",\n\t\t\t\t\t\"mediaUrl\":\"{{$json[\"headerTypeMediaUrl\"]}}\"\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"language\":\"{{$json[\"language\"]}}\"\n\t\t}\n\t}]\n}",
+        "options": {}
+      },
+      "id": "7c3eb938-29f2-4282-bcf4-e1290fc6fc6a",
+      "name": "IB WA w-H-IMG wo-Button",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        920,
+        900
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 300,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "20",
+          "name": "Infobip SMS [Kavi]"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ej52vr.api.infobip.com/whatsapp/1/message/template",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"messages\":[{\n\"from\":\"{{$json[\"from\"]}}\",\n\"to\":\"{{$json[\"to\"]}}\",\n\"messageId\":\"{{$json[\"messageId\"]}}\",\n\"content\":{\n\"templateName\":\"{{$json[\"templateName\"]}}\",\n\"templateData\":{\n\"body\":{\"placeholders\":[{{$json[\"placeholders\"]||\"\"}}]},\n\"header\":{\n\"type\":\"{{$json[\"headerType\"]}}\",\n\"mediaUrl\":\"{{$json[\"headerTypeMediaUrl\"]}}\"\n},\n\"buttons\": [{\n\"type\": \"URL\",\n\"parameter\": \"{{$json[\"button\"]}}\"\n}]\n},\n\"language\":\"{{$json[\"language\"]}}\"\n}\n}]\n}",
+        "options": {}
+      },
+      "id": "caa9e54d-0e01-4926-a0c6-1d53a0b2a662",
+      "name": "IB WA w-H-IMG w-Button",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        920,
+        1100
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 300,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "20",
+          "name": "Infobip SMS [Kavi]"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxvle.api.infobip.com/whatsapp/1/message/template",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messages\": [\n    {\n      \"from\": \"60192052803\",\n      \"to\": \"\",\n      \"messageId\": \"a28dd97c-1ffb-4fcf-99f1-0b557ed381da\",\n      \"content\": {\n        \"templateName\": \"booking_rejection_suggestion\",\n        \"templateData\": {\n          \"body\": {\n            \"placeholders\": [\n              \"{{ $json[\"Full Name\"] }}\"\n            ]\n          }\n        },\n        \"language\": \"en_GB\"\n      },\n      \"callbackData\": \"Callback data\",\n      \"notifyUrl\": \"https://www.example.com/whatsapp\"\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "id": "e639ca82-238a-4f8f-aedd-6670ab1ff46e",
+      "name": "IB WA wo-H wo-B",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        440,
+        660
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 300,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "20",
+          "name": "Infobip SMS [Kavi]"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "id": "22fa3580-efa2-41d0-929b-35eb3b2137fb",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        660
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT * FROM users WHERE email = 'jiunyew98@gmail.com'",
+        "options": {}
+      },
+      "id": "a9c5a7bb-8034-4d14-99f8-06c40dbdc18c",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.1,
+      "position": [
+        20,
+        660
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "from",
+              "value": "60192052803"
+            },
+            {
+              "name": "to",
+              "value": "=60{{$json.phone_number}}"
+            },
+            {
+              "name": "Full Name",
+              "value": "={{ $json.first_name }} {{ $json.last_name }}"
+            },
+            {
+              "name": "templateName",
+              "value": "booking_rejection_suggestion"
+            },
+            {
+              "name": "language",
+              "value": "en_MY"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "db32e504-bdc1-4b6a-99c5-18250bd9d07f",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        220,
+        660
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.trevo.my/v1/web-hook/lean-plum/user-tag",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n\"Authorization\":\"Basic c29jYXJfbW9iaWxpdHk6UWZUalduWnI0dTd3IXolQw==\",\n\"Content-Type\":\"application/json\",\n\"Accept-Encoding\":\"gzip, deflate, br\",\n\"User-Agent\":\"Leanplum-Webhook\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"userId\":\"{{ $json[\"uuid\"] }}\",\n\"action\":\"add\",\n\"secretKey\":\"4E635266556A586E5A7234753778214125442A472D4B6150645367566B597033\",\n\"userTagSlug\":\"<input tagslug>\",\n\"campaignName\":\"<input tag logs/campaign>\"\n} ",
+        "options": {}
+      },
+      "id": "ad159f75-ee36-423c-9d35-116cc90709ec",
+      "name": "ID|UserTag",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        920,
+        1340
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 2
+            }
+          ]
+        }
+      },
+      "id": "3a64567e-8daf-472a-9e13-f138ff65a9e7",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        -220,
+        1020
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"ref_no\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['ref_no']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function6",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        140,
+        1020
+      ],
+      "id": "24e807cf-1153-46a7-a95c-951a83697303"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"user_uuid\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Booking_Suggestion\",\n            \"evtData\": {\n                \"userId\": \"{{ $json[\"user_uuid\"] }}\",\n\"pcity\": \"{{$json[\"city\"]}}\",\n\"ref_no\": \"{{ $json[\"rej_booking_ref\"] }}\",\n\"booking_days\": \"{{ $json[\"booking_days\"] }}\",\n\"brand\": \"{{ $json[\"rej_brand\"] }}\",\n\"model\": \"{{ $json[\"rej_model\"] }}\",\n\"request_start\": \"{{ $json[\"requested_at\"] }}\",\n\t\t\"vurl1\": \"{{$json[\"vurl1\"]}}\",\n\t\t\"vmodel1\": \"{{$json[\"vmodel1\"]}}\",\n\t\t\"vbase_price1\": \"{{$json[\"vbase_price1\"]}}\",\n\"vurl2\": \"{{$json[\"vurl2\"]}}\",\n\t\t\"vmodel2\": \"{{$json[\"vmodel2\"]}}\",\n\t\t\"vbase_price2\": \"{{$json[\"vbase_price2\"]}}\"\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "06f58304-81cc-4c7b-a0f2-a377104f5c6f",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        460,
+        1020
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=--Guest with rejected booking in the last 24h\nselect distinct b.ref_no, \nll.city_id,\ncase when ll.city_id in (1) then 'KV'   \nwhen ll.city_id in (2,12) then 'PGM' when ll.city_id in (48) then 'PGI'\nwhen ll.city_id in (3,19,20,21) then 'KK'   when ll.city_id in (4) then 'JB' \nwhen ll.city_id in (5) then 'IP'   when ll.city_id in (47) then 'NS'\nwhen ll.city_id in (13) then 'LGK' \nwhen ll.city_id in (14) then 'PRLS'\nwhen ll.city_id in (15) then 'MLK'\nwhen ll.city_id in (16) then 'PHG'\nwhen ll.city_id in (17) then 'TRGN'\nwhen ll.city_id in (18) then 'KLT'\nwhen ll.city_id in (22,23) then 'KCH'\nelse 'Others' end as city,\nto_char(b.created_at,'YYYY-MM-DD HH24:MI') as created_at, \nto_char(b.request_start_at,'YYYY-MM-DD') as request_start,\nto_char(b.request_end_at,'YYYY-MM-DD') as request_end, \nceil((EXTRACT(EPOCH FROM b.request_end_at::TIMESTAMP) - EXTRACT(EPOCH FROM b.request_start_at::TIMESTAMP)) / 86400::INTEGER) as booking_days,\nb.status,\nbr.name as brand,\nREPLACE(REPLACE(case when POSITION(' ' IN trim(regexp_replace(regexp_replace(INITCAP(m.name),'^([a-z]{1,3})-','\\1'),'([a-z]{3,})-','\\1 '))) > 0 \nthen trim(SUBSTR(trim(regexp_replace(regexp_replace(INITCAP(m.name),'^([a-z]{1,3})-','\\1'),'([a-z]{3,})-','\\1 ')),1, \nPOSITION(' ' IN trim(regexp_replace(regexp_replace(INITCAP(m.name),'^([a-z]{1,3})-','\\1'),'([a-z]{3,})-','\\1 ')))))\nelse trim(regexp_replace(regexp_replace(INITCAP(m.name),'^([a-z]{1,3})-','\\1'),'([a-z]{3,})-','\\1 ')) end, '🌙', ''), '🕌', '') as model, m.type as car_type,\nl.id as listing_id,\nlp.base_price,\nb.user_id, \nconcat(u.first_name,' ',u.last_name) as guest_name,\nu.uuid\nfrom bookings b \nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = b.listing_id\nleft join listings l on l.id = b.listing_id\nleft join users u on u.id = b.user_id\nleft join models m on m.id = l.model_id\nleft join brands br on br.id = m.brand_id \nleft join listing_pricing lp on lp.listing_id = b.listing_id \nwhere 1=1\nand b.status = 'rejected'\nand ll.country = 'Malaysia'\n--and b.updated_at between (NOW() - interval'5 days') and NOW()\nand b.user_id in ('5162')--,'163488')\nlimit 1",
+        "additionalFields": {}
+      },
+      "id": "28b08b2a-3b74-43c4-9051-baefd4fdee42",
+      "name": "Postgres2",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        1020
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=with availisting as (\n\t\t\tselect ROW_NUMBER() OVER (ORDER BY Z.listing_id) AS row_num, \n\t\t\tZ.*\n\t\t\tfrom \n\t\t\t(select '{{ $json[\"uuid\"] }}' as user_uuid, '{{$json[\"ref_no\"]}}' as rej_booking_ref, '{{ $json[\"created_at\"] }}'as requested_at, '{{ $json[\"model\"] }}'as rej_model, '{{ $json[\"brand\"] }}'as rej_brand,\n'{{ $json[\"booking_days\"] }}' as booking_days, \n\t\t\tB.listing_id,\n\t\t\tB.url,\n\t\t\tB.brand,\n\t\t\tB.model,\n\t\t\tB.car_type,\n\t\t\tB.id, \n\t\t\tB.display_name, \n\t\t\tB.email, \n\t\t\tB.phone_number,\n\t\t\tB.uuid,\n\t\t\tB.base_price,\n\t\t\tB.city_id,\n\t\t\tB.city,\n\t\t\tB.year,\n\t\t\tB.special_req, \n\t\t\tB.fuld_booking,  \n\t\t\t(B.fuld_booking::numeric/nullif(B.special_req,0))*100 as AFR_rate,\n\t\t\tB.avai_days,\n\t\t\tB.booked_days\n\t\t\tfrom \n\t\t\t\t(select distinct b.listing_id, \n\t\t\t\tl.url,\n\t\t\t\tbr.name as brand,\n\t\t\t\tREPLACE(REPLACE(case when POSITION(' ' IN trim(regexp_replace(regexp_replace(INITCAP(m.name),'^([a-z]{1,3})-','\\1'),'([a-z]{3,})-','\\1 '))) > 0 \n\t\t\t\tthen trim(SUBSTR(trim(regexp_replace(regexp_replace(INITCAP(m.name),'^([a-z]{1,3})-','\\1'),'([a-z]{3,})-','\\1 ')),1, \n\t\t\t\tPOSITION(' ' IN trim(regexp_replace(regexp_replace(INITCAP(m.name),'^([a-z]{1,3})-','\\1'),'([a-z]{3,})-','\\1 ')))))\n\t\t\t\telse trim(regexp_replace(regexp_replace(INITCAP(m.name),'^([a-z]{1,3})-','\\1'),'([a-z]{3,})-','\\1 ')) end, '🌙', ''), '🕌', '') as model,m.type as car_type,\n\t\t\t\tlp.base_price,\n\t\t\t\tll.city_id,\n\t\t\t\tcase when ll.city_id in (1) then 'KV'   \n\t\t\t\twhen ll.city_id in (2,12) then 'PGM' when ll.city_id in (48) then 'PGI'\n\t\t\t\twhen ll.city_id in (3,19,20,21) then 'KK'   when ll.city_id in (4,15) then 'JB' \n\t\t\t\twhen ll.city_id in (5) then 'IP'   when ll.city_id in (47) then 'NS'\n\t\t\t\twhen ll.city_id in (13) then 'LGK' else 'Others' end as city,\n\t\t\t\tm.year,\n\t\t\t\tu.id, \n\t\t\t\tconcat(u.first_name,' ',u.last_name) as display_name,\n\t\t\t\tu.email, \n\t\t\t\tu.phone_number,\n\t\t\t\tu.uuid,\n\t\t\t\tcount(distinct avai.avai_days) as avai_days,\n\t\t\t\tcount(distinct bd.booked_days) as booked_days,\n\t\t\t\tcount(distinct case when ((b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')) or (b.status in ('withdrawn','cancelled') and b.reason ~* '(host|owner|avai|car)') or (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null))) then b.ref_no end) as special_req,\n\t\t\t\tcount(distinct case when b.status in ('accepted', 'waiting_for_inspection', 'start_driving', 'return_car', 'completed') then b.ref_no end) as fuld_booking\n\t\t\t\tfrom bookings b \n\t\t\t\tleft join listings l on l.id = b.listing_id \n\t\t\t\tleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = b.listing_id\n\t\t\t\tleft join listing_pricing lp on lp.listing_id = l.id\n\t\t\t\tleft join pricing_policies pp on pp.id = lp.pricing_policy_id\n\t\t\t\tleft join models m on m.id = l.model_id \n\t\t\t\tleft join brands br on br.id = m.brand_id \n\t\t\t\tleft join users u on u.id = l.user_id \n\t\t\t\tleft join listing_availability la on la.listing_id = l.id\n\t\t\t\tleft join booking_lines bl on bl.booking_id = b.id\n\t\t\t\tleft join\n\t\t\t\t\t(select l.id,\n\t\t\t\t\tdates.ymd as avai_days\n\t\t\t\t\tfrom listings l \n\t\t\t\t\tleft join listing_availability la on la.listing_id = l.id \n\t\t\t\t\tleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = l.id\n\t\t\t\t\tjoin (SELECT generate_series('{{ $json[\"request_start\"] }}', timestamp '{{ $json[\"request_end\"] }}', interval '1 day')::date ymd) dates on \n\t\t\t\t\tdates.ymd between la.start_date::date and la.end_date::date\n\t\t\t\t\twhere ll.country = 'Malaysia')avai\n\t\t\t\t\ton avai.id = b.listing_id \n\t\t\t\tleft join\n\t\t\t\t\t(select l.id,\n\t\t\t\t\tdates.ymd as booked_days\n\t\t\t\t\tfrom listings l \n\t\t\t\t\tleft join bookings b on b.listing_id = l.id\n\t\t\t\t\tleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = l.id\n\t\t\t\t\tjoin (SELECT generate_series('{{ $json[\"request_start\"] }}', timestamp '{{ $json[\"request_end\"] }}', interval '1 day')::date ymd) dates on \n\t\t\t\t\tdates.ymd between b.request_start_at::date and b.request_end_at::date\n\t\t\t\t\twhere b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')\n\t\t\t\t\tand ll.country = 'Malaysia')bd\n\t\t\t\t\ton bd.id = b.listing_id \n\t\t\t\twhere b.status not in ('payment_failed')\n\t\t\t\tand l.status = 'approved'\n\t\t\t\tand l.deleted_at is null\n\t\t\t\tand ll.country = 'Malaysia'\n\t\t\t\tand la.end_date::timestamp > NOW()::timestamp\n\t\t\t\tand b.request_end_at between (NOW()::timestamp - interval'30 days') and NOW()::timestamp --L30D at least 1 requested \n\t\t\t\tgroup by 1,2,3,4,5,6,7,8,9,10,11,12,13,14) B\n\t\t\twhere 1=1\n\t\t\tand B.special_req > 0\n\t\t\tand B.car_type = '{{ $json[\"car_type\"] }}'\n\t\t\tand B.city_id = '{{$json[\"city_id\"]}}'\n\t\t\t--and B.base_price <= ({{ $json[\"base_price\"] }} + {{ $json[\"base_price\"] }}*0.2)\n\t\t\t--and B.base_price >= ({{ $json[\"base_price\"] }} - {{ $json[\"base_price\"] }}*0.2)\n\t\t\t--and B.avai_days = {{ $json[\"booking_days\"] }}\n\t\t\t--and B.booked_days = 0\n\t\t\tgroup by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25\n\t\t\thaving (B.fuld_booking::numeric/nullif(B.special_req,0))*100 >= '75'\n\t\t\torder by 18 desc\n\t\t\tlimit 3)z)\nselect distinct al.user_uuid, al.city, al.rej_booking_ref, al.requested_at, al.rej_model, al.rej_brand,al.booking_days,\nal1.url as vurl1,\nal1.model as vmodel1, \nal1.car_type as vtype1, \nal1.base_price as vbase_price1,\nal2.url as vurl2,\nal2.model as vmodel2, \nal2.car_type as vtype2, \nal2.base_price as vbase_price2\nfrom availisting al\njoin availisting al1 on al1.row_num = 1\njoin availisting al2 on al2.row_num = 2\njoin availisting al3 on al3.row_num = 3\nwhere al2.url is not null",
+        "additionalFields": {}
+      },
+      "id": "33d45dc5-2f49-49dd-895f-979683428bf4",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        300,
+        1020
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Postgres1": [
+      {
+        "json": {
+          "user_uuid": "0f8beb0d-d72d-4be0-817a-0acada887db7",
+          "city": "KV",
+          "rej_booking_ref": "T1T4279O",
+          "requested_at": "2021-04-01 03:23",
+          "rej_model": "Persona",
+          "rej_brand": "Proton",
+          "booking_days": "1",
+          "vurl1": "TRr9nfH1Mxb",
+          "vmodel1": "Bezza",
+          "vtype1": "sedan",
+          "vbase_price1": "100.00",
+          "vurl2": "5Nz17gy4Mxb",
+          "vmodel2": "Vios",
+          "vtype2": "sedan",
+          "vbase_price2": "165.00"
+        }
+      }
+    ]
+  },
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionOrder": "v0"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-09-04T09:46:41.859Z",
+  "versionId": "869409ec-3570-4e7d-a17a-286432b8a026"
+}
