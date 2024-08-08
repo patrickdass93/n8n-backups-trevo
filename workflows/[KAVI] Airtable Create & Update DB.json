@@ -1,0 +1,505 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Airtable2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Airtable1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable2": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Airtable3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Compare Datasets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-07-17T03:39:27.406Z",
+  "id": "m0YkyWRgYgZGL91B",
+  "name": "[KAVI] Airtable Create & Update DB",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "02edb048-51b0-49b9-8060-833733cccb2c",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1XcQFT58D3RDPWOa3ugWVb_d4Tcx5NkaEE8hVpo1nCJ8",
+          "mode": "list",
+          "cachedResultName": "Delivery Management Trial",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XcQFT58D3RDPWOa3ugWVb_d4Tcx5NkaEE8hVpo1nCJ8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XcQFT58D3RDPWOa3ugWVb_d4Tcx5NkaEE8hVpo1nCJ8/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "c6d21f7e-b04d-4aed-8d17-ab195221d3c4",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        980,
+        -140
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "authentication": "airtableTokenApi",
+        "operation": "list",
+        "application": {
+          "__rl": true,
+          "value": "apppS3zxMC275MP5w",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblIEU3k1yyOzo7to",
+          "mode": "id"
+        },
+        "additionalOptions": {}
+      },
+      "id": "628d4cee-6488-42be-8c44-d462eb327140",
+      "name": "Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        980,
+        260
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "IISAdLPqycCf9dkr",
+          "name": "Airtable Personal Access Token account - Kavi (1)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "delivery_id",
+              "field2": "fields.delivery_id"
+            }
+          ]
+        },
+        "joinMode": "keepNonMatches",
+        "outputDataFrom": "input1",
+        "options": {
+          "fuzzyCompare": true
+        }
+      },
+      "id": "33164851-d378-47e7-a406-129600440ab1",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        1180,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "airtableTokenApi",
+        "operation": "append",
+        "application": {
+          "__rl": true,
+          "value": "apppS3zxMC275MP5w",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblIEU3k1yyOzo7to",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "ff1bc5c6-05d2-4c46-b502-8f2b1b608457",
+      "name": "Airtable1",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        1400,
+        180
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "IISAdLPqycCf9dkr",
+          "name": "Airtable Personal Access Token account - Kavi (1)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select bd.id as delivery_id\n, b.id as booking_id\n, b.ref_no as booking_ref\n, bd.type\n, b.request_start_at as booking_start_time\n, b.request_end_at as booking_end_time\n, b.status \n, ST_Distance(ll.geo, ua.geo) as distance_calc\n--, ST_Distance(ST_Transform(ll.geo, 4326), ST_Transform(ua.geo, 4326)) as distance2\n, bd.distance\n, ll.\"name\" as host_address_name\n, ll.address_line_1 as host_addressline_1\n, ll.address_line_2 as host_addressline_2\n, ll.state_region_province as host_state_region_province\n, ll.postal_code as host_postal_code\n, ua.\"name\" as guest_address_name\n, ua.address_line_1 as guest_addressline_1\n, ua.address_line_2 as guest_addressline_2\n, ua.state_region_province as guest_state_region_province\n, ua.postal_code as guest_postal_code\nfrom bookings b\nleft join listings l on l.id = b.listing_id \nleft join listing_location ll on ll.listing_id = l.id \nleft join booking_deliveries bd on bd.booking_id = b.id \nleft join user_address ua on bd.delivery_id = ua.id\nwhere ll.country = 'Indonesia'\nand bd.id is not null\nand bd.type in ('pick-up','drop-off')\nand b.status != 'payment_failed'\nand b.request_start_at <= NOW() + interval '4 weeks'\nand b.request_start_at >= NOW() - interval '2 days'",
+        "options": {}
+      },
+      "id": "19cbaa54-a4ff-4946-84c8-cf85cea4232a",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        980,
+        100
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableTokenApi",
+        "operation": "list",
+        "application": {
+          "__rl": true,
+          "value": "apppS3zxMC275MP5w",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblIEU3k1yyOzo7to",
+          "mode": "id"
+        },
+        "additionalOptions": {}
+      },
+      "id": "3f3b1029-cd81-4fb0-a949-adb1f48101f1",
+      "name": "Airtable2",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        980,
+        600
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "IISAdLPqycCf9dkr",
+          "name": "Airtable Personal Access Token account - Kavi (1)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "delivery_id",
+              "field2": "fields.delivery_id"
+            }
+          ]
+        },
+        "options": {
+          "fuzzyCompare": true
+        }
+      },
+      "id": "b51a45cd-1f99-4c1c-bf7f-b4272ecda32a",
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        1380,
+        -120
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "authentication": "airtableTokenApi",
+        "operation": "update",
+        "application": {
+          "__rl": true,
+          "value": "apppS3zxMC275MP5w",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblIEU3k1yyOzo7to",
+          "mode": "id"
+        },
+        "id": "={{ $json.id }}",
+        "updateAllFields": false,
+        "fields": [
+          "status"
+        ],
+        "options": {
+          "bulkSize": 10,
+          "typecast": true
+        }
+      },
+      "id": "e38d037e-1a14-4d9c-94a4-3f1687d74163",
+      "name": "Airtable3",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        1580,
+        520
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "IISAdLPqycCf9dkr",
+          "name": "Airtable Personal Access Token account - Kavi (1)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select bd.id as delivery_id\n, b.id as booking_id\n, b.ref_no as booking_ref\n, bd.type\n, b.request_start_at as booking_start_time\n, b.request_end_at as booking_end_time\n, b.status \n, ST_Distance(ll.geo, ua.geo) as distance_calc\n--, ST_Distance(ST_Transform(ll.geo, 4326), ST_Transform(ua.geo, 4326)) as distance2\n, bd.distance\n, ll.\"name\" as host_address_name\n, ll.address_line_1 as host_addressline_1\n, ll.address_line_2 as host_addressline_2\n, ll.state_region_province as host_state_region_province\n, ll.postal_code as host_postal_code\n, ua.\"name\" as guest_address_name\n, ua.address_line_1 as guest_addressline_1\n, ua.address_line_2 as guest_addressline_2\n, ua.state_region_province as guest_state_region_province\n, ua.postal_code as guest_postal_code\nfrom bookings b\nleft join listings l on l.id = b.listing_id \nleft join listing_location ll on ll.listing_id = l.id \nleft join booking_deliveries bd on bd.booking_id = b.id \nleft join user_address ua on bd.delivery_id = ua.id\nwhere ll.country = 'Indonesia'\nand bd.id is not null\nand bd.type in ('pick-up','drop-off')\nand b.status != 'payment_failed'\nand b.request_start_at <= NOW() + interval '4 weeks'\nand b.request_start_at >= NOW() - interval '2 days'",
+        "options": {}
+      },
+      "id": "6c4a8937-5ab7-4cc1-a5a3-b6068a9af75e",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        980,
+        440
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "delivery_id",
+              "field2": "fields.delivery_id"
+            }
+          ]
+        },
+        "options": {
+          "clashHandling": {
+            "values": {
+              "resolveClash": "preferInput2"
+            }
+          },
+          "multipleMatches": "first"
+        }
+      },
+      "id": "38e9fecf-e259-40ba-a532-6892e6870e7d",
+      "name": "Merge2",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        1200,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "number": [
+            {
+              "name": "id",
+              "value": "={{ $json.id }}"
+            }
+          ],
+          "string": [
+            {
+              "name": "status",
+              "value": "={{ $json.status }}"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": true
+        }
+      },
+      "id": "823e45ec-c589-49f3-890f-268714c39862",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1400,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "content": "Update node not functioning as expected"
+      },
+      "id": "a61b20ea-47b8-4509-86c9-ac8e30645311",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "mergeByFields": {
+          "values": [
+            {}
+          ]
+        },
+        "resolve": "mix",
+        "preferWhenMix": "input2",
+        "exceptWhenMix": "status",
+        "options": {}
+      },
+      "id": "a3595632-b9ed-4811-ab78-2428b5108209",
+      "name": "Compare Datasets",
+      "type": "n8n-nodes-base.compareDatasets",
+      "typeVersion": 2.2,
+      "position": [
+        1600,
+        -120
+      ],
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-07-24T05:06:52.606Z",
+  "versionId": "e65df854-a1da-49ba-afa1-3ba34634e3c2"
+}
