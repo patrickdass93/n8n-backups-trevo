@@ -1,0 +1,970 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Clear Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weekly Raw Data Dump": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "SIB API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Read Weekly Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear Sheet": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Weekly Raw Data Dump",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Weekly Raw Data Dump": {
+      "main": [
+        [
+          {
+            "node": "Weekly Raw Data Dump",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Weekly Sheet": {
+      "main": [
+        [
+          {
+            "node": "SendInBlue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SIB API1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Tracking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SendInBlue": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "createdAt": "2023-05-24T07:36:40.545Z",
+  "id": "76",
+  "name": "[KAVI] [HOST COMMUNITY] - [COPY] MY Host Weekly Statement copy",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                2
+              ],
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "5bac44e7-d511-441c-8db3-2e5b79fd5141",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        660,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\"to\":[{\"email\":\"{{$json[\"email\"]}}\",\"name\":\"{{$json[\"host_name\"]}}\"}],\n\"templateId\":308,\"params\":{ \"CPHOSTNAME\":\"{{$json[\"host_name\"]}}\", \"AVAILABLE_DAYS\":\"{{$json[\"avai_days\"]}}\",\"REJECTED_BOOKING\":\"{{$json[\"rej_booking\"]}}\"}}\n\n",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API - Send 1st Rejection Email1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        480,
+        1340
+      ],
+      "id": "b34bb42f-e7a8-41e4-9212-8917906a811a",
+      "retryOnFail": true,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "disabled": true,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg",
+          "mode": "list",
+          "cachedResultName": "2023 - Host Weekly Statement [N8N]",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1148559864,
+          "mode": "list",
+          "cachedResultName": "RAW",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gDedi2SnusO3F33VJnb89rvbKOf8UfUari4ePlR1Hfc/edit#gid=1148559864"
+        },
+        "dataMode": "autoMapInputData",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "5a326840-f504-415b-a10f-952651db35fe",
+      "name": "Weekly Raw Data Dump",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1140,
+        300
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect distinct l.user_id as host_id,\nu.uuid,\nu.email,\nconcat(u.first_name,' ',u.last_name)as user_name, \nDATE_TRUNC('week', b.request_end_at::timestamp)::DATE AS booking_end_week,\nl.id as listing_id, \nl.registration_no as plate_no,\nl.url, \ncount(distinct case when b.status not in ('payment_failed') then b.id end) as received_booking, \ncount(distinct case when b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') then b.id end) as fulfiled_booking,\ncount(distinct case when b.status in ('completed') then b.id end) as completed_booking,\ncount(distinct case when b.status in ('rejected') then b.id end) as rejected_booking,\n(count(distinct case when b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') then b.id end))::decimal/nullif(count(distinct case when ((b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')) or (b.status in ('withdrawn','cancelled') and b.reason ~* '(host|owner|avai|car)') or (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null))) then b.id end),0)::decimal as fr,\ncase when (sum(case when bl.pricing_id = '3' then 0.5\nwhen (case when b.status = 'completed' then extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp)end)/86400 < 1 then 1\nwhen ((case when b.status = 'completed' then extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp)end)::int)%86400 < 2160 then\nfloor((case when b.status = 'completed' then extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp)end)/86400)\nelse ceil((case when b.status = 'completed' then extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp)end)/86400) end)) is null then '0'\nelse sum(case when bl.pricing_id = '3' then 0.5\nwhen (case when b.status = 'completed' then extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp)end)/86400 < 1 then 1\nwhen ((case when b.status = 'completed' then extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp)end)::int)%86400 < 2160 then\nfloor((case when b.status = 'completed' then extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp)end)/86400)\nelse ceil((case when b.status = 'completed' then extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp)end)/86400) end) end as booking_dur_days, \ncase when (sum(case when b.status = 'completed' then d5.rental-(d5.rental*(cc.percent/100))-(d5.rental*(cc.percent/100)*0.06) end)) is null then '0'\nelse sum(case when b.status = 'completed' then d5.rental-(d5.rental*(cc.percent/100))-(d5.rental*(cc.percent/100)*0.06) end) end as est_payout,\ncase when (sum(case when b.status = 'rejected' then d5.rental-(d5.rental*(cc.percent/100))-(d5.rental*(cc.percent/100)*0.06) end)) is null then '0'\nelse sum(case when b.status = 'rejected' then d5.rental-(d5.rental*(cc.percent/100))-(d5.rental*(cc.percent/100)*0.06) end) end as est_lost\n--case when ((sum(case when (b.status in ('accepted', 'completed','rejected','start_driving')) then d5.rental-(d5.rental*(cc.percent/100)) end))-(sum(case when b.status = 'completed' then d5.rental-(d5.rental*(cc.percent/100)) end))) is null then '0' \n--else (sum(case when (b.status in ('accepted', 'completed','rejected','start_driving')) then d5.rental-(d5.rental*(cc.percent/100)) end))-(sum(case when b.status in ('accepted', 'completed','start_driving') then d5.rental-(d5.rental*(cc.percent/100)) end)) end as est_loss\nfrom bookings b\nleft join listings l on l.id = b.listing_id \nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = b.listing_id\nleft join users u on u.id = l.user_id \nleft join companies c on c.owner_id = l.user_id \nleft join listing_commission_class lcc on lcc.listing_id = l.id\nleft join commission_class cc on cc.id = lcc.commission_id \nleft join booking_lines bl on bl.booking_id = b.id and bl.slug = 'rental-fee'\nleft join \n\t(select distinct b.listing_id,\n    DATE_TRUNC('week', b.request_end_at::timestamp)::DATE AS booking_completed_week,\n\tsum(case when bl.pricing_id = '3' then 0.5\n\twhen (extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp))/86400 < 1 then 1\n\twhen (extract(EPOCH from b.request_end_at::timestamp)::int - extract(EPOCH from b.request_start_at::timestamp)::int)%86400 < 2160 then\n\tfloor((extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp))/86400)\n\telse ceil((extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp))/86400) end) as dur\n\t--\n\tfrom bookings b\n\tleft join listings l on l.id = b.listing_id \n\tleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = b.listing_id\n\tleft join booking_lines bl on bl.booking_id = b.id and bl.slug = 'rental-fee'\n\twhere b.status = 'completed'\n\tand b.request_end_at::timestamp >= CURRENT_DATE-16 AND b.request_end_at::timestamp < CURRENT_DATE-9\n\tand ll.country = 'Malaysia'\n\tgroup by 1,2)du\n\ton du.listing_id = l.id and du.booking_completed_week = b.request_end_at\n--\nleft join \n(select bl.booking_id, bl.amount as del_pickup from booking_lines bl where bl.slug = 'car-pick-up-fee') d1\non b.id = d1.booking_id\nleft join\n(select bl.booking_id, bl.amount as del_dropoff from booking_lines bl where bl.slug = 'car-drop-off-fee') d2\non b.id = d2.booking_id\nleft join\n(select bl.booking_id, bl.amount as del_pickup_disc from booking_lines bl where bl.slug = 'car-pick-up-discount-fee') d3\non b.id = d3.booking_id\nleft join\n(select bl.booking_id, bl.amount as del_dropoff_disc from booking_lines bl where bl.slug = 'car-drop-off-discount-fee') d4\non b.id = d4.booking_id\nleft join\n(select bl.booking_id, bl.amount as rental from booking_lines bl where bl.slug = 'rental-fee') d5\non b.id = d5.booking_id\nwhere ll.country = 'Malaysia'\nand b.request_end_at::timestamp >= CURRENT_DATE-16 AND b.request_end_at::timestamp < CURRENT_DATE-9\nand ((c.owner_id is null) or (u.email in ('addyazmin@gmail.com','seow@trevo.my','aaronleong1510@gmail.com')))\nand l.status = 'approved'\nand l.deleted_at is null\ngroup by 1,2,3,4,5,6,7\n",
+        "additionalFields": {}
+      },
+      "id": "460156cf-5757-4afe-b901-1fc0bc8f6275",
+      "name": "Postgres - Weekly Raw Data",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        360,
+        1120
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "16",
+          "name": "trevodb_recreated"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect distinct l.user_id,\nu.uuid,\nu.email,\nconcat(u.first_name,' ',u.last_name)as name, \nto_char(b.request_end_at::timestamp,'YYYY-MM-DD')as booking_completed_week,\n--DATE_TRUNC('week', b.request_end_at)::DATE AS booking_completed_week,\nl.id as listing_id, \nl.registration_no,\nl.url, \ncount(distinct case when b.status not in ('payment_failed') then b.id end) as req_booking, \ncount(distinct case when ((b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')) or (b.status in ('withdrawn','cancelled') and b.reason ~* '(host|owner|avai|car)') or (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null))) then b.id end) as spec_req,\ncount(distinct case when b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') then b.id end) as fuld_booking,\ncount(distinct case when b.status in ('completed') then b.id end) as comp_booking,\ncount(distinct case when b.status in ('rejected') then b.id end) as rej_booking,\n(count(distinct case when b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') then b.id end))::decimal/nullif(count(distinct case when ((b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')) or (b.status in ('withdrawn','cancelled') and b.reason ~* '(host|owner|avai|car)') or (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null))) then b.id end),0)::decimal as afr,\ncase when (sum(case when bl.pricing_id = '3' then 0.5\nwhen (case when b.status = 'completed' then extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp)end)/86400 < 1 then 1\nwhen ((case when b.status = 'completed' then extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp)end)::int)%86400 < 2160 then\nfloor((case when b.status = 'completed' then extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp)end)/86400)\nelse ceil((case when b.status = 'completed' then extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp)end)/86400) end)) is null then '0'\nelse sum(case when bl.pricing_id = '3' then 0.5\nwhen (case when b.status = 'completed' then extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp)end)/86400 < 1 then 1\nwhen ((case when b.status = 'completed' then extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp)end)::int)%86400 < 2160 then\nfloor((case when b.status = 'completed' then extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp)end)/86400)\nelse ceil((case when b.status = 'completed' then extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp)end)/86400) end) end as total_completed_days, \ncase when (sum(case when b.status = 'completed' then d5.rental-(d5.rental*(cc.percent/100))-(d5.rental*(cc.percent/100)*0.06) end)) is null then '0'\nelse sum(case when b.status = 'completed' then d5.rental-(d5.rental*(cc.percent/100))-(d5.rental*(cc.percent/100)*0.06) end) end as est_earnings,\ncase when (sum(case when b.status = 'rejected' then d5.rental-(d5.rental*(cc.percent/100))-(d5.rental*(cc.percent/100)*0.06) end)) is null then '0'\nelse sum(case when b.status = 'rejected' then d5.rental-(d5.rental*(cc.percent/100))-(d5.rental*(cc.percent/100)*0.06) end) end as est_lost\n--case when ((sum(case when (b.status in ('accepted', 'completed','rejected','start_driving')) then d5.rental-(d5.rental*(cc.percent/100)) end))-(sum(case when b.status = 'completed' then d5.rental-(d5.rental*(cc.percent/100)) end))) is null then '0' \n--else (sum(case when (b.status in ('accepted', 'completed','rejected','start_driving')) then d5.rental-(d5.rental*(cc.percent/100)) end))-(sum(case when b.status in ('accepted', 'completed','start_driving') then d5.rental-(d5.rental*(cc.percent/100)) end)) end as est_loss\nfrom bookings b\nleft join listings l on l.id = b.listing_id \nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = b.listing_id\nleft join users u on u.id = l.user_id \nleft join companies c on c.owner_id = l.user_id \nleft join listing_commission_class lcc on lcc.listing_id = l.id\nleft join commission_class cc on cc.id = lcc.commission_id \nleft join booking_lines bl on bl.booking_id = b.id and bl.slug = 'rental-fee'\nleft join \n\t(select distinct b.listing_id,\n    DATE_TRUNC('month', b.request_end_at::timestamp)::DATE AS booking_completed_month,\n\tsum(case when bl.pricing_id = '3' then 0.5\n\twhen (extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp))/86400 < 1 then 1\n\twhen (extract(EPOCH from b.request_end_at::timestamp)::int - extract(EPOCH from b.request_start_at::timestamp)::int)%86400 < 2160 then\n\tfloor((extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp))/86400)\n\telse ceil((extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp))/86400) end) as dur\n\t--\n\tfrom bookings b\n\tleft join listings l on l.id = b.listing_id \n\tleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = b.listing_id\n\tleft join booking_lines bl on bl.booking_id = b.id and bl.slug = 'rental-fee'\n\twhere b.status = 'completed'\n\tand b.request_end_at::timestamp >= '2021-09-01 00:00'\n\tand ll.country = 'Malaysia'\n\tgroup by 1,2)du\n\ton du.listing_id = l.id and du.booking_completed_month = b.request_end_at\n--\nleft join \n(select bl.booking_id, bl.amount as del_pickup from booking_lines bl where bl.slug = 'car-pick-up-fee') d1\non b.id = d1.booking_id\nleft join\n(select bl.booking_id, bl.amount as del_dropoff from booking_lines bl where bl.slug = 'car-drop-off-fee') d2\non b.id = d2.booking_id\nleft join\n(select bl.booking_id, bl.amount as del_pickup_disc from booking_lines bl where bl.slug = 'car-pick-up-discount-fee') d3\non b.id = d3.booking_id\nleft join\n(select bl.booking_id, bl.amount as del_dropoff_disc from booking_lines bl where bl.slug = 'car-drop-off-discount-fee') d4\non b.id = d4.booking_id\nleft join\n(select bl.booking_id, bl.amount as rental from booking_lines bl where bl.slug = 'rental-fee') d5\non b.id = d5.booking_id\nwhere ll.country = 'Malaysia'\nand b.request_end_at::timestamp >= CURRENT_DATE - 22\nand b.request_end_at::timestamp < CURRENT_DATE - 15\nand ((c.owner_id is null) or (u.email in ('addyazmin@gmail.com','seow@trevo.my','aaronleong1510@gmail.com')))\nand l.status = 'approved'\nand l.deleted_at is null\ngroup by 1,2,3,4,5,6,7,8\norder by 5 desc\n",
+        "additionalFields": {}
+      },
+      "id": "111f3e41-ee6f-4de9-a1da-9a4cc2f25dfe",
+      "name": "Postgres - Weekly Raw Data1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        700,
+        1160
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "16",
+          "name": "trevodb_recreated"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\nWITH \n    unique_users AS (\n            SELECT \n                u.uuid\n                , u.id AS user_id\n                , u.email\n                , CASE WHEN u.display_name IS NOT NULL THEN u.display_name ELSE concat(u.first_name,' ',u.last_name) END AS user_name\n            FROM users u\n            LEFT JOIN user_attributions ua ON ua.user_id = u.id\n            \n            WHERE 1=1   \n                AND u.status = 'active'\n                AND ((ua.key = 'current-country' AND ua.value = 'MY' AND u.dob > '1900-01-01')\n                    OR (ua.key = 'signup-country' AND ua.value = 'MY' AND u.dob > '1900-01-01'))\n                OR u.phone_country_code IN ('+60')\n        )\n    \n    , approved_listings AS (\n            SELECT\n                l.id AS listing_id\n                , l.registration_no as plate_no\n                , l.url\n                , l.user_id as host_id\n            FROM listings l\n            LEFT JOIN listing_location ll on ll.listing_id = l.id\n            \n            WHERE 1=1\n                AND l.status IN ('approved')\n                AND ll.country IN ('Malaysia')\n                AND l.deleted_at IS NULL\n        )\n    \n    , all_bookings AS (\n            SELECT DISTINCT ON (b.id)\n                -- Booking Details\n                b.id AS booking_id\n                , b.listing_id\n                , l.host_id\n                , u.uuid\n                , u.user_name\n                , u.email\n                , l.plate_no\n                , l.url\n                , b.ref_no AS booking_ref\n                , CASE \n                    WHEN b.reason ~~* '%test%' THEN 'test'\n                    WHEN b.status IN ('cancelled','withdrawn') \n                        AND (\n                            b.reason ~~* '%host%'\n                            OR b.reason ~~* '%owner%'\n                            OR b.reason ~~* '%available%'\n                            OR b.reason ~~* '%car%'\n                        ) THEN 'rejected'\n                    WHEN b.status IN ('rejected') \n                        AND (\n                            b.reason ~~* '%guest%'\n                        ) THEN 'withdrawn'\n                    ELSE b.status END AS booking_status\n                , b.created_at AT TIME ZONE 'Asia/Jakarta' AS booking_request_ts\n                , DATE_TRUNC('month', b.created_at AT TIME ZONE 'Asia/Jakarta')::DATE AS booking_request_month\n                , DATE_TRUNC('week', b.created_at AT TIME ZONE 'Asia/Jakarta')::DATE AS booking_request_week\n                , DATE_TRUNC('month', b.request_end_at AT TIME ZONE 'Asia/Jakarta')::DATE AS booking_end_month\n                , DATE_TRUNC('week', b.request_end_at AT TIME ZONE 'Asia/Jakarta')::DATE AS booking_end_week\n                , CEIL(EXTRACT(EPOCH FROM b.request_end_at - b.request_start_at)/86400) AS booking_dur_days\n                -- Booking Value\n                , CASE WHEN hp.booking_id IS NULL THEN CEIL(b.gross_amount*(100-cc.percent)/100) ELSE hp.amount END AS payout_amount\n\n            FROM bookings b\n            LEFT JOIN approved_listings l ON l.listing_id = b.listing_id\n            LEFT JOIN unique_users u on u.user_id = l.host_id\n            LEFT JOIN listing_commission_class lc ON lc.listing_id = b.listing_id\n            LEFT JOIN commission_class cc ON cc.id = lc.commission_id\n            LEFT JOIN payouts hp ON hp.booking_id = b.id\n                AND hp.country ~* 'MY'\n            \n            WHERE b.currency = 'myr'\n        )\n    \n    , bookings_data AS (\n            SELECT \n                b.host_id\n                , b.uuid\n                , b.email\n                , b.user_name\n                , b.booking_end_week\n                , b.listing_id\n                , b.plate_no\n                , b.url\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car','cancelled','rejected','requested') THEN b.booking_id ELSE NULL END) AS received_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_id ELSE NULL END) AS fulfiled_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_id ELSE NULL END) AS completed_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('rejected') THEN b.booking_id ELSE NULL END) AS rejected_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_id ELSE NULL END)::decimal /\n                    NULLIF(COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car','cancelled','rejected','requested') THEN b.booking_id ELSE NULL END),0)::decimal AS fr\n                , SUM(CASE WHEN b.booking_status IN ('completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_dur_days ELSE 0 END) AS booking_dur_days\n                , SUM(CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car') THEN b.payout_amount ELSE 0 END) AS est_payout\n                , SUM(CASE WHEN b.booking_status IN ('rejected') THEN b.payout_amount ELSE 0 END) AS est_loss\n            FROM all_bookings b\n            WHERE booking_end_week >= CURRENT_DATE-16 AND booking_end_week < CURRENT_DATE-9\n            \n            GROUP BY 1,2,3,4,5,6,7,8\n        )\n        \nSELECT *\nFROM bookings_data\nWHERE 1=1\n    AND received_booking > 0\n    /*AND host_id NOT IN (\n            -- Internal\n            25989,364640,31534\n        )*/\nORDER BY 1,15 DESC",
+        "additionalFields": {}
+      },
+      "id": "17249a9b-14a7-4e77-84d9-227533104d16",
+      "name": "Postgres - Weekly Raw Data3",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        540,
+        1120
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "16",
+          "name": "trevodb_recreated"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\"to\":[{\"email\":\"{{ $json[\"EMAIL\"] }}\",\"name\":\"{{$json[\"NAME\"]}}\"}],\n\"templateId\":346,\"params\":{ \"STARTDATE\":\"{{$json[\"STARTDATE\"]}}\",\n\"ENDDATE\":\"{{$json[\"ENDDATE\"]}}\",\n\"CPHOSTNAME\":\"{{$json[\"NAME\"]}}\",\n\"COMPBOOKING\":\"{{$json[\"COMPBOOKING\"]}}\",\n\"ESTPAYOUT\":\"{{$json[\"ESTPAYOUT\"]}}\",\n\"COMPDAYS\":\"{{$json[\"COMPDAYS\"]}}\",\n\"C1PLATE\":\"{{$json[\"C1PLATE\"]}}\",\n\"C1REQUESTBOOK\":\"{{$json[\"C1REQUESTBOOK\"]}}\",\n\"C1REJECTBOOK\":\"{{$json[\"C1REJECTBOOK\"]}}\",\n\"C1COMPBOOK\":\"{{$json[\"C1COMPBOOK\"]}}\",\n\"C1DAYSBOOKED\":\"{{$json[\"C1DAYSBOOKED\"]}}\",\n\"C1ESTPAYOUT\":\"{{$json[\"C1ESTPAYOUT\"]}}\",\n\"C1ESTLOSS\":\"{{$json[\"C1ESTLOSS\"]}}\",\n\"C1ACCEPTRATE\":\"{{$json[\"C1ACCEPTRATE\"]}}\",\n\"C1DYNPRICING\":\"{{$json[\"C1DYNPRICING\"]}}\",\n\"C2PLATE\":\"{{$json[\"C2PLATE\"]}}\",\n\"C2REQUESTBOOK\":\"{{$json[\"C2REQUESTBOOK\"]}}\",\n\"C2REJECTBOOK\":\"{{$json[\"C2REJECTBOOK\"]}}\",\n\"C2COMPBOOK\":\"{{$json[\"C2COMPBOOK\"]}}\",\n\"C2DAYSBOOKED\":\"{{$json[\"C2DAYSBOOKED\"]}}\",\n\"C2ESTPAYOUT\":\"{{$json[\"C2ESTPAYOUT\"]}}\",\n\"C2ESTLOSS\":\"{{$json[\"C2ESTLOSS\"]}}\",\n\"C2ACCEPTRATE\":\"{{$json[\"C2ACCEPTRATE\"]}}\",\n\"C2DYNPRICING\":\"{{$json[\"C2DYNPRICING\"]}}\",\n\"C3PLATE\":\"{{$json[\"C3PLATE\"]}}\",\n\"C3REQUESTBOOK\":\"{{$json[\"C3REQUESTBOOK\"]}}\",\n\"C3REJECTBOOK\":\"{{$json[\"C3REJECTBOOK\"]}}\",\n\"C3COMPBOOK\":\"{{$json[\"C3COMPBOOK\"]}}\",\n\"C3DAYSBOOKED\":\"{{$json[\"C3DAYSBOOKED\"]}}\",\n\"C3ESTPAYOUT\":\"{{$json[\"C3ESTPAYOUT\"]}}\",\n\"C3ESTLOSS\":\"{{$json[\"C3ESTLOSS\"]}}\",\n\"C3ACCEPTRATE\":\"{{$json[\"C3ACCEPTRATE\"]}}\",\n\"C3DYNPRICING\":\"{{$json[\"C3DYNPRICING\"]}}\",\n\"C4PLATE\":\"{{$json[\"C4PLATE\"]}}\",\n\"C4REQUESTBOOK\":\"{{$json[\"C4REQUESTBOOK\"]}}\",\n\"C4REJECTBOOK\":\"{{$json[\"C4REJECTBOOK\"]}}\",\n\"C4COMPBOOK\":\"{{$json[\"C4COMPBOOK\"]}}\",\n\"C4DAYSBOOKED\":\"{{$json[\"C4DAYSBOOKED\"]}}\",\n\"C4ESTPAYOUT\":\"{{$json[\"C4ESTPAYOUT\"]}}\",\n\"C4ESTLOSS\":\"{{$json[\"C4ESTLOSS\"]}}\",\n\"C4ACCEPTRATE\":\"{{$json[\"C4ACCEPTRATE\"]}}\",\n\"C4DYNPRICING\":\"{{$json[\"C4DYNPRICING\"]}}\",\n\"C5PLATE\":\"{{$json[\"C5PLATE\"]}}\",\n\"C5REQUESTBOOK\":\"{{$json[\"C5REQUESTBOOK\"]}}\",\n\"C5REJECTBOOK\":\"{{$json[\"C5REJECTBOOK\"]}}\",\n\"C5COMPBOOK\":\"{{$json[\"C5COMPBOOK\"]}}\",\n\"C5DAYSBOOKED\":\"{{$json[\"C5DAYSBOOKED\"]}}\",\n\"C5ESTPAYOUT\":\"{{$json[\"C5ESTPAYOUT\"]}}\",\n\"C5ESTLOSS\":\"{{$json[\"C5ESTLOSS\"]}}\",\n\"C5ACCEPTRATE\":\"{{$json[\"C5ACCEPTRATE\"]}}\",\n\"C5DYNPRICING\":\"{{$json[\"C5DYNPRICING\"]}}\",\n\"C6PLATE\":\"{{$json[\"C6PLATE\"]}}\",\n\"C6REQUESTBOOK\":\"{{$json[\"C6REQUESTBOOK\"]}}\",\n\"C6REJECTBOOK\":\"{{$json[\"C6REJECTBOOK\"]}}\",\n\"C6COMPBOOK\":\"{{$json[\"C6COMPBOOK\"]}}\",\n\"C6DAYSBOOKED\":\"{{$json[\"C6DAYSBOOKED\"]}}\",\n\"C6ESTPAYOUT\":\"{{$json[\"C6ESTPAYOUT\"]}}\",\n\"C6ESTLOSS\":\"{{$json[\"C6ESTLOSS\"]}}\",\n\"C6ACCEPTRATE\":\"{{$json[\"C6ACCEPTRATE\"]}}\",\n\"C6DYNPRICING\":\"{{$json[\"C6DYNPRICING\"]}}\",\n\"C7PLATE\":\"{{$json[\"C7PLATE\"]}}\",\n\"C7REQUESTBOOK\":\"{{$json[\"C7REQUESTBOOK\"]}}\",\n\"C7REJECTBOOK\":\"{{$json[\"C7REJECTBOOK\"]}}\",\n\"C7COMPBOOK\":\"{{$json[\"C7COMPBOOK\"]}}\",\n\"C7DAYSBOOKED\":\"{{$json[\"C7DAYSBOOKED\"]}}\",\n\"C7ESTPAYOUT\":\"{{$json[\"C7ESTPAYOUT\"]}}\",\n\"C7ESTLOSS\":\"{{$json[\"C7ESTLOSS\"]}}\",\n\"C7ACCEPTRATE\":\"{{$json[\"C7ACCEPTRATE\"]}}\",\n\"C7DYNPRICING\":\"{{$json[\"C7DYNPRICING\"]}}\",\n\"C8PLATE\":\"{{$json[\"C8PLATE\"]}}\",\n\"C8REQUESTBOOK\":\"{{$json[\"C8REQUESTBOOK\"]}}\",\n\"C8REJECTBOOK\":\"{{$json[\"C8REJECTBOOK\"]}}\",\n\"C8COMPBOOK\":\"{{$json[\"C8COMPBOOK\"]}}\",\n\"C8DAYSBOOKED\":\"{{$json[\"C8DAYSBOOKED\"]}}\",\n\"C8ESTPAYOUT\":\"{{$json[\"C8ESTPAYOUT\"]}}\",\n\"C8ESTLOSS\":\"{{$json[\"C8ESTLOSS\"]}}\",\n\"C8ACCEPTRATE\":\"{{$json[\"C8ACCEPTRATE\"]}}\",\n\"C8DYNPRICING\":\"{{$json[\"C8DYNPRICING\"]}}\",\n\"C9PLATE\":\"{{$json[\"C9PLATE\"]}}\",\n\"C9REQUESTBOOK\":\"{{$json[\"C9REQUESTBOOK\"]}}\",\n\"C9REJECTBOOK\":\"{{$json[\"C9REJECTBOOK\"]}}\",\n\"C9COMPBOOK\":\"{{$json[\"C9COMPBOOK\"]}}\",\n\"C9DAYSBOOKED\":\"{{$json[\"C9DAYSBOOKED\"]}}\",\n\"C9ESTPAYOUT\":\"{{$json[\"C9ESTPAYOUT\"]}}\",\n\"C9ESTLOSS\":\"{{$json[\"C9ESTLOSS\"]}}\",\n\"C9ACCEPTRATE\":\"{{$json[\"C9ACCEPTRATE\"]}}\",\n\"C9DYNPRICING\":\"{{$json[\"C9DYNPRICING\"]}}\",\n\"C10PLATE\":\"{{$json[\"C10PLATE\"]}}\",\n\"C10REQUESTBOOK\":\"{{$json[\"C10REQUESTBOOK\"]}}\",\n\"C10REJECTBOOK\":\"{{$json[\"C10REJECTBOOK\"]}}\",\n\"C10COMPBOOK\":\"{{$json[\"C10COMPBOOK\"]}}\",\n\"C10DAYSBOOKED\":\"{{$json[\"C10DAYSBOOKED\"]}}\",\n\"C10ESTPAYOUT\":\"{{$json[\"C10ESTPAYOUT\"]}}\",\n\"C10ESTLOSS\":\"{{$json[\"C10ESTLOSS\"]}}\",\n\"C10ACCEPTRATE\":\"{{$json[\"C10ACCEPTRATE\"]}}\",\n\"C10DYNPRICING\":\"{{$json[\"C10DYNPRICING\"]}}\",\n\"C11PLATE\":\"{{$json[\"C11PLATE\"]}}\",\n\"C11REQUESTBOOK\":\"{{$json[\"C11REQUESTBOOK\"]}}\",\n\"C11REJECTBOOK\":\"{{$json[\"C11REJECTBOOK\"]}}\",\n\"C11COMPBOOK\":\"{{$json[\"C11COMPBOOK\"]}}\",\n\"C11DAYSBOOKED\":\"{{$json[\"C11DAYSBOOKED\"]}}\",\n\"C11ESTPAYOUT\":\"{{$json[\"C11ESTPAYOUT\"]}}\",\n\"C11ESTLOSS\":\"{{$json[\"C11ESTLOSS\"]}}\",\n\"C11ACCEPTRATE\":\"{{$json[\"C11ACCEPTRATE\"]}}\",\n\"C11DYNPRICING\":\"{{$json[\"C11DYNPRICING\"]}}\",\n\"C12PLATE\":\"{{$json[\"C12PLATE\"]}}\",\n\"C12REQUESTBOOK\":\"{{$json[\"C12REQUESTBOOK\"]}}\",\n\"C12REJECTBOOK\":\"{{$json[\"C12REJECTBOOK\"]}}\",\n\"C12COMPBOOK\":\"{{$json[\"C12COMPBOOK\"]}}\",\n\"C12DAYSBOOKED\":\"{{$json[\"C12DAYSBOOKED\"]}}\",\n\"C12ESTPAYOUT\":\"{{$json[\"C12ESTPAYOUT\"]}}\",\n\"C12ESTLOSS\":\"{{$json[\"C12ESTLOSS\"]}}\",\n\"C12ACCEPTRATE\":\"{{$json[\"C12ACCEPTRATE\"]}}\",\n\"C12DYNPRICING\":\"{{$json[\"C12DYNPRICING\"]}}\",\n\"C13PLATE\":\"{{$json[\"C13PLATE\"]}}\",\n\"C13REQUESTBOOK\":\"{{$json[\"C13REQUESTBOOK\"]}}\",\n\"C13REJECTBOOK\":\"{{$json[\"C13REJECTBOOK\"]}}\",\n\"C13COMPBOOK\":\"{{$json[\"C13COMPBOOK\"]}}\",\n\"C13DAYSBOOKED\":\"{{$json[\"C13DAYSBOOKED\"]}}\",\n\"C13ESTPAYOUT\":\"{{$json[\"C13ESTPAYOUT\"]}}\",\n\"C13ESTLOSS\":\"{{$json[\"C13ESTLOSS\"]}}\",\n\"C13ACCEPTRATE\":\"{{$json[\"C13ACCEPTRATE\"]}}\",\n\"C13DYNPRICING\":\"{{$json[\"C13DYNPRICING\"]}}\",\n\"C14PLATE\":\"{{$json[\"C14PLATE\"]}}\",\n\"C14REQUESTBOOK\":\"{{$json[\"C14REQUESTBOOK\"]}}\",\n\"C14REJECTBOOK\":\"{{$json[\"C14REJECTBOOK\"]}}\",\n\"C14COMPBOOK\":\"{{$json[\"C14COMPBOOK\"]}}\",\n\"C14DAYSBOOKED\":\"{{$json[\"C14DAYSBOOKED\"]}}\",\n\"C14ESTPAYOUT\":\"{{$json[\"C14ESTPAYOUT\"]}}\",\n\"C14ESTLOSS\":\"{{$json[\"C14ESTLOSS\"]}}\",\n\"C14ACCEPTRATE\":\"{{$json[\"C14ACCEPTRATE\"]}}\",\n\"C14DYNPRICING\":\"{{$json[\"C14DYNPRICING\"]}}\",\n\"C15PLATE\":\"{{$json[\"C15PLATE\"]}}\",\n\"C15REQUESTBOOK\":\"{{$json[\"C15REQUESTBOOK\"]}}\",\n\"C15REJECTBOOK\":\"{{$json[\"C15REJECTBOOK\"]}}\",\n\"C15COMPBOOK\":\"{{$json[\"C15COMPBOOK\"]}}\",\n\"C15DAYSBOOKED\":\"{{$json[\"C15DAYSBOOKED\"]}}\",\n\"C15ESTPAYOUT\":\"{{$json[\"C15ESTPAYOUT\"]}}\",\n\"C15ESTLOSS\":\"{{$json[\"C15ESTLOSS\"]}}\",\n\"C15ACCEPTRATE\":\"{{$json[\"C15ACCEPTRATE\"]}}\",\n\"C15DYNPRICING\":\"{{$json[\"C15DYNPRICING\"]}}\",\n\"C16PLATE\":\"{{$json[\"C16PLATE\"]}}\",\n\"C16REQUESTBOOK\":\"{{$json[\"C16REQUESTBOOK\"]}}\",\n\"C16REJECTBOOK\":\"{{$json[\"C16REJECTBOOK\"]}}\",\n\"C16COMPBOOK\":\"{{$json[\"C16COMPBOOK\"]}}\",\n\"C16DAYSBOOKED\":\"{{$json[\"C16DAYSBOOKED\"]}}\",\n\"C16ESTPAYOUT\":\"{{$json[\"C16ESTPAYOUT\"]}}\",\n\"C16ESTLOSS\":\"{{$json[\"C16ESTLOSS\"]}}\",\n\"C16ACCEPTRATE\":\"{{$json[\"C16ACCEPTRATE\"]}}\",\n\"C16DYNPRICING\":\"{{$json[\"C16DYNPRICING\"]}}\",\n\"C17PLATE\":\"{{$json[\"C17PLATE\"]}}\",\n\"C17REQUESTBOOK\":\"{{$json[\"C17REQUESTBOOK\"]}}\",\n\"C17REJECTBOOK\":\"{{$json[\"C17REJECTBOOK\"]}}\",\n\"C17COMPBOOK\":\"{{$json[\"C17COMPBOOK\"]}}\",\n\"C17DAYSBOOKED\":\"{{$json[\"C17DAYSBOOKED\"]}}\",\n\"C17ESTPAYOUT\":\"{{$json[\"C17ESTPAYOUT\"]}}\",\n\"C17ESTLOSS\":\"{{$json[\"C17ESTLOSS\"]}}\",\n\"C17ACCEPTRATE\":\"{{$json[\"C17ACCEPTRATE\"]}}\",\n\"C17DYNPRICING\":\"{{$json[\"C17DYNPRICING\"]}}\",\n\"C18PLATE\":\"{{$json[\"C18PLATE\"]}}\",\n\"C18REQUESTBOOK\":\"{{$json[\"C18REQUESTBOOK\"]}}\",\n\"C18REJECTBOOK\":\"{{$json[\"C18REJECTBOOK\"]}}\",\n\"C18COMPBOOK\":\"{{$json[\"C18COMPBOOK\"]}}\",\n\"C18DAYSBOOKED\":\"{{$json[\"C18DAYSBOOKED\"]}}\",\n\"C18ESTPAYOUT\":\"{{$json[\"C18ESTPAYOUT\"]}}\",\n\"C18ESTLOSS\":\"{{$json[\"C18ESTLOSS\"]}}\",\n\"C18ACCEPTRATE\":\"{{$json[\"C18ACCEPTRATE\"]}}\",\n\"C18DYNPRICING\":\"{{$json[\"C18DYNPRICING\"]}}\",\n\"C19PLATE\":\"{{$json[\"C19PLATE\"]}}\",\n\"C19REQUESTBOOK\":\"{{$json[\"C19REQUESTBOOK\"]}}\",\n\"C19REJECTBOOK\":\"{{$json[\"C19REJECTBOOK\"]}}\",\n\"C19COMPBOOK\":\"{{$json[\"C19COMPBOOK\"]}}\",\n\"C19DAYSBOOKED\":\"{{$json[\"C19DAYSBOOKED\"]}}\",\n\"C19ESTPAYOUT\":\"{{$json[\"C19ESTPAYOUT\"]}}\",\n\"C19ESTLOSS\":\"{{$json[\"C19ESTLOSS\"]}}\",\n\"C19ACCEPTRATE\":\"{{$json[\"C19ACCEPTRATE\"]}}\",\n\"C19DYNPRICING\":\"{{$json[\"C19DYNPRICING\"]}}\",\n\"C20PLATE\":\"{{$json[\"C20PLATE\"]}}\",\n\"C20REQUESTBOOK\":\"{{$json[\"C20REQUESTBOOK\"]}}\",\n\"C20REJECTBOOK\":\"{{$json[\"C20REJECTBOOK\"]}}\",\n\"C20COMPBOOK\":\"{{$json[\"C20COMPBOOK\"]}}\",\n\"C20DAYSBOOKED\":\"{{$json[\"C20DAYSBOOKED\"]}}\",\n\"C20ESTPAYOUT\":\"{{$json[\"C20ESTPAYOUT\"]}}\",\n\"C20ESTLOSS\":\"{{$json[\"C20ESTLOSS\"]}}\",\n\"C20ACCEPTRATE\":\"{{$json[\"C20ACCEPTRATE\"]}}\",\n\"C20DYNPRICING\":\"{{$json[\"C20DYNPRICING\"]}}\",\n\"C21PLATE\":\"{{$json[\"C21PLATE\"]}}\",\n\"C21REQUESTBOOK\":\"{{$json[\"C21REQUESTBOOK\"]}}\",\n\"C21REJECTBOOK\":\"{{$json[\"C21REJECTBOOK\"]}}\",\n\"C21COMPBOOK\":\"{{$json[\"C21COMPBOOK\"]}}\",\n\"C21DAYSBOOKED\":\"{{$json[\"C21DAYSBOOKED\"]}}\",\n\"C21ESTPAYOUT\":\"{{$json[\"C21ESTPAYOUT\"]}}\",\n\"C21ESTLOSS\":\"{{$json[\"C21ESTLOSS\"]}}\",\n\"C21ACCEPTRATE\":\"{{$json[\"C21ACCEPTRATE\"]}}\",\n\"C21DYNPRICING\":\"{{$json[\"C21DYNPRICING\"]}}\",\n\"C22PLATE\":\"{{$json[\"C22PLATE\"]}}\",\n\"C22REQUESTBOOK\":\"{{$json[\"C22REQUESTBOOK\"]}}\",\n\"C22REJECTBOOK\":\"{{$json[\"C22REJECTBOOK\"]}}\",\n\"C22COMPBOOK\":\"{{$json[\"C22COMPBOOK\"]}}\",\n\"C22DAYSBOOKED\":\"{{$json[\"C22DAYSBOOKED\"]}}\",\n\"C22ESTPAYOUT\":\"{{$json[\"C22ESTPAYOUT\"]}}\",\n\"C22ESTLOSS\":\"{{$json[\"C22ESTLOSS\"]}}\",\n\"C22ACCEPTRATE\":\"{{$json[\"C22ACCEPTRATE\"]}}\",\n\"C22DYNPRICING\":\"{{$json[\"C22DYNPRICING\"]}}\",\n\"C23PLATE\":\"{{$json[\"C23PLATE\"]}}\",\n\"C23REQUESTBOOK\":\"{{$json[\"C23REQUESTBOOK\"]}}\",\n\"C23REJECTBOOK\":\"{{$json[\"C23REJECTBOOK\"]}}\",\n\"C23COMPBOOK\":\"{{$json[\"C23COMPBOOK\"]}}\",\n\"C23DAYSBOOKED\":\"{{$json[\"C23DAYSBOOKED\"]}}\",\n\"C23ESTPAYOUT\":\"{{$json[\"C23ESTPAYOUT\"]}}\",\n\"C23ESTLOSS\":\"{{$json[\"C23ESTLOSS\"]}}\",\n\"C23ACCEPTRATE\":\"{{$json[\"C23ACCEPTRATE\"]}}\",\n\"C23DYNPRICING\":\"{{$json[\"C23DYNPRICING\"]}}\",\n\"C24PLATE\":\"{{$json[\"C24PLATE\"]}}\",\n\"C24REQUESTBOOK\":\"{{$json[\"C24REQUESTBOOK\"]}}\",\n\"C24REJECTBOOK\":\"{{$json[\"C24REJECTBOOK\"]}}\",\n\"C24COMPBOOK\":\"{{$json[\"C24COMPBOOK\"]}}\",\n\"C24DAYSBOOKED\":\"{{$json[\"C24DAYSBOOKED\"]}}\",\n\"C24ESTPAYOUT\":\"{{$json[\"C24ESTPAYOUT\"]}}\",\n\"C24ESTLOSS\":\"{{$json[\"C24ESTLOSS\"]}}\",\n\"C24ACCEPTRATE\":\"{{$json[\"C24ACCEPTRATE\"]}}\",\n\"C24DYNPRICING\":\"{{$json[\"C24DYNPRICING\"]}}\",\n\"C25PLATE\":\"{{$json[\"C25PLATE\"]}}\",\n\"C25REQUESTBOOK\":\"{{$json[\"C25REQUESTBOOK\"]}}\",\n\"C25REJECTBOOK\":\"{{$json[\"C25REJECTBOOK\"]}}\",\n\"C25COMPBOOK\":\"{{$json[\"C25COMPBOOK\"]}}\",\n\"C25DAYSBOOKED\":\"{{$json[\"C25DAYSBOOKED\"]}}\",\n\"C25ESTPAYOUT\":\"{{$json[\"C25ESTPAYOUT\"]}}\",\n\"C25ESTLOSS\":\"{{$json[\"C25ESTLOSS\"]}}\",\n\"C25ACCEPTRATE\":\"{{$json[\"C25ACCEPTRATE\"]}}\",\n\"C25DYNPRICING\":\"{{$json[\"C25DYNPRICING\"]}}\",\n\"C26PLATE\":\"{{$json[\"C26PLATE\"]}}\",\n\"C26REQUESTBOOK\":\"{{$json[\"C26REQUESTBOOK\"]}}\",\n\"C26REJECTBOOK\":\"{{$json[\"C26REJECTBOOK\"]}}\",\n\"C26COMPBOOK\":\"{{$json[\"C26COMPBOOK\"]}}\",\n\"C26DAYSBOOKED\":\"{{$json[\"C26DAYSBOOKED\"]}}\",\n\"C26ESTPAYOUT\":\"{{$json[\"C26ESTPAYOUT\"]}}\",\n\"C26ESTLOSS\":\"{{$json[\"C26ESTLOSS\"]}}\",\n\"C26ACCEPTRATE\":\"{{$json[\"C26ACCEPTRATE\"]}}\",\n\"C26DYNPRICING\":\"{{$json[\"C26DYNPRICING\"]}}\",\n\"C27PLATE\":\"{{$json[\"C27PLATE\"]}}\",\n\"C27REQUESTBOOK\":\"{{$json[\"C27REQUESTBOOK\"]}}\",\n\"C27REJECTBOOK\":\"{{$json[\"C27REJECTBOOK\"]}}\",\n\"C27COMPBOOK\":\"{{$json[\"C27COMPBOOK\"]}}\",\n\"C27DAYSBOOKED\":\"{{$json[\"C27DAYSBOOKED\"]}}\",\n\"C27ESTPAYOUT\":\"{{$json[\"C27ESTPAYOUT\"]}}\",\n\"C27ESTLOSS\":\"{{$json[\"C27ESTLOSS\"]}}\",\n\"C27ACCEPTRATE\":\"{{$json[\"C27ACCEPTRATE\"]}}\",\n\"C27DYNPRICING\":\"{{$json[\"C27DYNPRICING\"]}}\",\n\"C28PLATE\":\"{{$json[\"C28PLATE\"]}}\",\n\"C28REQUESTBOOK\":\"{{$json[\"C28REQUESTBOOK\"]}}\",\n\"C28REJECTBOOK\":\"{{$json[\"C28REJECTBOOK\"]}}\",\n\"C28COMPBOOK\":\"{{$json[\"C28COMPBOOK\"]}}\",\n\"C28DAYSBOOKED\":\"{{$json[\"C28DAYSBOOKED\"]}}\",\n\"C28ESTPAYOUT\":\"{{$json[\"C28ESTPAYOUT\"]}}\",\n\"C28ESTLOSS\":\"{{$json[\"C28ESTLOSS\"]}}\",\n\"C28ACCEPTRATE\":\"{{$json[\"C28ACCEPTRATE\"]}}\",\n\"C28DYNPRICING\":\"{{$json[\"C28DYNPRICING\"]}}\",\n\"C29PLATE\":\"{{$json[\"C29PLATE\"]}}\",\n\"C29REQUESTBOOK\":\"{{$json[\"C29REQUESTBOOK\"]}}\",\n\"C29REJECTBOOK\":\"{{$json[\"C29REJECTBOOK\"]}}\",\n\"C29COMPBOOK\":\"{{$json[\"C29COMPBOOK\"]}}\",\n\"C29DAYSBOOKED\":\"{{$json[\"C29DAYSBOOKED\"]}}\",\n\"C29ESTPAYOUT\":\"{{$json[\"C29ESTPAYOUT\"]}}\",\n\"C29ESTLOSS\":\"{{$json[\"C29ESTLOSS\"]}}\",\n\"C29ACCEPTRATE\":\"{{$json[\"C29ACCEPTRATE\"]}}\",\n\"C29DYNPRICING\":\"{{$json[\"C29DYNPRICING\"]}}\",\n\"C30PLATE\":\"{{$json[\"C30PLATE\"]}}\",\n\"C30REQUESTBOOK\":\"{{$json[\"C30REQUESTBOOK\"]}}\",\n\"C30REJECTBOOK\":\"{{$json[\"C30REJECTBOOK\"]}}\",\n\"C30COMPBOOK\":\"{{$json[\"C30COMPBOOK\"]}}\",\n\"C30DAYSBOOKED\":\"{{$json[\"C30DAYSBOOKED\"]}}\",\n\"C30ESTPAYOUT\":\"{{$json[\"C30ESTPAYOUT\"]}}\",\n\"C30ESTLOSS\":\"{{$json[\"C30ESTLOSS\"]}}\",\n\"C30ACCEPTRATE\":\"{{$json[\"C30ACCEPTRATE\"]}}\",\n\"C30DYNPRICING\":\"{{$json[\"C30DYNPRICING\"]}}\"}}\n\n",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        -20
+      ],
+      "id": "6965bc62-318b-4468-a331-37d520e18006",
+      "retryOnFail": true,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "disabled": true,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "13nlPpYQEcgYhe6ED8tHkzufz-KSdgBwqt1hkQsf98dk",
+          "mode": "list",
+          "cachedResultName": "Zambam Tester XX",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13nlPpYQEcgYhe6ED8tHkzufz-KSdgBwqt1hkQsf98dk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2058516091,
+          "mode": "list",
+          "cachedResultName": "FinalTest",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13nlPpYQEcgYhe6ED8tHkzufz-KSdgBwqt1hkQsf98dk/edit#gid=2058516091"
+        },
+        "options": {
+          "outputFormatting": {
+            "values": {
+              "general": "FORMATTED_VALUE",
+              "date": "FORMATTED_STRING"
+            }
+          }
+        }
+      },
+      "id": "c7660174-72ba-41df-9c91-042d29a3355c",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        860,
+        -20
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "amount": 15,
+        "unit": "seconds"
+      },
+      "id": "35ac780f-a02f-405d-97fd-b37434d43ca8",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        300
+      ],
+      "webhookId": "76b329b8-1f17-4dcd-afaf-a0d2f0e5d8e8"
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg",
+          "mode": "list",
+          "cachedResultName": "2023 - Host Weekly Statement [N8N]",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1148559864,
+          "mode": "list",
+          "cachedResultName": "RAW",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gDedi2SnusO3F33VJnb89rvbKOf8UfUari4ePlR1Hfc/edit#gid=1148559864"
+        },
+        "clear": "specificRange",
+        "range": "A2:X"
+      },
+      "id": "0c809312-9545-4110-a5d6-10b60d0b47b2",
+      "name": "Clear Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        820,
+        300
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\nWITH \n    unique_users AS (\n            SELECT \n                u.uuid\n                , u.id AS user_id\n                , u.email\n                , CASE WHEN u.display_name IS NOT NULL THEN u.display_name ELSE concat(u.first_name,' ',u.last_name) END AS user_name\n            FROM users u\n            LEFT JOIN user_attributions ua ON ua.user_id = u.id\n            \n            WHERE 1=1   \n                AND u.status = 'active'\n                AND ((ua.key = 'current-country' AND ua.value = 'MY' AND u.dob > '1900-01-01')\n                    OR (ua.key = 'signup-country' AND ua.value = 'MY' AND u.dob > '1900-01-01'))\n                OR u.phone_country_code IN ('+60')\n        )\n    \n    , approved_listings AS (\n            SELECT\n                l.id AS listing_id\n                , l.registration_no as plate_no\n                , l.url\n                , l.user_id as host_id\n                , case when lcc.id in ('1','8') then 'Shield 25' else cc.name end as insurance\n            FROM listings l\n            LEFT JOIN listing_location ll on ll.listing_id = l.id\n            left join listing_commission_class lcc on lcc.listing_id = l.id \n            left join commission_class cc on cc.id = lcc.commission_id\n            \n            WHERE 1=1\n                AND l.status IN ('approved')\n                AND ll.country IN ('Malaysia')\n                AND l.deleted_at IS NULL\n        )\n    \n    , all_bookings AS (\n            SELECT DISTINCT ON (b.id)\n                -- Booking Details\n                b.id AS booking_id\n                , b.listing_id\n                , l.host_id\n                , u.uuid\n                , u.user_name\n                , u.email\n                , l.plate_no\n                , l.url\n                , b.ref_no AS booking_ref\n                , CASE \n                    WHEN b.reason ~~* '%test%' THEN 'test'\n                    WHEN b.status IN ('cancelled','withdrawn') \n                        AND (\n                            b.reason ~~* '%host%'\n                            OR b.reason ~~* '%owner%'\n                            OR b.reason ~~* '%available%'\n                            OR b.reason ~~* '%car%'\n                        ) THEN 'rejected'\n                    WHEN b.status IN ('rejected') \n                        AND (\n                            b.reason ~~* '%guest%'\n                        ) THEN 'withdrawn'\n                    ELSE b.status END AS booking_status\n                , b.created_at AT TIME ZONE 'Asia/Jakarta' AS booking_request_ts\n                , DATE_TRUNC('month', b.created_at AT TIME ZONE 'Asia/Kuala_Lumpur')::DATE AS booking_request_month\n                , DATE_TRUNC('week', b.created_at AT TIME ZONE 'Asia/Kuala_Lumpur')::DATE AS booking_request_week\n                , DATE_TRUNC('month', b.request_end_at AT TIME ZONE 'Asia/Kuala_Lumpur')::DATE AS booking_end_month\n                , DATE_TRUNC('week', b.request_end_at AT TIME ZONE 'Asia/Kuala_Lumpur')::DATE AS booking_end_week\n                , CEIL(EXTRACT(EPOCH FROM b.request_end_at - b.request_start_at)/86400) AS booking_dur_days\n                -- Booking Value\n                , CASE WHEN hp.booking_id IS NULL THEN CEIL(b.gross_amount*(100-cc.percent)/100) ELSE hp.amount END AS payout_amount\n                , case WHEN sum(A.multipliercontr) < 0 THEN 0 ELSE MAX(A.multipliercontr) end as multiplier\n                , MAX(l.insurance) as insurance\n                , A.amount*(cc.percent/100) as rate\n\n            FROM bookings b\n            left join \n\t\t(select distinct A.id, A.ref_no, A.status, A.registration_no, A.dur, \n\t\tcase \n\t\t\twhen cast(A.rentalFee as numeric)-(cast(A.basePrice as numeric)*A.dur) < 0 then\n\t\t\t(case when A.dur >= 30 then (cast(A.basePrice as numeric)*A.dur)*.70\n\t\t\tWHEN A.dur BETWEEN 7 AND 29 THEN (cast(A.basePrice as numeric)*A.dur)*.75 end)\n\t\t\telse cast(A.basePrice as numeric)*A.dur\n\t\t\tend as beforemultiplier,\n\t\tCASE \n\t\t\twhen cast(A.rentalFee as numeric)-(cast(A.basePrice as numeric)*A.dur) < 0 then \n\t\t    (case WHEN A.dur >= 30 THEN (cast(A.rentalFee as numeric) - (cast(A.basePrice as numeric)*A.dur)*.70)\n\t\t    WHEN A.dur BETWEEN 7 AND 29 THEN (cast(A.rentalFee as numeric) - (cast(A.basePrice as numeric)*A.dur)*.75) end)\n\t\t    ELSE cast(A.rentalFee as numeric)-(cast(A.basePrice as numeric)*A.dur)\n\t\tEND as multipliercontr, \n\t\tA.rentalFee, A.gross_amount, A.amount\n\t\tfrom\n\t\t\t(select distinct b.id, b.ref_no, b.status,\n\t\t\tl.id as listing_id, \n\t\t\tl.registration_no, \n\t\t\tbm.meta->>'currency' as currency,\n\t\t\tbm.meta->>'basePrice' as basePrice,\n\t\t\tcast(j.multiplierprice as numeric) as multip,\n\t\t\tbm.meta->>'rentalFee' as rentalFee,\n\t\t\tbl.amount,\n\t\t\tb.gross_amount,\n\t\t\tb.net_amount,\n\t\t\tbm.meta->>'listingLocation' as listingLocation,\n\t\t\tcase when bl.pricing_id = '3' then 0.5\n\t\t\twhen (extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400 < 1 then 1\n\t\t\twhen (extract(EPOCH from b.request_end_at)::int - extract(EPOCH from b.request_start_at)::int)%86400 < 2160 then\n\t\t\tfloor((extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400)\n\t\t\telse ceil((extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400) end as dur\n\t\t\tFROM bookings b\n\t\t\t\tleft join booking_multipliers bm on bm.booking_id = b.id\n\t\t\t    left join listings l on l.id = b.listing_id \n\t\t\t    left JOIN listing_location ll on b.listing_id = ll.listing_id\n\t\t\t    left join booking_lines bl on bl.booking_id = b.id and bl.slug = 'rental-fee'\n\t\t\t    left JOIN (select \n\t\t\t\t\t\t\tdistinct(TO_DATE(REGEXP_REPLACE(SUBSTRING(json_extract_path(json_array_elements(bm.meta->'multiplierPricing'),'date')::text,1,10), '[^0-9-]', ''),'YYYY-MM-DD')) as multiplierdate,\n\t\t\t\t\t\t\tbm.id,\n\t\t\t\t\t\t\tjson_extract_path(json_array_elements(bm.meta->'multiplierPricing'),'price')::text as multiplierprice,\n\t\t\t\t\t\t\tjson_extract_path(json_array_elements(bm.meta->'multiplierPricing'),'multiplier')::text as multiplier\n\t\t\t\t\t\t\t\t\tFROM booking_multipliers bm\n\t\t\t\t\t\t\t\t\tJOIN bookings b on b.id = bm.booking_id\n\t\t\t\t\t\t\t    \tjoin listings l on l.id = b.listing_id \n\t\t\t\t\t\t\t    \tleft JOIN listing_location ll on b.listing_id = ll.listing_id\n\t\t\t\t\t\t\t    \tWHERE ll.country = 'Malaysia'\n\t\t\t\t\t\t\t    \tgroup by 1,2,3\n\t\t\t\t\t\t\t    \torder by 2\n\t\t\t\t\t\t\t    \t) j on j.id = b.listing_id \n\t\t\t    WHERE country = 'Malaysia'\n\t\t\t    and b.status = 'completed'\n\t\t\t    group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14\n\t\t\t\torder by 1 desc) A) A on A.id = b.id\n            LEFT JOIN approved_listings l ON l.listing_id = b.listing_id\n            LEFT JOIN unique_users u on u.user_id = l.host_id\n            LEFT JOIN listing_commission_class lc ON lc.listing_id = b.listing_id\n            LEFT JOIN commission_class cc ON cc.id = lc.commission_id\n            LEFT JOIN payouts hp ON hp.booking_id = b.id\n                AND hp.country ~* 'MY'\n            \n            WHERE b.currency = 'myr'\n            group by 1,3,4,5,6,7,8,9,17,20\n        )\n    \n    , bookings_data AS (\n            SELECT \n                b.host_id\n                , b.uuid\n                , b.email\n                , b.user_name\n                , b.booking_end_week\n                , b.listing_id\n                , b.plate_no\n                , b.url\n                , case when b.insurance in ('Shield 25') then 'Shield 75'\n                \t\twhen b.insurance in ('Shield 30') then 'Shield 70'\n                \t\twhen b.insurance in ('Shield 35') then 'Shield 65'\n                \t\twhen b.insurance in ('Shield 40') then 'Shield 60' else NULL end as insurance\n                , SUM(CASE WHEN b.booking_status IN ('completed','start_driving','waiting_for_inspection','return_car') THEN b.rate ELSE 0 END) as comrate\n                , to_char((date_trunc('week', current_date) - INTERVAL '2 weeks')::date, 'YYYY-MM-DD') AS start_date\n\t\t\t\t, to_char((date_trunc('week', current_date) - INTERVAL '8 days')::date, 'YYYY-MM-DD') AS end_date\n\t\t\t\t, to_char((date_trunc('week', current_date) + INTERVAL '1 days')::date, 'YYYY-MM-DD') AS payoutdate_start\n\t\t\t\t, to_char((date_trunc('week', current_date) + INTERVAL '4 days')::date, 'YYYY-MM-DD') AS payoutdate_end\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car','cancelled','rejected','requested') THEN b.booking_id ELSE NULL END) AS received_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_id ELSE NULL END) AS fulfiled_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_id ELSE NULL END) AS completed_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('rejected') THEN b.booking_id ELSE NULL END) AS rejected_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_id ELSE NULL END)::decimal /\n                    NULLIF(COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car','rejected','requested') THEN b.booking_id ELSE NULL END),0)::decimal AS fr\n                , SUM(CASE WHEN b.booking_status IN ('completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_dur_days ELSE 0 END) AS booking_dur_days\n                , SUM(CASE WHEN b.booking_status IN ('completed','start_driving','waiting_for_inspection','return_car') THEN b.payout_amount ELSE 0 END) AS est_payout\n                , SUM(CASE WHEN b.booking_status IN ('rejected') THEN b.payout_amount ELSE 0 END) AS est_loss\n                , sum(case when b.booking_status in ('completed') then b.multiplier end) as multiplier\n                , SUM(CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car') THEN b.rate ELSE 0 END)*0.06 as SST\n            FROM all_bookings b\n            WHERE booking_end_week BETWEEN (CURRENT_DATE - INTERVAL '15 DAYS') AND (CURRENT_DATE - INTERVAL '9 DAYS')\n            GROUP BY 1,2,3,4,5,6,7,8,9\n        )\n        \nSELECT *\nFROM bookings_data\nWHERE 1=1\n    AND received_booking > 0\n    and insurance in ('Shield 75',\n--'Shield 70',\n'Shield 65',\n'Shield 60')\n       AND host_id IN (\n            -- Internal\n            '11182',\n'5162',\n'28',\n'34411',\n'307858'\n        )\n\nORDER BY 1,15 DESC",
+        "additionalFields": {}
+      },
+      "id": "80436eda-f3f1-4ce7-b957-469244ea359b",
+      "name": "Postgres - Weekly Raw Data Dump",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        980,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "16",
+          "name": "trevodb_recreated"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg",
+          "mode": "list",
+          "cachedResultName": "2023 - Host Weekly Statement [N8N]",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2030623506,
+          "mode": "list",
+          "cachedResultName": "Final",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg/edit#gid=2030623506"
+        },
+        "options": {
+          "outputFormatting": {
+            "values": {
+              "general": "FORMATTED_VALUE",
+              "date": "FORMATTED_STRING"
+            }
+          }
+        }
+      },
+      "id": "228b1d86-2315-446f-a698-8dac70728b5b",
+      "name": "Read Weekly Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1420,
+        300
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg",
+          "mode": "list",
+          "cachedResultName": "2023 - Host Weekly Statement [N8N]",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1520045667,
+          "mode": "list",
+          "cachedResultName": "Tracking",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg/edit#gid=1520045667"
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "SIB",
+              "fieldValue": "={{ $json.messageId }}"
+            },
+            {
+              "fieldId": "Date",
+              "fieldValue": "={{ $node[\"Schedule Trigger\"].json[\"Readable date\"] }}"
+            },
+            {
+              "fieldId": "Host",
+              "fieldValue": "={{ $node[\"Read Weekly Sheet\"].json.EMAIL }}"
+            },
+            {
+              "fieldId": "Timestamp",
+              "fieldValue": "={{ $node[\"Schedule Trigger\"].json.timestamp }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1cfe2f2d-5b36-4aef-875a-e758108793c7",
+      "name": "Google Sheets - Tracking",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1900,
+        300
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\"to\":[{\"email\":\"{{ $node[\"Read Weekly Sheet\"].json[\"EMAIL\"] }}\",\"name\":\"{{ $node[\"Read Weekly Sheet\"].json[\"HOSTNAME\"] }}\"}],\n\"templateId\":455}\n",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1740,
+        300
+      ],
+      "id": "ba80953e-18ff-40d3-a977-d7e9d0e3a830",
+      "retryOnFail": true,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "disabled": true,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "update",
+        "identifier": "={{ $json.EMAIL }}",
+        "updateAttributes": {
+          "updateAttributesValues": [
+            {
+              "fieldName": "WSTARTDATE",
+              "fieldValue": "={{ $json.STARTDATE }}"
+            },
+            {
+              "fieldName": "WENDDATE",
+              "fieldValue": "={{ $json.ENDDATE }}"
+            },
+            {
+              "fieldName": "WHOSTNAME",
+              "fieldValue": "={{ $json.HOSTNAME }}"
+            },
+            {
+              "fieldName": "WCOMPBOOKING",
+              "fieldValue": "={{ $json.COMPBOOKING }}"
+            },
+            {
+              "fieldName": "WESTPAYOUT",
+              "fieldValue": "={{ $json.ESTPAYOUT }}"
+            },
+            {
+              "fieldName": "WCOMPDAYS",
+              "fieldValue": "={{ $json.COMPDAYS }}"
+            },
+            {
+              "fieldName": "WCOMRATE",
+              "fieldValue": "={{ $json.COMRATE }}"
+            },
+            {
+              "fieldName": "WPRICESURGE",
+              "fieldValue": "={{ $json.PRICESURGE }}"
+            },
+            {
+              "fieldName": "WSST",
+              "fieldValue": "={{ $json.SST }}"
+            },
+            {
+              "fieldName": "WPAYOUTSTART",
+              "fieldValue": "={{ $json.PAYOUTSTART }}"
+            },
+            {
+              "fieldName": "WPAYOUTEND",
+              "fieldValue": "={{ $json.PAYOUTEND }}"
+            },
+            {
+              "fieldName": "C1PLATE",
+              "fieldValue": "={{ $json.C1PLATE }}"
+            },
+            {
+              "fieldName": "C1ACCEPTRATE",
+              "fieldValue": "={{ $json.C1ACCEPTRATE }}"
+            },
+            {
+              "fieldName": "C1DAYSBOOKED",
+              "fieldValue": "={{ $json.C1DAYSBOOKED }}"
+            },
+            {
+              "fieldName": "C1REQUESTBOOK",
+              "fieldValue": "={{ $json.C1REQUESTBOOK }}"
+            },
+            {
+              "fieldName": "C1COMPBOOK",
+              "fieldValue": "={{ $json.C1COMPBOOK }}"
+            },
+            {
+              "fieldName": "C1REJECTBOOK",
+              "fieldValue": "={{ $json.C1REJECTBOOK }}"
+            },
+            {
+              "fieldName": "C1DYNPRICING",
+              "fieldValue": "={{ $json.C1DYNPRICING }}"
+            },
+            {
+              "fieldName": "C1ESTLOSS",
+              "fieldValue": "={{ $json.C1ESTLOSS }}"
+            },
+            {
+              "fieldName": "C1SHIELDPLAN",
+              "fieldValue": "={{ $json.C1SHIELDPLAN }}"
+            },
+            {
+              "fieldName": "C1PLATFORMCOMM",
+              "fieldValue": "={{ $json.C1PLATFORMCOMM }}"
+            },
+            {
+              "fieldName": "C1SST",
+              "fieldValue": "={{ $json.C1SST }}"
+            },
+            {
+              "fieldName": "C1ESTPAYOUT",
+              "fieldValue": "={{ $json.C1ESTPAYOUT }}"
+            },
+            {
+              "fieldName": "C2PLATE",
+              "fieldValue": "={{ $json.C2PLATE }}"
+            },
+            {
+              "fieldName": "C2ACCEPTRATE",
+              "fieldValue": "={{ $json.C2ACCEPTRATE }}"
+            },
+            {
+              "fieldName": "C2DAYSBOOKED",
+              "fieldValue": "={{ $json.C2DAYSBOOKED }}"
+            },
+            {
+              "fieldName": "C2REQUESTBOOK",
+              "fieldValue": "={{ $json.C2REQUESTBOOK }}"
+            },
+            {
+              "fieldName": "C2COMPBOOK",
+              "fieldValue": "={{ $json.C2COMPBOOK }}"
+            },
+            {
+              "fieldName": "C2REJECTBOOK",
+              "fieldValue": "={{ $json.C2REJECTBOOK }}"
+            },
+            {
+              "fieldName": "C2ESTLOSS",
+              "fieldValue": "={{ $json.C2ESTLOSS }}"
+            },
+            {
+              "fieldName": "C2DYNPRICING",
+              "fieldValue": "={{ $json.C2DYNPRICING }}"
+            },
+            {
+              "fieldName": "C2SHIELDPLAN",
+              "fieldValue": "={{ $json.C2SHIELDPLAN }}"
+            },
+            {
+              "fieldName": "C2PLATFORMCOMM",
+              "fieldValue": "={{ $json.C2PLATFORMCOMM }}"
+            },
+            {
+              "fieldName": "C2SST",
+              "fieldValue": "={{ $json.C2SST }}"
+            },
+            {
+              "fieldName": "C2ESTPAYOUT",
+              "fieldValue": "={{ $json.C2ESTPAYOUT }}"
+            },
+            {
+              "fieldName": "C3PLATE",
+              "fieldValue": "={{ $json.C3PLATE }}"
+            },
+            {
+              "fieldName": "C3ACCEPTRATE",
+              "fieldValue": "={{ $json.C3ACCEPTRATE }}"
+            },
+            {
+              "fieldName": "C3DAYSBOOKED",
+              "fieldValue": "={{ $json.C3DAYSBOOKED }}"
+            },
+            {
+              "fieldName": "C3REQUESTBOOK",
+              "fieldValue": "={{ $json.C3REQUESTBOOK }}"
+            },
+            {
+              "fieldName": "C3COMPBOOK",
+              "fieldValue": "={{ $json.C3COMPBOOK }}"
+            },
+            {
+              "fieldName": "C3REJECTBOOK",
+              "fieldValue": "={{ $json.C3REJECTBOOK }}"
+            },
+            {
+              "fieldName": "C3ESTLOSS",
+              "fieldValue": "={{ $json.C3ESTLOSS }}"
+            },
+            {
+              "fieldName": "C3DYNPRICING",
+              "fieldValue": "={{ $json.C3DYNPRICING }}"
+            },
+            {
+              "fieldName": "C3SHIELDPLAN",
+              "fieldValue": "={{ $json.C3SHIELDPLAN }}"
+            },
+            {
+              "fieldName": "C3PLATFORMCOMM",
+              "fieldValue": "={{ $json.C3PLATFORMCOMM }}"
+            },
+            {
+              "fieldName": "C3SST",
+              "fieldValue": "={{ $json.C3SST }}"
+            },
+            {
+              "fieldName": "C3ESTPAYOUT",
+              "fieldValue": "={{ $json.C3ESTPAYOUT }}"
+            },
+            {
+              "fieldName": "C4PLATE",
+              "fieldValue": "={{ $json.C4PLATE }}"
+            },
+            {
+              "fieldName": "C4ACCEPTRATE",
+              "fieldValue": "={{ $json.C4ACCEPTRATE }}"
+            },
+            {
+              "fieldName": "C4DAYSBOOKED",
+              "fieldValue": "={{ $json.C4DAYSBOOKED }}"
+            },
+            {
+              "fieldName": "C4REQUESTBOOK",
+              "fieldValue": "={{ $json.C4REQUESTBOOK }}"
+            },
+            {
+              "fieldName": "C4COMPBOOK",
+              "fieldValue": "={{ $json.C4COMPBOOK }}"
+            },
+            {
+              "fieldName": "C4REJECTBOOK",
+              "fieldValue": "={{ $json.C4REJECTBOOK }}"
+            },
+            {
+              "fieldName": "C4ESTLOSS",
+              "fieldValue": "={{ $json.C4ESTLOSS }}"
+            },
+            {
+              "fieldName": "C4DYNPRICING",
+              "fieldValue": "={{ $json.C4DYNPRICING }}"
+            },
+            {
+              "fieldName": "C4SHIELDPLAN",
+              "fieldValue": "={{ $json.C4SHIELDPLAN }}"
+            },
+            {
+              "fieldName": "C4PLATFORMCOMM",
+              "fieldValue": "={{ $json.C4PLATFORMCOMM }}"
+            },
+            {
+              "fieldName": "C4SST",
+              "fieldValue": "={{ $json.C4SST }}"
+            },
+            {
+              "fieldName": "C4ESTPAYOUT",
+              "fieldValue": "={{ $json.C4ESTPAYOUT }}"
+            },
+            {
+              "fieldName": "C5PLATE",
+              "fieldValue": "={{ $json.C5PLATE }}"
+            },
+            {
+              "fieldName": "C5ACCEPTRATE",
+              "fieldValue": "={{ $json.C5ACCEPTRATE }}"
+            },
+            {
+              "fieldName": "C5DAYSBOOKED",
+              "fieldValue": "={{ $json.C5DAYSBOOKED }}"
+            },
+            {
+              "fieldName": "C5REQUESTBOOK",
+              "fieldValue": "={{ $json.C5REQUESTBOOK }}"
+            },
+            {
+              "fieldName": "C5COMPBOOK",
+              "fieldValue": "={{ $json.C5COMPBOOK }}"
+            },
+            {
+              "fieldName": "C5REJECTBOOK",
+              "fieldValue": "={{ $json.C5REJECTBOOK }}"
+            },
+            {
+              "fieldName": "C5ESTLOSS",
+              "fieldValue": "={{ $json.C5ESTLOSS }}"
+            },
+            {
+              "fieldName": "C5DYNPRICING",
+              "fieldValue": "={{ $json.C5DYNPRICING }}"
+            },
+            {
+              "fieldName": "C5SHIELDPLAN",
+              "fieldValue": "={{ $json.C5SHIELDPLAN }}"
+            },
+            {
+              "fieldName": "C5PLATFORMCOMM",
+              "fieldValue": "={{ $json.C5PLATFORMCOMM }}"
+            },
+            {
+              "fieldName": "C5SST",
+              "fieldValue": "={{ $json.C5SST }}"
+            },
+            {
+              "fieldName": "C5ESTPAYOUT",
+              "fieldValue": "={{ $json.C5ESTPAYOUT }}"
+            },
+            {
+              "fieldName": "C6PLATE",
+              "fieldValue": "={{ $json.C6PLATE }}"
+            },
+            {
+              "fieldName": "C6ACCEPTRATE",
+              "fieldValue": "={{ $json.C6ACCEPTRATE }}"
+            },
+            {
+              "fieldName": "C6DAYSBOOKED",
+              "fieldValue": "={{ $json.C6DAYSBOOKED }}"
+            },
+            {
+              "fieldName": "C6REQUESTBOOK",
+              "fieldValue": "={{ $json.C6REQUESTBOOK }}"
+            },
+            {
+              "fieldName": "C6COMPBOOK",
+              "fieldValue": "={{ $json.C6COMPBOOK }}"
+            },
+            {
+              "fieldName": "C6REJECTBOOK",
+              "fieldValue": "={{ $json.C6REJECTBOOK }}"
+            },
+            {
+              "fieldName": "C6ESTLOSS",
+              "fieldValue": "={{ $json.C6ESTLOSS }}"
+            },
+            {
+              "fieldName": "C6DYNPRICING",
+              "fieldValue": "={{ $json.C6DYNPRICING }}"
+            },
+            {
+              "fieldName": "C6PLATFORMCOMM",
+              "fieldValue": "={{ $json.C6PLATFORMCOMM }}"
+            },
+            {
+              "fieldName": "C6SST",
+              "fieldValue": "={{ $json.C6SST }}"
+            },
+            {
+              "fieldName": "C6ESTPAYOUT",
+              "fieldValue": "={{ $json.C6ESTPAYOUT }}"
+            },
+            {
+              "fieldName": "C6SHIELDPLAN",
+              "fieldValue": "={{ $json.C6SHIELDPLAN }}"
+            }
+          ]
+        }
+      },
+      "id": "40542f9d-58ec-48bc-9ad8-81b948a898f3",
+      "name": "SendInBlue",
+      "type": "n8n-nodes-base.sendInBlue",
+      "typeVersion": 1,
+      "position": [
+        1580,
+        300
+      ],
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\"to\":[{\"email\":\"{{ $json[\"EMAIL\"] }}\",\"name\":\"{{$json[\"HOSTNAME\"]}}\"}],\n\"templateId\":455,\"params\":{ \"STARTDATE\":\"{{$json[\"STARTDATE\"]}}\",\n\"ENDDATE\":\"{{$json[\"ENDDATE\"]}}\",\n\"HOSTNAME\":\"{{$json[\"HOSTNAME\"]}}\",\n\"COMPBOOKING\":\"{{$json[\"COMPBOOKING\"]}}\",\n\"ESTPAYOUT\":\"{{$json[\"ESTPAYOUT\"]}}\",\n\"COMPDAYS\":\"{{$json[\"COMPDAYS\"]}}\",\n\"COMRATE\":\"{{$json[\"COMRATE\"]}}\",\n\"PAYOUTSTART\":\"{{$json[\"PAYOUTSTART\"]}}\",\n\"PAYOUTEND\":\"{{$json[\"PAYOUTEND\"]}}\",\n\"PRICESURGE\":\"{{$json[\"PRICESURGE\"]}}\",\n\"SST\":\"{{$json[\"SST\"]}}\",\n\"C1PLATE\":\"{{$json[\"C1PLATE\"]}}\",\n\"C1REQUESTBOOK\":\"{{$json[\"C1REQUESTBOOK\"]}}\",\n\"C1REJECTBOOK\":\"{{$json[\"C1REJECTBOOK\"]}}\",\n\"C1COMPBOOK\":\"{{$json[\"C1COMPBOOK\"]}}\",\n\"C1DAYSBOOKED\":\"{{$json[\"C1DAYSBOOKED\"]}}\",\n\"C1ESTPAYOUT\":\"{{$json[\"C1ESTPAYOUT\"]}}\",\n\"C1ESTLOSS\":\"{{$json[\"C1ESTLOSS\"]}}\",\n\"C1ACCEPTRATE\":\"{{$json[\"C1ACCEPTRATE\"]}}\",\n\"C1DYNPRICING\":\"{{$json[\"C1DYNPRICING\"]}}\",\n\"C1SHIELDPLAN\":\"{{$json[\"C1SHIELDPLAN\"]}}\",\n\"C1PLATFORMCOMM\":\"{{$json[\"C1PLATFORMCOMM\"]}}\",\n\"C1SST\":\"{{$json[\"C1SST\"]}}\",\n\"C2PLATE\":\"{{$json[\"C2PLATE\"]}}\",\n\"C2REQUESTBOOK\":\"{{$json[\"C2REQUESTBOOK\"]}}\",\n\"C2REJECTBOOK\":\"{{$json[\"C2REJECTBOOK\"]}}\",\n\"C2COMPBOOK\":\"{{$json[\"C2COMPBOOK\"]}}\",\n\"C2DAYSBOOKED\":\"{{$json[\"C2DAYSBOOKED\"]}}\",\n\"C2ESTPAYOUT\":\"{{$json[\"C2ESTPAYOUT\"]}}\",\n\"C2ESTLOSS\":\"{{$json[\"C2ESTLOSS\"]}}\",\n\"C2ACCEPTRATE\":\"{{$json[\"C2ACCEPTRATE\"]}}\",\n\"C2DYNPRICING\":\"{{$json[\"C2DYNPRICING\"]}}\",\n\"C2SHIELDPLAN\":\"{{$json[\"C2SHIELDPLAN\"]}}\",\n\"C2PLATFORMCOMM\":\"{{$json[\"C2PLATFORMCOMM\"]}}\",\n\"C2SST\":\"{{$json[\"C2SST\"]}}\",\n\"C3PLATE\":\"{{$json[\"C3PLATE\"]}}\",\n\"C3REQUESTBOOK\":\"{{$json[\"C3REQUESTBOOK\"]}}\",\n\"C3REJECTBOOK\":\"{{$json[\"C3REJECTBOOK\"]}}\",\n\"C3COMPBOOK\":\"{{$json[\"C3COMPBOOK\"]}}\",\n\"C3DAYSBOOKED\":\"{{$json[\"C3DAYSBOOKED\"]}}\",\n\"C3ESTPAYOUT\":\"{{$json[\"C3ESTPAYOUT\"]}}\",\n\"C3ESTLOSS\":\"{{$json[\"C3ESTLOSS\"]}}\",\n\"C3ACCEPTRATE\":\"{{$json[\"C3ACCEPTRATE\"]}}\",\n\"C3DYNPRICING\":\"{{$json[\"C3DYNPRICING\"]}}\",\n\"C3SHIELDPLAN\":\"{{$json[\"C3SHIELDPLAN\"]}}\",\n\"C3PLATFORMCOMM\":\"{{$json[\"C3PLATFORMCOMM\"]}}\",\n\"C3SST\":\"{{$json[\"C3SST\"]}}\",\n\"C4PLATE\":\"{{$json[\"C4PLATE\"]}}\",\n\"C4REQUESTBOOK\":\"{{$json[\"C4REQUESTBOOK\"]}}\",\n\"C4REJECTBOOK\":\"{{$json[\"C4REJECTBOOK\"]}}\",\n\"C4COMPBOOK\":\"{{$json[\"C4COMPBOOK\"]}}\",\n\"C4DAYSBOOKED\":\"{{$json[\"C4DAYSBOOKED\"]}}\",\n\"C4ESTPAYOUT\":\"{{$json[\"C4ESTPAYOUT\"]}}\",\n\"C4ESTLOSS\":\"{{$json[\"C4ESTLOSS\"]}}\",\n\"C4ACCEPTRATE\":\"{{$json[\"C4ACCEPTRATE\"]}}\",\n\"C4DYNPRICING\":\"{{$json[\"C4DYNPRICING\"]}}\",\n\"C4SHIELDPLAN\":\"{{$json[\"C4SHIELDPLAN\"]}}\",\n\"C4PLATFORMCOMM\":\"{{$json[\"C4PLATFORMCOMM\"]}}\",\n\"C4SST\":\"{{$json[\"C4SST\"]}}\",\n\"C5PLATE\":\"{{$json[\"C5PLATE\"]}}\",\n\"C5REQUESTBOOK\":\"{{$json[\"C5REQUESTBOOK\"]}}\",\n\"C5REJECTBOOK\":\"{{$json[\"C5REJECTBOOK\"]}}\",\n\"C5COMPBOOK\":\"{{$json[\"C5COMPBOOK\"]}}\",\n\"C5DAYSBOOKED\":\"{{$json[\"C5DAYSBOOKED\"]}}\",\n\"C5ESTPAYOUT\":\"{{$json[\"C5ESTPAYOUT\"]}}\",\n\"C5ESTLOSS\":\"{{$json[\"C5ESTLOSS\"]}}\",\n\"C5ACCEPTRATE\":\"{{$json[\"C5ACCEPTRATE\"]}}\",\n\"C5DYNPRICING\":\"{{$json[\"C5DYNPRICING\"]}}\",\n\"C5SHIELDPLAN\":\"{{$json[\"C5SHIELDPLAN\"]}}\",\n\"C5PLATFORMCOMM\":\"{{$json[\"C5PLATFORMCOMM\"]}}\",\n\"C5SST\":\"{{$json[\"C5SST\"]}}\",\n\"C6PLATE\":\"{{$json[\"C6PLATE\"]}}\",\n\"C6REQUESTBOOK\":\"{{$json[\"C6REQUESTBOOK\"]}}\",\n\"C6REJECTBOOK\":\"{{$json[\"C6REJECTBOOK\"]}}\",\n\"C6COMPBOOK\":\"{{$json[\"C6COMPBOOK\"]}}\",\n\"C6DAYSBOOKED\":\"{{$json[\"C6DAYSBOOKED\"]}}\",\n\"C6ESTPAYOUT\":\"{{$json[\"C6ESTPAYOUT\"]}}\",\n\"C6ESTLOSS\":\"{{$json[\"C6ESTLOSS\"]}}\",\n\"C6ACCEPTRATE\":\"{{$json[\"C6ACCEPTRATE\"]}}\",\n\"C6DYNPRICING\":\"{{$json[\"C6DYNPRICING\"]}}\",\n\"C6SHIELDPLAN\":\"{{$json[\"C6SHIELDPLAN\"]}}\",\n\"C6PLATFORMCOMM\":\"{{$json[\"C6PLATFORMCOMM\"]}}\",\n\"C6SST\":\"{{$json[\"C6SST\"]}}\"}}\n\n",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        640
+      ],
+      "id": "33b97ece-b467-4ea2-8f44-453680c78880",
+      "retryOnFail": true,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "disabled": true,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\nWITH \n    unique_users AS (\n            SELECT \n                u.uuid\n                , u.id AS user_id\n                , u.email\n                , CASE WHEN u.display_name IS NOT NULL THEN u.display_name ELSE concat(u.first_name,' ',u.last_name) END AS user_name\n            FROM users u\n            LEFT JOIN user_attributions ua ON ua.user_id = u.id\n            \n            WHERE 1=1   \n                AND u.status = 'active'\n                AND ((ua.key = 'current-country' AND ua.value = 'MY' AND u.dob > '1900-01-01')\n                    OR (ua.key = 'signup-country' AND ua.value = 'MY' AND u.dob > '1900-01-01'))\n                OR u.phone_country_code IN ('+60')\n        )\n    \n    , approved_listings AS (\n            SELECT\n                l.id AS listing_id\n                , l.registration_no as plate_no\n                , l.url\n                , l.user_id as host_id\n                , case when lcc.id in ('1','8') then 'Shield 25' else cc.name end as insurance\n            FROM listings l\n            LEFT JOIN listing_location ll on ll.listing_id = l.id\n            left join listing_commission_class lcc on lcc.listing_id = l.id \n            left join commission_class cc on cc.id = lcc.commission_id\n            \n            WHERE 1=1\n                AND l.status IN ('approved')\n                AND ll.country IN ('Malaysia')\n                AND l.deleted_at IS NULL\n        )\n    \n    , all_bookings AS (\n            SELECT DISTINCT ON (b.id)\n                -- Booking Details\n                b.id AS booking_id\n                , b.listing_id\n                , l.host_id\n                , u.uuid\n                , u.user_name\n                , u.email\n                , l.plate_no\n                , l.url\n                , b.ref_no AS booking_ref\n                , CASE \n                    WHEN b.reason ~~* '%test%' THEN 'test'\n                    WHEN b.status IN ('cancelled','withdrawn') \n                        AND (\n                            b.reason ~~* '%host%'\n                            OR b.reason ~~* '%owner%'\n                            OR b.reason ~~* '%available%'\n                            OR b.reason ~~* '%car%'\n                        ) THEN 'rejected'\n                    WHEN b.status IN ('rejected') \n                        AND (\n                            b.reason ~~* '%guest%'\n                        ) THEN 'withdrawn'\n                    ELSE b.status END AS booking_status\n                , b.created_at AT TIME ZONE 'Asia/Jakarta' AS booking_request_ts\n                , DATE_TRUNC('month', b.created_at AT TIME ZONE 'Asia/Jakarta')::DATE AS booking_request_month\n                , DATE_TRUNC('week', b.created_at AT TIME ZONE 'Asia/Jakarta')::DATE AS booking_request_week\n                , DATE_TRUNC('month', b.request_end_at AT TIME ZONE 'Asia/Jakarta')::DATE AS booking_end_month\n                , DATE_TRUNC('week', b.request_end_at AT TIME ZONE 'Asia/Jakarta')::DATE AS booking_end_week\n                , CEIL(EXTRACT(EPOCH FROM b.request_end_at - b.request_start_at)/86400) AS booking_dur_days\n                -- Booking Value\n                , CASE WHEN hp.booking_id IS NULL THEN CEIL(b.gross_amount*(100-cc.percent)/100) ELSE hp.amount END AS payout_amount\n                , case WHEN sum(A.multipliercontr) < 0 THEN 0 ELSE MAX(A.multipliercontr) end as multiplier\n                , MAX(l.insurance) as insurance\n                , A.amount*(cc.percent/100) as rate\n\n            FROM bookings b\n            left join \n\t\t(select distinct A.id, A.ref_no, A.status, A.registration_no, A.dur, \n\t\tcase \n\t\t\twhen cast(A.rentalFee as numeric)-(cast(A.basePrice as numeric)*A.dur) < 0 then\n\t\t\t(case when A.dur >= 30 then (cast(A.basePrice as numeric)*A.dur)*.70\n\t\t\tWHEN A.dur BETWEEN 7 AND 29 THEN (cast(A.basePrice as numeric)*A.dur)*.75 end)\n\t\t\telse cast(A.basePrice as numeric)*A.dur\n\t\t\tend as beforemultiplier,\n\t\tCASE \n\t\t\twhen cast(A.rentalFee as numeric)-(cast(A.basePrice as numeric)*A.dur) < 0 then \n\t\t    (case WHEN A.dur >= 30 THEN (cast(A.rentalFee as numeric) - (cast(A.basePrice as numeric)*A.dur)*.70)\n\t\t    WHEN A.dur BETWEEN 7 AND 29 THEN (cast(A.rentalFee as numeric) - (cast(A.basePrice as numeric)*A.dur)*.75) end)\n\t\t    ELSE cast(A.rentalFee as numeric)-(cast(A.basePrice as numeric)*A.dur)\n\t\tEND as multipliercontr, \n\t\tA.rentalFee, A.gross_amount, A.amount\n\t\tfrom\n\t\t\t(select distinct b.id, b.ref_no, b.status,\n\t\t\tl.id as listing_id, \n\t\t\tl.registration_no, \n\t\t\tbm.meta->>'currency' as currency,\n\t\t\tbm.meta->>'basePrice' as basePrice,\n\t\t\tcast(j.multiplierprice as numeric) as multip,\n\t\t\tbm.meta->>'rentalFee' as rentalFee,\n\t\t\tbl.amount,\n\t\t\tb.gross_amount,\n\t\t\tb.net_amount,\n\t\t\tbm.meta->>'listingLocation' as listingLocation,\n\t\t\tcase when bl.pricing_id = '3' then 0.5\n\t\t\twhen (extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400 < 1 then 1\n\t\t\twhen (extract(EPOCH from b.request_end_at)::int - extract(EPOCH from b.request_start_at)::int)%86400 < 2160 then\n\t\t\tfloor((extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400)\n\t\t\telse ceil((extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400) end as dur\n\t\t\tFROM bookings b\n\t\t\t\tleft join booking_multipliers bm on bm.booking_id = b.id\n\t\t\t    left join listings l on l.id = b.listing_id \n\t\t\t    left JOIN listing_location ll on b.listing_id = ll.listing_id\n\t\t\t    left join booking_lines bl on bl.booking_id = b.id and bl.slug = 'rental-fee'\n\t\t\t    left JOIN (select \n\t\t\t\t\t\t\tdistinct(TO_DATE(REGEXP_REPLACE(SUBSTRING(json_extract_path(json_array_elements(bm.meta->'multiplierPricing'),'date')::text,1,10), '[^0-9-]', ''),'YYYY-MM-DD')) as multiplierdate,\n\t\t\t\t\t\t\tbm.id,\n\t\t\t\t\t\t\tjson_extract_path(json_array_elements(bm.meta->'multiplierPricing'),'price')::text as multiplierprice,\n\t\t\t\t\t\t\tjson_extract_path(json_array_elements(bm.meta->'multiplierPricing'),'multiplier')::text as multiplier\n\t\t\t\t\t\t\t\t\tFROM booking_multipliers bm\n\t\t\t\t\t\t\t\t\tJOIN bookings b on b.id = bm.booking_id\n\t\t\t\t\t\t\t    \tjoin listings l on l.id = b.listing_id \n\t\t\t\t\t\t\t    \tleft JOIN listing_location ll on b.listing_id = ll.listing_id\n\t\t\t\t\t\t\t    \tWHERE ll.country = 'Malaysia'\n\t\t\t\t\t\t\t    \tgroup by 1,2,3\n\t\t\t\t\t\t\t    \torder by 2\n\t\t\t\t\t\t\t    \t) j on j.id = b.listing_id \n\t\t\t    WHERE country = 'Malaysia'\n\t\t\t    and b.status = 'completed'\n\t\t\t    group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14\n\t\t\t\torder by 1 desc) A) A on A.id = b.id\n            LEFT JOIN approved_listings l ON l.listing_id = b.listing_id\n            LEFT JOIN unique_users u on u.user_id = l.host_id\n            LEFT JOIN listing_commission_class lc ON lc.listing_id = b.listing_id\n            LEFT JOIN commission_class cc ON cc.id = lc.commission_id\n            LEFT JOIN payouts hp ON hp.booking_id = b.id\n                AND hp.country ~* 'MY'\n            \n            WHERE b.currency = 'myr'\n            group by 1,3,4,5,6,7,8,9,17,20\n        )\n    \n    , bookings_data AS (\n            SELECT \n                b.host_id\n                , b.uuid\n                , b.email\n                , b.user_name\n                , b.booking_end_week\n                , b.listing_id\n                , b.plate_no\n                , b.url\n                , case when b.insurance in ('Shield 25') then 'Shield 75'\n                \t\twhen b.insurance in ('Shield 30') then 'Shield 70'\n                \t\twhen b.insurance in ('Shield 35') then 'Shield 65'\n                \t\twhen b.insurance in ('Shield 40') then 'Shield 60' else NULL end as insurance\n                , SUM(CASE WHEN b.booking_status IN ('completed','start_driving','waiting_for_inspection','return_car') THEN b.rate ELSE 0 END) as comrate\n                , to_char((date_trunc('week', current_date) - INTERVAL '1 weeks')::date, 'YYYY-MM-DD') AS start_date\n\t\t\t\t, to_char((date_trunc('week', current_date) - INTERVAL '1 days')::date, 'YYYY-MM-DD') AS end_date\n\t\t\t\t, to_char(date_trunc('week', current_date) + INTERVAL '8 day', 'YYYY-MM-DD') AS payoutdate_start\n\t\t\t\t, to_char((date_trunc('week', current_date) + INTERVAL '11 days')::date, 'YYYY-MM-DD') AS payoutdate_end\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car','cancelled','rejected','requested') THEN b.booking_id ELSE NULL END) AS received_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_id ELSE NULL END) AS fulfiled_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_id ELSE NULL END) AS completed_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('rejected') THEN b.booking_id ELSE NULL END) AS rejected_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_id ELSE NULL END)::decimal /\n                    NULLIF(COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car','rejected','requested') THEN b.booking_id ELSE NULL END),0)::decimal AS fr\n                , SUM(CASE WHEN b.booking_status IN ('completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_dur_days ELSE 0 END) AS booking_dur_days\n                , SUM(CASE WHEN b.booking_status IN ('completed','start_driving','waiting_for_inspection','return_car') THEN b.payout_amount ELSE 0 END) AS est_payout\n                , SUM(CASE WHEN b.booking_status IN ('rejected') THEN b.payout_amount ELSE 0 END) AS est_loss\n                , sum(case when b.booking_status in ('completed') then b.multiplier end) as multiplier\n                , SUM(CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car') THEN b.payout_amount ELSE 0 END)*0.06 as SST\n            FROM all_bookings b\n            WHERE booking_end_week BETWEEN (CURRENT_DATE - INTERVAL '8 DAYS') AND (CURRENT_DATE - INTERVAL '2 DAYS')\n            GROUP BY 1,2,3,4,5,6,7,8,9\n        )\n        \nSELECT *\nFROM bookings_data\nWHERE 1=1\n    AND received_booking > 0\n    and insurance in ('Shield 75',\n'Shield 70',\n'Shield 65',\n'Shield 60')\n       AND host_id IN (\n            -- Internal\n            '11182',\n'5162',\n'28',\n'34411',\n'307858'\n        )\n\nORDER BY 1,15 DESC",
+        "additionalFields": {}
+      },
+      "id": "48539864-5315-40f0-8424-6074292a2a57",
+      "name": "Postgres - Weekly Raw Data Dump1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        320,
+        660
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "16",
+          "name": "trevodb_recreated"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\nWITH \n    unique_users AS (\n            SELECT \n                u.uuid\n                , u.id AS user_id\n                , u.email\n                , CASE WHEN u.display_name IS NOT NULL THEN u.display_name ELSE concat(u.first_name,' ',u.last_name) END AS user_name\n            FROM users u\n            LEFT JOIN user_attributions ua ON ua.user_id = u.id\n            \n            WHERE 1=1   \n                AND u.status = 'active'\n                AND ((ua.key = 'current-country' AND ua.value = 'MY' AND u.dob > '1900-01-01')\n                    OR (ua.key = 'signup-country' AND ua.value = 'MY' AND u.dob > '1900-01-01'))\n                OR u.phone_country_code IN ('+60')\n        )\n    \n    , approved_listings AS (\n            SELECT\n                l.id AS listing_id\n                , l.registration_no as plate_no\n                , l.url\n                , l.user_id as host_id\n                , case when lcc.id in ('1','8') then 'Shield 25' else cc.name end as insurance\n            FROM listings l\n            LEFT JOIN listing_location ll on ll.listing_id = l.id\n            left join listing_commission_class lcc on lcc.listing_id = l.id \n            left join commission_class cc on cc.id = lcc.commission_id\n            \n            WHERE 1=1\n                AND l.status IN ('approved')\n                AND ll.country IN ('Malaysia')\n                AND l.deleted_at IS NULL\n        )\n    \n    , all_bookings AS (\n            SELECT DISTINCT ON (b.id)\n                -- Booking Details\n                b.id AS booking_id\n                , b.listing_id\n                , l.host_id\n                , u.uuid\n                , u.user_name\n                , u.email\n                , l.plate_no\n                , l.url\n                , b.ref_no AS booking_ref\n                , CASE \n                    WHEN b.reason ~~* '%test%' THEN 'test'\n                    WHEN b.status IN ('cancelled','withdrawn') \n                        AND (\n                            b.reason ~~* '%host%'\n                            OR b.reason ~~* '%owner%'\n                            OR b.reason ~~* '%available%'\n                            OR b.reason ~~* '%car%'\n                        ) THEN 'rejected'\n                    WHEN b.status IN ('rejected') \n                        AND (\n                            b.reason ~~* '%guest%'\n                        ) THEN 'withdrawn'\n                    ELSE b.status END AS booking_status\n                , b.created_at AT TIME ZONE 'Asia/Jakarta' AS booking_request_ts\n                , DATE_TRUNC('month', b.created_at AT TIME ZONE 'Asia/Jakarta')::DATE AS booking_request_month\n                , DATE_TRUNC('week', b.created_at AT TIME ZONE 'Asia/Jakarta')::DATE AS booking_request_week\n                , DATE_TRUNC('month', b.request_end_at AT TIME ZONE 'Asia/Jakarta')::DATE AS booking_end_month\n                , DATE_TRUNC('week', b.request_end_at AT TIME ZONE 'Asia/Jakarta')::DATE AS booking_end_week\n                , CEIL(EXTRACT(EPOCH FROM b.request_end_at - b.request_start_at)/86400) AS booking_dur_days\n                -- Booking Value\n                , CASE WHEN hp.booking_id IS NULL THEN CEIL(b.gross_amount*(100-cc.percent)/100) ELSE hp.amount END AS payout_amount\n                , case WHEN sum(A.multipliercontr) < 0 THEN 0 ELSE MAX(A.multipliercontr) end as multiplier\n                , MAX(l.insurance) as insurance\n                , A.amount*(cc.percent/100) as rate\n\n            FROM bookings b\n            left join \n\t\t(select distinct A.id, A.ref_no, A.status, A.registration_no, A.dur, \n\t\tcase \n\t\t\twhen cast(A.rentalFee as numeric)-(cast(A.basePrice as numeric)*A.dur) < 0 then\n\t\t\t(case when A.dur >= 30 then (cast(A.basePrice as numeric)*A.dur)*.70\n\t\t\tWHEN A.dur BETWEEN 7 AND 29 THEN (cast(A.basePrice as numeric)*A.dur)*.75 end)\n\t\t\telse cast(A.basePrice as numeric)*A.dur\n\t\t\tend as beforemultiplier,\n\t\tCASE \n\t\t\twhen cast(A.rentalFee as numeric)-(cast(A.basePrice as numeric)*A.dur) < 0 then \n\t\t    (case WHEN A.dur >= 30 THEN (cast(A.rentalFee as numeric) - (cast(A.basePrice as numeric)*A.dur)*.70)\n\t\t    WHEN A.dur BETWEEN 7 AND 29 THEN (cast(A.rentalFee as numeric) - (cast(A.basePrice as numeric)*A.dur)*.75) end)\n\t\t    ELSE cast(A.rentalFee as numeric)-(cast(A.basePrice as numeric)*A.dur)\n\t\tEND as multipliercontr, \n\t\tA.rentalFee, A.gross_amount, A.amount\n\t\tfrom\n\t\t\t(select distinct b.id, b.ref_no, b.status,\n\t\t\tl.id as listing_id, \n\t\t\tl.registration_no, \n\t\t\tbm.meta->>'currency' as currency,\n\t\t\tbm.meta->>'basePrice' as basePrice,\n\t\t\tcast(j.multiplierprice as numeric) as multip,\n\t\t\tbm.meta->>'rentalFee' as rentalFee,\n\t\t\tbl.amount,\n\t\t\tb.gross_amount,\n\t\t\tb.net_amount,\n\t\t\tbm.meta->>'listingLocation' as listingLocation,\n\t\t\tcase when bl.pricing_id = '3' then 0.5\n\t\t\twhen (extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400 < 1 then 1\n\t\t\twhen (extract(EPOCH from b.request_end_at)::int - extract(EPOCH from b.request_start_at)::int)%86400 < 2160 then\n\t\t\tfloor((extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400)\n\t\t\telse ceil((extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400) end as dur\n\t\t\tFROM bookings b\n\t\t\t\tleft join booking_multipliers bm on bm.booking_id = b.id\n\t\t\t    left join listings l on l.id = b.listing_id \n\t\t\t    left JOIN listing_location ll on b.listing_id = ll.listing_id\n\t\t\t    left join booking_lines bl on bl.booking_id = b.id and bl.slug = 'rental-fee'\n\t\t\t    left JOIN (select \n\t\t\t\t\t\t\tdistinct(TO_DATE(REGEXP_REPLACE(SUBSTRING(json_extract_path(json_array_elements(bm.meta->'multiplierPricing'),'date')::text,1,10), '[^0-9-]', ''),'YYYY-MM-DD')) as multiplierdate,\n\t\t\t\t\t\t\tbm.id,\n\t\t\t\t\t\t\tjson_extract_path(json_array_elements(bm.meta->'multiplierPricing'),'price')::text as multiplierprice,\n\t\t\t\t\t\t\tjson_extract_path(json_array_elements(bm.meta->'multiplierPricing'),'multiplier')::text as multiplier\n\t\t\t\t\t\t\t\t\tFROM booking_multipliers bm\n\t\t\t\t\t\t\t\t\tJOIN bookings b on b.id = bm.booking_id\n\t\t\t\t\t\t\t    \tjoin listings l on l.id = b.listing_id \n\t\t\t\t\t\t\t    \tleft JOIN listing_location ll on b.listing_id = ll.listing_id\n\t\t\t\t\t\t\t    \tWHERE ll.country = 'Malaysia'\n\t\t\t\t\t\t\t    \tgroup by 1,2,3\n\t\t\t\t\t\t\t    \torder by 2\n\t\t\t\t\t\t\t    \t) j on j.id = b.listing_id \n\t\t\t    WHERE country = 'Malaysia'\n\t\t\t    and b.status = 'completed'\n\t\t\t    group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14\n\t\t\t\torder by 1 desc) A) A on A.id = b.id\n            LEFT JOIN approved_listings l ON l.listing_id = b.listing_id\n            LEFT JOIN unique_users u on u.user_id = l.host_id\n            LEFT JOIN listing_commission_class lc ON lc.listing_id = b.listing_id\n            LEFT JOIN commission_class cc ON cc.id = lc.commission_id\n            LEFT JOIN payouts hp ON hp.booking_id = b.id\n                AND hp.country ~* 'MY'\n            \n            WHERE b.currency = 'myr'\n            group by 1,3,4,5,6,7,8,9,17,20\n        )\n    \n    , bookings_data AS (\n            SELECT \n                b.host_id\n                , b.uuid\n                , b.email\n                , b.user_name\n                , b.booking_end_week\n                , b.listing_id\n                , b.plate_no\n                , b.url\n                , case when b.insurance in ('Shield 25') then 'Shield 75'\n                \t\twhen b.insurance in ('Shield 30') then 'Shield 70'\n                \t\twhen b.insurance in ('Shield 35') then 'Shield 65'\n                \t\twhen b.insurance in ('Shield 40') then 'Shield 60' else NULL end as insurance\n                , SUM(CASE WHEN b.booking_status IN ('completed','start_driving','waiting_for_inspection','return_car') THEN b.rate ELSE 0 END) as comrate\n                , to_char((date_trunc('week', current_date) - INTERVAL '2 weeks')::date, 'YYYY-MM-DD') AS start_date\n\t\t\t\t, to_char((date_trunc('week', current_date) - INTERVAL '8 days')::date, 'YYYY-MM-DD') AS end_date\n\t\t\t\t, to_char((date_trunc('week', current_date) + INTERVAL '1 days')::date, 'YYYY-MM-DD') AS payoutdate_start\n\t\t\t\t, to_char((date_trunc('week', current_date) + INTERVAL '4 days')::date, 'YYYY-MM-DD') AS payoutdate_end\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car','cancelled','rejected','requested') THEN b.booking_id ELSE NULL END) AS received_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_id ELSE NULL END) AS fulfiled_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_id ELSE NULL END) AS completed_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('rejected') THEN b.booking_id ELSE NULL END) AS rejected_booking\n                , COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_id ELSE NULL END)::decimal /\n                    NULLIF(COUNT(DISTINCT CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car','rejected','requested') THEN b.booking_id ELSE NULL END),0)::decimal AS fr\n                , SUM(CASE WHEN b.booking_status IN ('completed','start_driving','waiting_for_inspection','return_car') THEN b.booking_dur_days ELSE 0 END) AS booking_dur_days\n                , SUM(CASE WHEN b.booking_status IN ('completed','start_driving','waiting_for_inspection','return_car') THEN b.payout_amount ELSE 0 END) AS est_payout\n                , SUM(CASE WHEN b.booking_status IN ('rejected') THEN b.payout_amount ELSE 0 END) AS est_loss\n                , sum(case when b.booking_status in ('completed') then b.multiplier end) as multiplier\n                , SUM(CASE WHEN b.booking_status IN ('accepted','completed','start_driving','waiting_for_inspection','return_car') THEN b.payout_amount ELSE 0 END)*0.06 as SST\n            FROM all_bookings b\n            WHERE booking_end_week BETWEEN (CURRENT_DATE - INTERVAL '8 DAYS') AND (CURRENT_DATE - INTERVAL '2 DAYS')\n            GROUP BY 1,2,3,4,5,6,7,8,9\n        )\n        \nSELECT *\nFROM bookings_data\nWHERE 1=1\n    AND received_booking > 0\n    and insurance in ('Shield 75',\n'Shield 70',\n'Shield 65',\n'Shield 60')\n       AND host_id IN (\n            -- Internal\n            '11182',\n'5162',\n'28',\n'34411',\n'307858'\n        )\n\nORDER BY 1,15 DESC",
+        "additionalFields": {}
+      },
+      "id": "a26d88d2-2196-4b3a-a523-c81ca2525b35",
+      "name": "Postgres - Weekly Raw Data Dump2",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        520,
+        680
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "16",
+          "name": "trevodb_recreated"
+        }
+      },
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 1800,
+    "errorWorkflow": "11",
+    "saveDataSuccessExecution": "all"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2023-05-25T03:12:44.635Z",
+  "versionId": "8f4e042c-3b99-4180-b71d-d0d170d1295a"
+}
