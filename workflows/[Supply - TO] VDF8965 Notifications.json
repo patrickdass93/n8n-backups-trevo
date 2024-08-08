@@ -1,0 +1,116 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Google Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-07-02T09:29:25.013Z",
+  "id": "XWeMLD1x1dSA1Zdu",
+  "name": "[Supply - TO] VDF8965 Notifications",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  b.id\n  , u.display_name\n  , concat('wa.me/',u.phone_country_code,u.phone_number) as phone_number\n  --, b.request_start_at\n  --, b.request_end_at\nFROM bookings b\nJOIN users u on u.id = b.user_id\nWHERE 1=1\n  AND b.listing_id IN (55395)\n  AND b.status NOT IN ('payment_failed')",
+        "options": {}
+      },
+      "id": "1e357ad3-02c2-4d0e-b52d-3abcbedc82f0",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        760,
+        340
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 10
+            }
+          ]
+        }
+      },
+      "id": "e27c8683-a03e-4eca-8b69-d48ec8cabbdb",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        600,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAA43qcepg",
+        "messageUi": {
+          "text": "=New booking for VDF8965\nBooking ID: https://gearbox.trevo.my/trevo/bookings-v2/edit/{{ $json.id }}/detail/\nGuest Name: {{ $json.display_name }}\nContact: {{ $json.phone_number }}"
+        },
+        "additionalFields": {}
+      },
+      "id": "4c9e33f7-563b-4895-8993-0aefb8a7157e",
+      "name": "Google Chat",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        940,
+        340
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "Google Chat [Pat]"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-03-31T06:52:09.032Z",
+      "updatedAt": "2023-03-31T06:52:09.032Z",
+      "id": "5",
+      "name": "Patrick"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-07-02T10:10:08.261Z",
+  "versionId": "fd2c6004-3165-4422-b593-89b7f38113d5"
+}
