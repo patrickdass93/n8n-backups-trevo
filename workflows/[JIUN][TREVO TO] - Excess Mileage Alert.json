@@ -1,0 +1,174 @@
+{
+  "active": true,
+  "connections": {
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Function3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function3": {
+      "main": [
+        [
+          {
+            "node": "Google Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-07-18T05:25:32.675Z",
+  "id": "DybjiKmqytzbixof",
+  "name": "[JIUN][TREVO TO] - Excess Mileage Alert",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=select *,\nA.dur_comp * 200 as given_mileage,\nA.travelled - (A.dur_comp*200)as exceeded\nfrom \n(select l.registration_no,\nb.ref_no,\nto_char(b.created_at,'YYYY-MM-DD HH24:Mi') as created_at,\nto_char(b.request_start_at,'YYYY-MM-DD HH24:Mi') as request_start_at,\nto_char(b.request_end_at,'YYYY-MM-DD HH24:Mi') as request_end_at,\nto_char(b.request_end_at, 'YYYY-MM')as month,\nbi.mileage as start_mileage, \nbi2.mileage as end_mileage,\nnullif(bi2.mileage - bi.mileage,0) as travelled,\nsum(case when b.status in ('accepted', 'waiting_for_inspection', 'start_driving', 'return_car', 'completed') then (case when bl.pricing_id = '3' then 0.5\nwhen (extract(EPOCH from b.request_end_at)::int - extract(EPOCH from b.request_start_at)::int)%86400 < 2160 then\nfloor((extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400)\nelse ceil((extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400) end)end) as dur_comp,\nd5.rental\nfrom bookings b \nleft join listings l on l.id = b.listing_id\nleft join booking_lines bl on bl.booking_id = b.id and bl.slug = 'rental-fee'\nleft join booking_inspections bi on bi.booking_id = b.id and bi.type = 'start'\nleft join booking_inspections bi2 on bi2.booking_id = b.id and bi2.type = 'end'\nleft join\n(select bl.booking_id, bl.amount as rental from booking_lines bl where bl.slug = 'rental-fee') d5\non b.id = d5.booking_id\nwhere l.user_id in ('2301647',\n'2301657',\n'2301669')\nand l.status = 'approved' and l.deleted_at is null\nand b.status in ('accepted', 'waiting_for_inspection', 'start_driving', 'return_car','completed')\ngroup by 1,2,3,4,5,6,7,8,9,11\norder by 5)A",
+        "options": {}
+      },
+      "id": "451c741c-9ec2-4e64-adce-2c4910adafe4",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        500,
+        240
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.exceeded }}",
+              "operation": "larger"
+            }
+          ]
+        }
+      },
+      "id": "198d5478-091b-478d-8237-402561346d9d",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        720,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"ref_no\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['ref_no']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function3",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        920,
+        240
+      ],
+      "id": "0a65f357-6b9a-43ee-83b4-e97c5e8a07d9"
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAA9XjvKNo",
+        "messageUi": {
+          "text": "={{ $json.ref_no }} {{$json[\"registration_no\"]}} has excess mileage by {{ $json[\"exceeded\"] }}"
+        },
+        "additionalFields": {}
+      },
+      "id": "d297b460-31f8-4366-9916-527e92c4aad8",
+      "name": "Google Chat",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        240
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "Google Chat [Pat]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "b06f0626-87c6-435d-bd5f-1ac163ca4c75",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        280,
+        240
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds": [
+        "DBNF58VQ",
+        "KZRHJJ37",
+        "NCQ1FPVR",
+        "GG4I9VFX",
+        "4UVHN0BB",
+        "EJDC4PRM",
+        "R7DXSN0C"
+      ]
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-08-08T05:00:36.229Z",
+  "versionId": "f70c4442-5a74-49a7-ba75-66eb78f36cc5"
+}
