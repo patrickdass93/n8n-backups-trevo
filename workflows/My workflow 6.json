@@ -1,0 +1,90 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-11-14T03:28:40.815Z",
+  "id": "DomWW9qdzIYg9Qee",
+  "name": "My workflow 6",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "5dea6405-67f2-4a5a-9a75-8396cdf2dfaf",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        700,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"UUID\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_HSP_Rejections\",\n            \"evtData\": {\n                \"offence_no\": \"HSP_rejections_\",\n                \"HSP_rejection_registration_no\": \"{{ $json[\"Registration No\"] }}\"\n\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "78a55c84-8a0d-41bd-b6bf-654011115738",
+      "name": "Event - 1st Rejection",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1240,
+        240
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect A.* \nfrom\n(select distinct b.ref_no, \nb.status,\nb.reason,\ncase when ((b.reason in ('Car is not available - under maintenance','I change my mind regarding my car’s availability')) or (b.reason ~* '(workshop)')) then 'Availability' \nwhen (b.reason ~* '(delivery)') then 'Delivery'\nwhen (b.reason ~* '(contact)') then 'Contact'\nwhen (b.reason = 'auto-rejected') then 'Auto_rejected'\nelse 'Others' end as rej_type,\nb.created_at::timestamp, \nb.updated_at::timestamp, \nb.request_start_at::timestamp, b.request_end_at::timestamp,\nb.user_id as guest_id, \nconcat(u2.first_name,' ',u2.last_name)as guest_name,\nl.id, \nl.registration_no, \nl.user_id,\nconcat(u.first_name,' ',u.last_name)as host_name,\nu.email, \nu.uuid, \nm.name as model\nfrom bookings b \nleft join listings l on l.id = b.listing_id\nleft join users u on u.id = l.user_id\nleft join users u2 on u2.id = b.user_id \nleft join models m on m.id = l.model_id \nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = b.listing_id\nwhere 1=1\nand b.status = 'rejected'\nand ll.country = 'Malaysia'\nand b.updated_at::timestamp >= (NOW() - interval'1 days')\n--and b.listing_id = '20035'\n)A\n--where A.rej_type = 'Delivery'\n--limit 1",
+        "options": {}
+      },
+      "id": "0b93bd76-ba3c-4260-9e09-168230bd8805",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        920,
+        240
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-11-14T03:28:40.815Z",
+  "versionId": "3ce9b531-e508-455d-a9c6-51bebe1e6a9b"
+}
