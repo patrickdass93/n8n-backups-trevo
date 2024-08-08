@@ -1,0 +1,228 @@
+{
+  "active": false,
+  "connections": {
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets3": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-11-30T02:03:40.656Z",
+  "id": "IAuR8emMffb8Supw",
+  "name": "[KAVI] SMS Log",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1akRBCYF5NfTHpMefgQocnPIKtjp3HiZoGfzWfBKeMnk",
+          "mode": "list",
+          "cachedResultName": "N8N Workflow Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1akRBCYF5NfTHpMefgQocnPIKtjp3HiZoGfzWfBKeMnk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2034748721,
+          "mode": "list",
+          "cachedResultName": "Sheet7",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1akRBCYF5NfTHpMefgQocnPIKtjp3HiZoGfzWfBKeMnk/edit#gid=2034748721"
+        },
+        "options": {
+          "outputFormatting": {
+            "values": {
+              "general": "UNFORMATTED_VALUE",
+              "date": "FORMATTED_STRING"
+            }
+          }
+        }
+      },
+      "id": "4d0e3f06-5a3c-4ff6-b2bb-ca870f0dacb6",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        900,
+        140
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SET TIMEZONE = 'Asia/Kuala_Lumpur';\nselect * \nfrom bookings b \nwhere b.ref_no in ({{ $json[\"String\"] }})",
+        "options": {}
+      },
+      "id": "c4265cbd-327b-4c97-9be6-9231818d832f",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.1,
+      "position": [
+        1040,
+        140
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1akRBCYF5NfTHpMefgQocnPIKtjp3HiZoGfzWfBKeMnk",
+          "mode": "list",
+          "cachedResultName": "N8N Workflow Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1akRBCYF5NfTHpMefgQocnPIKtjp3HiZoGfzWfBKeMnk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 204602891,
+          "mode": "list",
+          "cachedResultName": "N8N Import",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1akRBCYF5NfTHpMefgQocnPIKtjp3HiZoGfzWfBKeMnk/edit#gid=204602891"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "id",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "8d5746fb-02bd-48ed-adf6-94612824702b",
+      "name": "Google Sheets2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1180,
+        140
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1akRBCYF5NfTHpMefgQocnPIKtjp3HiZoGfzWfBKeMnk",
+          "mode": "list",
+          "cachedResultName": "N8N Workflow Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1akRBCYF5NfTHpMefgQocnPIKtjp3HiZoGfzWfBKeMnk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 204602891,
+          "mode": "list",
+          "cachedResultName": "N8N Import",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1akRBCYF5NfTHpMefgQocnPIKtjp3HiZoGfzWfBKeMnk/edit#gid=204602891"
+        },
+        "clear": "specificRange",
+        "range": "A2:AA"
+      },
+      "id": "ddd35b61-c147-4041-b4cb-107c8fb29d76",
+      "name": "Google Sheets3",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        760,
+        140
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "dc9d4b1f-2e6b-4c5e-a382-d93a06e012a2",
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        620,
+        140
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger1": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-05-12T02:58:32.100Z",
+      "updatedAt": "2023-05-12T02:58:32.100Z",
+      "id": "7",
+      "name": "Host CRM"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2023-11-30T02:05:08.174Z",
+  "versionId": "19bcf411-5778-4987-b705-72a9513d81b9"
+}
