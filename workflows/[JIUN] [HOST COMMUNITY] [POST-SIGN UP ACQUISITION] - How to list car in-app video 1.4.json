@@ -1,0 +1,499 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Function1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function1": {
+      "main": [
+        [
+          {
+            "node": "LP API - Send PN - Add User to Campaign",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "LP API - Send PN - Add User to Campaign3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-06-09T01:57:56.483Z",
+  "id": "86",
+  "name": "[JIUN] [HOST COMMUNITY] [POST-SIGN UP ACQUISITION] - How to list car in-app video 1.4",
+  "nodes": [
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.leanplum.com/api?action=startCampaign",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={ \"appId\" : \"app_BXrjE7dc15VWXDLRfh77tActhBhSkCHeQhETDE1mXfQ\", \"clientKey\" : \"dev_L9yBjOmwfR3fNiVjL9woIYfWzsy5hMcGDx0og8isAFw\", \"apiVersion\" : \"1.0.6\", \"userId\":\"{{ $json[\"uuid\"] }}\", \"campaignId\":\"5389239187996672\", \"createDisposition\" : \"CreateNever\"}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "LP API - Send PN - Add User to Campaign3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1700,
+        -180
+      ],
+      "id": "89608b9c-c8eb-491d-950c-6a7000696ab8"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "739be276-1f78-4db4-b12f-8f83192795e6",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        900,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect distinct u.id, \nu.uuid,\nu.email, \nconcat(u.first_name,' ',u.last_name) as user_name,\nt.name\nfrom users u \nleft join tag_taggables tt on tt.taggable_id = u.id\nleft join tags t on t.id = tt.tag_id \nwhere 1=1\nand t.name in ('Lender')\nand u.created_at::timestamp between (NOW()::timestamp - interval '2 mins') and NOW()",
+        "options": {}
+      },
+      "id": "90ede5e4-e551-4958-8fa3-ab0cdf7940f9",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.1,
+      "position": [
+        1100,
+        -260
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.leanplum.com/api?action=startCampaign",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={ \"appId\" : \"app_BXrjE7dc15VWXDLRfh77tActhBhSkCHeQhETDE1mXfQ\", \"clientKey\" : \"dev_L9yBjOmwfR3fNiVjL9woIYfWzsy5hMcGDx0og8isAFw\", \"apiVersion\" : \"1.0.6\", \"userId\":\"{{ $json[\"uuid\"] }}\", \"campaignId\":\"6151543437459456\", \"createDisposition\" : \"CreateNever\"}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "LP API - Send PN - Add User to Campaign",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1700,
+        -360
+      ],
+      "id": "16d04b6e-61a8-4cb5-8e57-ac713e77aadd"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.success }}",
+              "operation": "contains",
+              "value2": "true"
+            }
+          ]
+        }
+      },
+      "id": "c4180416-0c5e-4ae6-90a3-a8940794ed0a",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"uuid\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['uuid']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        -260
+      ],
+      "id": "2ed41863-14cc-4952-a83b-5eca93de3c8d"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "callerPolicy": "any",
+    "errorWorkflow": "11",
+    "saveDataErrorExecution": "all",
+    "executionOrder": "v0"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds": [
+        "Top.infinity33@gmail.com",
+        "powforchai@gmail.com",
+        "Mohdaizuddinelias@gmail.com",
+        "outback-heirs0e@icloud.com",
+        "sitifatimahhhameer@gmail.com",
+        "saffiyyahfarhana@gmail.com",
+        "sharizalmalek@gmail.com",
+        "tharma_remo@yahoo.com",
+        " kriticarani@rocketmail.com",
+        "linges39@gmail.com",
+        "cpebizs@gmail.com",
+        19217,
+        20190,
+        23254,
+        27519,
+        27551,
+        32133,
+        33151,
+        35444,
+        35561,
+        36079,
+        36365,
+        36521,
+        37333,
+        38267,
+        38439,
+        39151,
+        40735,
+        40921,
+        41127,
+        41608,
+        41724,
+        41749,
+        42137,
+        42399,
+        42707,
+        42849,
+        12899,
+        19353,
+        23956,
+        26261,
+        27750,
+        28472,
+        29017,
+        31146,
+        31379,
+        33164,
+        33615,
+        33926,
+        35551,
+        36174,
+        36585,
+        37073,
+        37713,
+        37728,
+        38029,
+        38260,
+        38434,
+        38473,
+        39563,
+        39641,
+        39660,
+        39933,
+        40012,
+        40057,
+        40116,
+        40220,
+        40301,
+        40892,
+        41136,
+        41268,
+        41270,
+        41407,
+        41682,
+        42300,
+        42343,
+        42438,
+        42662,
+        42690,
+        42743,
+        34796,
+        39374,
+        41105,
+        20054,
+        36923,
+        27043,
+        19995,
+        39889,
+        26974,
+        39701,
+        38092,
+        41642,
+        18799,
+        39734,
+        1740,
+        40531,
+        36804,
+        38580,
+        26805,
+        14675,
+        34334,
+        40629,
+        21248,
+        28915,
+        41586,
+        41148,
+        41139,
+        39738,
+        35016,
+        27715,
+        39435,
+        26309,
+        35073,
+        2038,
+        36791,
+        39062,
+        37948,
+        38875,
+        30729,
+        39692,
+        32406,
+        24942,
+        40221,
+        38458,
+        38202,
+        37568,
+        32750,
+        35103,
+        41550,
+        39269,
+        37792,
+        36274,
+        35383,
+        25601,
+        12864,
+        41012,
+        37433,
+        32621,
+        33630,
+        27474,
+        38553,
+        21778,
+        2497,
+        40593,
+        28185,
+        31155,
+        35009,
+        1167,
+        41172,
+        34700,
+        17005,
+        41974,
+        39461,
+        39439,
+        40705,
+        33820,
+        10983,
+        1266,
+        39774,
+        34695,
+        40850,
+        36282,
+        35342,
+        40760,
+        1166,
+        14683,
+        840,
+        37105,
+        38286,
+        40753,
+        28301,
+        32796,
+        33760,
+        40946,
+        39536,
+        39717,
+        40502,
+        36721,
+        36427,
+        36069,
+        32385,
+        40786,
+        37724,
+        37392,
+        6871,
+        41785,
+        37198,
+        31404,
+        39170,
+        37529,
+        39371,
+        39373,
+        36415,
+        36968,
+        39960,
+        19972,
+        40670,
+        17984,
+        39343,
+        40835,
+        39622,
+        30316,
+        41135,
+        31632,
+        34878,
+        38573,
+        33659,
+        41011,
+        35567,
+        38925,
+        34917,
+        40896,
+        37706,
+        39999,
+        39279,
+        9708,
+        38912,
+        33302,
+        6107,
+        29539,
+        39837,
+        38311,
+        38218,
+        28724,
+        35373,
+        9552,
+        27319,
+        848,
+        28436,
+        6,
+        1,
+        2,
+        3,
+        4,
+        5,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "node:Schedule Trigger1": {
+      "recurrencyRules": [
+        96
+      ]
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2022-12-15T07:35:21.640Z",
+      "updatedAt": "2022-12-15T07:35:21.640Z",
+      "id": "2",
+      "name": "MY"
+    },
+    {
+      "createdAt": "2023-05-12T02:58:32.100Z",
+      "updatedAt": "2023-05-12T02:58:32.100Z",
+      "id": "7",
+      "name": "Host CRM"
+    },
+    {
+      "createdAt": "2023-05-12T02:58:38.207Z",
+      "updatedAt": "2023-05-12T02:58:38.207Z",
+      "id": "8",
+      "name": "Host Community"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-02-21T06:05:51.318Z",
+  "versionId": "537bc4d2-6845-49a9-b3f0-b4f9abd4315e"
+}
