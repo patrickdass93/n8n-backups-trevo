@@ -1,0 +1,101 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "LP API - Send PN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-04-20T02:46:23.087Z",
+  "id": "68",
+  "name": "[KAVI][CS] - Car Suggestion",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "5b03331e-27a7-4af0-86b8-d4a7513c00dd",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        620,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1_qEjc76qm5J39b2J289RFvAL2rpQP6qOxKVLumZhci4",
+          "mode": "list",
+          "cachedResultName": "LP Attribute Test",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_qEjc76qm5J39b2J289RFvAL2rpQP6qOxKVLumZhci4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_qEjc76qm5J39b2J289RFvAL2rpQP6qOxKVLumZhci4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "a70789ed-d4b1-4ea3-b41a-990bf2a974b4",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        840,
+        280
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.leanplum.com/api?action=startCampaign",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n  \"appId\": \"app_BXrjE7dc15VWXDLRfh77tActhBhSkCHeQhETDE1mXfQ\",\n  \"clientKey\": \"dev_L9yBjOmwfR3fNiVjL9woIYfWzsy5hMcGDx0og8isAFw\",\n  \"apiVersion\": \"1.0.6\",\n  \"userId\": \"{{ $json['uuid'] }}\",\n  \"campaignId\": \"5613996625952768\",\n  \"createDisposition\": \"CreateIfNeeded\",\n  \"vars\": {\n    \"model\": \"{{ $json['model'] }}\",\n    \"ListingDL\": \"{{ $node[\"Google Sheets\"].json[\"deeplink\"]}}\"\n  }\n}\n",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "LP API - Send PN",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        280
+      ],
+      "id": "04a98310-deb5-43c1-a374-93fd1d486d81"
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-04-20T03:43:13.072Z",
+  "versionId": "1d9c3621-7845-41c8-bc53-b2a693d000d2"
+}
