@@ -1,0 +1,330 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "IF1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Function",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Function1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function": {
+      "main": [
+        [
+          {
+            "node": "Google Chat1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function1": {
+      "main": [
+        [
+          {
+            "node": "Google Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-02-05T05:05:33.270Z",
+  "id": "Lgksy5T2ZPEFPASr",
+  "name": "[KAVI][Alert] Payment Failure Alert Google Chat",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "5 8-22 * * *"
+            }
+          ]
+        }
+      },
+      "id": "7e5f0570-9def-4cca-8b46-1c092d7caac6",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        600,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\nWITH hourly_stats AS (\n  SELECT \n    TO_CHAR(b.created_at, 'YYYY-WW') AS year_week,\n    EXTRACT(DOW FROM b.created_at) AS day_of_week,\n    EXTRACT(HOUR FROM b.created_at) AS hour_of_day,\n    COUNT(DISTINCT b.id) AS booking_requests,\n    COUNT(distinct case when b.status = 'payment_failed' then b.id END) as failed_requests,\n    COUNT(distinct case when b.status = 'payment_failed' then b.id END)::float/COUNT(DISTINCT b.id) as pf_rate,\n    COUNT(distinct case when b.status = 'payment_failed' then b.user_id end) as unique_failed_users\n  FROM bookings b\n  left join listings l on l.id = b.listing_id\n  left join listing_location ll on ll.listing_id = l.id \n  WHERE b.created_at BETWEEN (NOW() - INTERVAL '3 months') AND NOW() -- Filter data for the past 3 months\n  and ll.country = 'Malaysia'\n  GROUP BY 1, 2, 3\n  ORDER BY 1 DESC, 2 DESC, 3 DESC\n)\nSELECT \n  NOW()::DATE as today,\n  day_of_week,\n  hour_of_day,\n  STDDEV(pf_rate) AS standard_deviation,\n  CASE WHEN (AVG(pf_rate) + 1.5 * STDDEV(pf_rate)) < 0 THEN 0 ELSE (AVG(pf_rate) + 1.5 * STDDEV(pf_rate)) END AS upper_threshold,\n  CASE WHEN (AVG(pf_rate) + 2 * STDDEV(pf_rate)) < 0 THEN 0 ELSE (AVG(pf_rate) + 2 * STDDEV(pf_rate)) END AS upper_threshold_2,\n  (\n    SELECT \n      pf_rate\n    FROM \n      hourly_stats\n    WHERE \n      hour_of_day = EXTRACT(HOUR FROM NOW() - INTERVAL '1 hour') -- Get only the latest hour\n      AND day_of_week = CASE WHEN EXTRACT(HOUR FROM NOW() - INTERVAL '1 hour') = 23 THEN EXTRACT(DOW FROM NOW() - interval '1 day') ELSE EXTRACT(DOW FROM NOW()) END -- Filter DOW today\n      AND year_week = TO_CHAR(NOW(), 'YYYY-WW')\n    LIMIT 1\n  ) AS latest_pf_rate,\n  (\n    SELECT \n      unique_failed_users\n    FROM \n      hourly_stats\n    WHERE \n      hour_of_day = EXTRACT(HOUR FROM NOW() - INTERVAL '1 hour') -- Get only the latest hour\n      AND day_of_week = CASE WHEN EXTRACT(HOUR FROM NOW() - INTERVAL '1 hour') = 23 THEN EXTRACT(DOW FROM NOW() - interval '1 day') ELSE EXTRACT(DOW FROM NOW()) END -- Filter DOW today\n      AND year_week = TO_CHAR(NOW(), 'YYYY-WW')\n    LIMIT 1\n  ) AS unique_failed_users,\n(\n    SELECT \n      booking_requests\n    FROM \n      hourly_stats\n    WHERE \n      hour_of_day = EXTRACT(HOUR FROM NOW() - INTERVAL '1 hour') -- Get only the latest hour\n      AND day_of_week = CASE WHEN EXTRACT(HOUR FROM NOW() - INTERVAL '1 hour') = 23 THEN EXTRACT(DOW FROM NOW() - interval '1 day') ELSE EXTRACT(DOW FROM NOW()) END -- Filter DOW today\n      AND year_week = TO_CHAR(NOW(), 'YYYY-WW')\n    LIMIT 1\n  ) AS booking_requests,\n  (\n    SELECT \n      failed_requests\n    FROM \n      hourly_stats\n    WHERE \n      hour_of_day = EXTRACT(HOUR FROM NOW() - INTERVAL '1 hour') -- Get only the latest hour\n      AND day_of_week = CASE WHEN EXTRACT(HOUR FROM NOW() - INTERVAL '1 hour') = 23 THEN EXTRACT(DOW FROM NOW() - interval '1 day') ELSE EXTRACT(DOW FROM NOW()) END -- Filter DOW today\n      AND year_week = TO_CHAR(NOW(), 'YYYY-WW')\n    LIMIT 1\n  )\nFROM \n  hourly_stats\nwhere 1=1 \n  --and day_of_week = EXTRACT(DOW FROM NOW()) -- Filter DOW today\n  --and hour_of_day = EXTRACT(HOUR FROM NOW() - INTERVAL '1 hour')\n  --AND year_week = TO_CHAR(NOW(), 'YYYY-WW') -- Filter by current week\nGROUP BY \n  day_of_week, hour_of_day\nORDER BY \n  hour_of_day DESC\nLIMIT 1;\n\n\n\n",
+        "options": {
+          "largeNumbersOutput": "numbers"
+        }
+      },
+      "id": "ef508d63-cc10-42f9-a7c3-244aac87d26a",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.1,
+      "position": [
+        780,
+        320
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "value1": "={{ $json.latest_pf_rate }}",
+        "rules": {
+          "rules": [
+            {
+              "operation": "larger",
+              "value2": "={{ $json.upper_threshold_2 }}"
+            },
+            {
+              "operation": "larger",
+              "value2": "={{ $json.upper_threshold }}",
+              "output": 1
+            }
+          ]
+        }
+      },
+      "id": "386caa8f-7df2-4fc2-b68f-ca6d5102714a",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAtIW1dxg",
+        "messageUi": {
+          "text": "=*[ALERT]* Payment Failure Warning - Above 1st Band\n\nLast 1H Total Payment Failures: {{ $json[\"failed_requests\"] }} out of {{ $json[\"booking_requests\"] }}\nLast 1H Unique Users Affected: {{ $json[\"unique_failed_users\"] }}\nLast 1H Payment Failure Rate: {{ ($json[\"latest_pf_rate\"] * 100).toFixed(2) }}%\n\n1st Upper Band: {{ ($json[\"upper_threshold\"] * 100).toFixed(2) }}%\n2nd Upper Band (Urgent): {{ ($json[\"upper_threshold_2\"] * 100).toFixed(2) }}%\n\n[TREVO MY | Payment Failures Dashboard](http://analytics.socar.my/r/2594)"
+        },
+        "additionalFields": {}
+      },
+      "id": "be039a38-c181-4273-8620-cbd126555b30",
+      "name": "Google Chat",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        1720,
+        320
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAtIW1dxg",
+        "messageUi": {
+          "text": "=*[ALERT]* Payment Failure Warning - Above 2nd Band *(URGENT)*\n\nLast 1H Total Payment Failures: {{ $json[\"failed_requests\"] }} out of {{ $json[\"booking_requests\"] }}\nLast 1H Unique Users Affected: {{ $json[\"unique_failed_users\"] }}\nLast 1H Payment Failure Rate: {{ ($json[\"latest_pf_rate\"] * 100).toFixed(2) }}%\n\n1st Upper Band: {{ ($json[\"upper_threshold\"] * 100).toFixed(2) }}%\n2nd Upper Band (Urgent): {{ ($json[\"upper_threshold_2\"] * 100).toFixed(2) }}%\n\n[TREVO MY | Payment Failures Dashboard](http://analytics.socar.my/r/2594)"
+        },
+        "additionalFields": {}
+      },
+      "id": "644cb5c7-9b33-4b37-8b09-47b530f6de10",
+      "name": "Google Chat1",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        1720,
+        120
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.latest_pf_rate }}",
+              "operation": "isEmpty"
+            }
+          ]
+        }
+      },
+      "id": "f27eae15-f0d6-4272-a718-d88d95becbbf",
+      "name": "IF1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        940,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "5 08-22 * * *"
+            }
+          ]
+        }
+      },
+      "id": "44f03d81-9c81-418a-b2fd-64f30d9efc9a",
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        620,
+        100
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"today\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['today']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        120
+      ],
+      "id": "5220f193-d09d-4af4-8987-09a7169b9cd3"
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"today\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['today']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        320
+      ],
+      "id": "28345c7e-b2b2-4618-a2bb-636145f335bd"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.unique_failed_users }}",
+              "operation": "larger",
+              "value2": 8
+            }
+          ]
+        }
+      },
+      "id": "889e75a6-82ea-45c8-b4a0-c3c7f5c7e6b4",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        320
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11",
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds": [
+        "2024-05-16T00:00:00.000Z",
+        "2024-03-25T00:00:00.000Z",
+        "2024-02-15T00:00:00.000Z",
+        "2024-02-12T00:00:00.000Z",
+        "2024-02-10T00:00:00.000Z"
+      ]
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-07-02T04:45:26.645Z",
+      "updatedAt": "2023-07-02T04:45:26.645Z",
+      "id": "12",
+      "name": "Alert"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-05-16T06:05:02.780Z",
+  "versionId": "5fc8de50-7c2e-41bd-8036-b14594988eb2"
+}
