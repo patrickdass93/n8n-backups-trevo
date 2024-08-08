@@ -1,0 +1,122 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Send PN - Add User to Campaign1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2022-12-12T06:59:40.571Z",
+  "id": "5",
+  "name": "Jiun/Kavi - Host Compliance (Car Age >= 10)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "d0095cff-6ab9-46c3-acd5-3126a5e1461a",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        820,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \nl.id, l.registration_no, m.year, \nTRUNC(cast(to_char(CURRENT_DATE, 'yyyy') AS NUMERIC) - m.year) as car_age,\nm.name as model, \nl.user_id,\nu.uuid,\nu.email, \nu.phone_number\nfrom listings l \nleft join users u on u.id = l.user_id\nleft join listing_location ll on ll.listing_id = l.id\nleft join models m on m.id = l.model_id\nleft join brands b on b.id = m.brand_id\nleft join listing_availability la on la.listing_id = l.id\nwhere l.status in ('approved')\nand ll.country in ('Malaysia')\nand l.deleted_at is null\nand l.id = '20035'\ngroup by 1,2,3,4,5,6,7,8,9\n--having cast(to_char(CURRENT_DATE, 'yyyy') AS NUMERIC) - m.year = 9\norder by 4 asc",
+        "additionalFields": {}
+      },
+      "id": "485cb655-860f-4377-b591-7b13365fa72c",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1020,
+        360
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "trevodb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.leanplum.com/api?action=startCampaign",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={ \"appId\" : \"app_BXrjE7dc15VWXDLRfh77tActhBhSkCHeQhETDE1mXfQ\", \"clientKey\" : \"dev_L9yBjOmwfR3fNiVjL9woIYfWzsy5hMcGDx0og8isAFw\", \"apiVersion\" : \"1.0.6\", \"userId\":\"{{ $json[\"uuid\"] }}\", \"campaignId\":\"6238215416643584\", \"createDisposition\" : \"CreateNever\"}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "Send PN - Add User to Campaign1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1380,
+        360
+      ],
+      "id": "f6b4d5b8-c8b9-4c26-a8ba-814a21500af4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"uuid\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListings = items.filter((data) => actualNewListings.includes(data.json['uuid']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListings;"
+      },
+      "id": "e7834773-5ae0-4722-8a95-9689edcda1a4",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        360
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2022-12-15T07:10:58.310Z",
+  "versionId": "c7f73331-e18d-48d7-b7e0-759499f1c19a"
+}
