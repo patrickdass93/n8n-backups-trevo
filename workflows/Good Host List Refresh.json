@@ -1,0 +1,1002 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets2": {
+      "main": [
+        [
+          {
+            "node": "Postgres3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets3": {
+      "main": [
+        [
+          {
+            "node": "Postgres2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres3": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-07-04T05:19:06.055Z",
+  "id": "1pzCOl4mQRW0k9mC",
+  "name": "Good Host List Refresh",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "d54e6e79-5d4b-4633-84fb-f6dfb29d9e10",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        620,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1f13TPvhgdifnC1qhq1-3ouoywPuri03JPQNxsFSVYSE",
+          "mode": "list",
+          "cachedResultName": "TREVO MY - Good Hosts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1f13TPvhgdifnC1qhq1-3ouoywPuri03JPQNxsFSVYSE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 430812830,
+          "mode": "list",
+          "cachedResultName": "N8N Import - Good Host List ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1f13TPvhgdifnC1qhq1-3ouoywPuri03JPQNxsFSVYSE/edit#gid=430812830"
+        },
+        "clear": "specificRange",
+        "range": "A2:AC"
+      },
+      "id": "bc975ced-5bae-4148-9c74-5d0afbb586b9",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        840,
+        380
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\n--START HERE\nwith listings as\n(select distinct l.id as listing_id, \nl.url, \nbr.name as brand, \nm.name as model, \nlp.base_price, \ncase when ll.city_id in (1) then 'KV'   \nwhen ll.city_id in (2,12) then 'PGM' when ll.city_id in (48) then 'PGI'\nwhen ll.city_id in (3,19,20,21) then 'KK'   when ll.city_id in (4) then 'JB' \nwhen ll.city_id in (5) then 'IP'   when ll.city_id in (47) then 'NS'\nwhen ll.city_id in (13) then 'LGK' \nwhen ll.city_id in (14) then 'PRLS'\nwhen ll.city_id in (15) then 'MLK'\nwhen ll.city_id in (16) then 'PHG'\nwhen ll.city_id in (17) then 'TRGN'\nwhen ll.city_id in (18) then 'KLT'\nwhen ll.city_id in (22,23) then 'KCH'\nelse 'Others' end as City,\nll.address,\nl.allow_delivery,\nl.is_instant,\ncase when pp.id = '1' then 'yes'\nelse 'no' end as longterm,\nm.year,\nu.id, \nconcat(u.first_name,' ',u.last_name) as display_name,\nu.email, \nu.phone_number\nfrom listings l\n--\nleft join \n\t(select distinct ll.listing_id, \n\tll.country, \n\tll.city_id, \n\tconcat(ll.address_line_1,' ',ll.address_line_2,' ',ll.postal_code,' ',ll.country) as address,\n\tll.updated_at::timestamp\n\tfrom listing_location ll\n\tjoin \n\t\t(select distinct ll.listing_id, \n\t\tmax(ll.updated_at::timestamp)as updated_at\n\t\tfrom listing_location ll\n\t\tgroup by 1)max\n\t\ton max.listing_id = ll.listing_id and max.updated_at = ll.updated_at) ll \n\ton ll.listing_id = l.id\n--\nleft join listing_pricing lp on lp.listing_id = l.id\nleft join pricing_policies pp on pp.id = lp.pricing_policy_id\nleft join models m on m.id = l.model_id \nleft join brands br on br.id = m.brand_id \nleft join users u on u.id = l.user_id \nleft join listing_availability la on la.listing_id = l.id\nwhere 1=1\nand l.status = 'approved'\nand l.deleted_at is null\nand ll.country = 'Malaysia'\nand la.end_date::timestamp > NOW()::timestamp), \n--\nL6M_perf as \n(select distinct A.listing_id,\n--Overall\ncount(distinct case when (\n\t(A.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')) or --fulfilled\n\t(A.status = 'rejected' AND (A.reason !~* '(guest)' OR A.reason IS NULL) and A.nightowl = 'no') OR --exclude rejected with guest fault reasons and nightowl \n\t(A.status IN ('withdrawn', 'cancelled') AND A.reason ~* '(host|owner|avai|car)' and A.nightowl = 'no' AND A.reason !~* '(after i read|dont need|extended|rebook|rebooking|wrong date|wrong time|I didnt|manual|I want|I need|sorry|I would|mistake|my own car|wrong|change)') -- withdrawn with host fault reason and not guest fault reason and not nightowl\n\t) then A.ref_no end) as special_req,\ncount(distinct case when A.status in ('accepted', 'waiting_for_inspection', 'start_driving', 'return_car', 'completed') then A.ref_no end) as fuld_booking,\n--Weekend\ncount(distinct case when extract(isodow from A.request_start_at)>=6 and ((A.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')) or (A.status in ('withdrawn','cancelled') and A.reason ~* '(host|owner|avai|car)') or (A.status = 'rejected' and (A.reason !~* '(guest)' or A.reason is null))) then A.ref_no end) as special_req_weekend,\ncount(distinct case when extract(isodow from A.request_start_at)>=6 and A.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') then A.ref_no end) as fuld_weekend,\n--One-day\ncount(distinct case when A.dur = 1 and ((A.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')) or (A.status in ('withdrawn','cancelled') and A.reason ~* '(host|owner|avai|car)') or (A.status = 'rejected' and (A.reason !~* '(guest)' or A.reason is null))) then A.ref_no end) as special_req_1_day,\ncount(distinct case when A.dur = 1 and A.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') then A.ref_no end) as fuld_1_day,\n--Next-1/2-Day\ncount(distinct case when A.requested_start_lag <= '2' and ((A.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')) or (A.status in ('withdrawn','cancelled') and A.reason ~* '(host|owner|avai|car)') or (A.status = 'rejected' and (A.reason !~* '(guest)' or A.reason is null))) then A.ref_no end) as special_req_next_day,\ncount(distinct case when A.requested_start_lag <= '2' and A.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car') then A.ref_no end) as fuld_next_day,\n--\ncount(distinct case when A.status in ('accepted', 'waiting_for_inspection', 'start_driving', 'return_car', 'completed') and A.dur > 5 then A.ref_no end)as bookings_more_than_5_days\nfrom \n\t(select distinct b.ref_no, \n\tb.listing_id,\n\tb.status,\n\tb.reason,\n\tb.created_at,\n\tb.request_start_at::timestamp,\n\tb.request_end_at::timestamp,\n\tno.nightowl,\n\t(EXTRACT(EPOCH FROM b.request_end_at::timestamp) - EXTRACT(EPOCH FROM b.created_at::timestamp))/86400::integer as requested_start_lag,\n\tcase when bl.pricing_id = '3' then 0.5\n\twhen (extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp))/86400 < 1 then 1\n\twhen (extract(EPOCH from b.request_end_at::timestamp)::int - extract(EPOCH from b.request_start_at::timestamp)::int)%86400 < 2160 then\n\tfloor((extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp))/86400)\n\telse ceil((extract(EPOCH from b.request_end_at::timestamp) - extract(EPOCH from b.request_start_at::timestamp))/86400) end as dur\n\tfrom bookings b\n\tleft join booking_lines bl on bl.booking_id = b.id\n\tleft join\n\t\t(select distinct b.ref_no, \n\t\tcase when \n\t\t((EXTRACT(HOUR FROM b.created_at) in (23,0,1,2,3,4,5,6,7)) and    \n\t\t(EXTRACT(HOUR FROM b.request_start_at) in (6,7,8,9)) and\n\t\t((EXTRACT(EPOCH FROM (b.request_start_at - b.created_at)) / 3600) < 12)) then 'yes' else 'no' end as nightowl\n\t\tfrom bookings b)no\n\ton no.ref_no = b.ref_no\n\twhere b.request_end_at between (NOW()::timestamp - interval'60 days') and NOW()::timestamp\n\t)A\ngroup by 1)\n--\nselect l.*,\nl6p.*,\n(l6p.fuld_booking::numeric/nullif(l6p.special_req,0))*100 as AFR_rate,\n(l6p.fuld_weekend::numeric/nullif(l6p.special_req_weekend,0))*100 as AFR_rate_weekend,\n(l6p.fuld_1_day::numeric/nullif(l6p.special_req_1_day,0))*100 as AFR_rate_1_day,\n(l6p.fuld_next_day::numeric/nullif(l6p.special_req_next_day,0))*100 as AFR_rate_next_day\nfrom listings l \nleft join L6M_perf l6p on l6p.listing_id = l.listing_id",
+        "options": {}
+      },
+      "id": "64f0b422-a176-45c4-985d-eb684ba11d74",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1060,
+        380
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1f13TPvhgdifnC1qhq1-3ouoywPuri03JPQNxsFSVYSE",
+          "mode": "list",
+          "cachedResultName": "TREVO MY - Good Hosts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1f13TPvhgdifnC1qhq1-3ouoywPuri03JPQNxsFSVYSE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 430812830,
+          "mode": "list",
+          "cachedResultName": "N8N Import - Good Host List ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1f13TPvhgdifnC1qhq1-3ouoywPuri03JPQNxsFSVYSE/edit#gid=430812830"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "listing_id"
+          ],
+          "schema": [
+            {
+              "id": "listing_id",
+              "displayName": "listing_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "brand",
+              "displayName": "brand",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "model",
+              "displayName": "model",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "base_price",
+              "displayName": "base_price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "allow_delivery",
+              "displayName": "allow_delivery",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_instant",
+              "displayName": "is_instant",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "longterm",
+              "displayName": "longterm",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "year",
+              "displayName": "year",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "display_name",
+              "displayName": "display_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone_number",
+              "displayName": "phone_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "listing_id1",
+              "displayName": "listing_id1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "special_req",
+              "displayName": "special_req",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fuld_booking",
+              "displayName": "fuld_booking",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "special_req_weekend",
+              "displayName": "special_req_weekend",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fuld_weekend",
+              "displayName": "fuld_weekend",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "special_req_1_day",
+              "displayName": "special_req_1_day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fuld_1_day",
+              "displayName": "fuld_1_day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "special_req_next_day",
+              "displayName": "special_req_next_day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fuld_next_day",
+              "displayName": "fuld_next_day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "bookings_more_than_5_days",
+              "displayName": "bookings_more_than_5_days",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "afr_rate",
+              "displayName": "afr_rate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "afr_rate_weekend",
+              "displayName": "afr_rate_weekend",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "afr_rate_1_day",
+              "displayName": "afr_rate_1_day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "afr_rate_next_day",
+              "displayName": "afr_rate_next_day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "03acfbbf-b293-47be-b486-ce1e1b05f347",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1300,
+        380
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1f13TPvhgdifnC1qhq1-3ouoywPuri03JPQNxsFSVYSE",
+          "mode": "list",
+          "cachedResultName": "TREVO MY - Good Hosts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1f13TPvhgdifnC1qhq1-3ouoywPuri03JPQNxsFSVYSE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1894928593,
+          "mode": "list",
+          "cachedResultName": "N8N Import - TO List",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1f13TPvhgdifnC1qhq1-3ouoywPuri03JPQNxsFSVYSE/edit#gid=1894928593"
+        },
+        "clear": "specificRange",
+        "range": "A2:O"
+      },
+      "id": "043e8517-4eca-4a57-898c-37269985b838",
+      "name": "Google Sheets2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        840,
+        600
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1f13TPvhgdifnC1qhq1-3ouoywPuri03JPQNxsFSVYSE",
+          "mode": "list",
+          "cachedResultName": "TREVO MY - Good Hosts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1f13TPvhgdifnC1qhq1-3ouoywPuri03JPQNxsFSVYSE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1894928593,
+          "mode": "list",
+          "cachedResultName": "N8N Import - TO List",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1f13TPvhgdifnC1qhq1-3ouoywPuri03JPQNxsFSVYSE/edit#gid=1894928593"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "listing_id"
+          ],
+          "schema": [
+            {
+              "id": "listing_id",
+              "displayName": "listing_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "brand",
+              "displayName": "brand",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "model",
+              "displayName": "model",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "base_price",
+              "displayName": "base_price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "allow_delivery",
+              "displayName": "allow_delivery",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_instant",
+              "displayName": "is_instant",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "longterm",
+              "displayName": "longterm",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "year",
+              "displayName": "year",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "display_name",
+              "displayName": "display_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone_number",
+              "displayName": "phone_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "listing_id1",
+              "displayName": "listing_id1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "special_req",
+              "displayName": "special_req",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fuld_booking",
+              "displayName": "fuld_booking",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "special_req_weekend",
+              "displayName": "special_req_weekend",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fuld_weekend",
+              "displayName": "fuld_weekend",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "special_req_1_day",
+              "displayName": "special_req_1_day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fuld_1_day",
+              "displayName": "fuld_1_day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "special_req_next_day",
+              "displayName": "special_req_next_day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fuld_next_day",
+              "displayName": "fuld_next_day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "bookings_more_than_5_days",
+              "displayName": "bookings_more_than_5_days",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "afr_rate",
+              "displayName": "afr_rate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "afr_rate_weekend",
+              "displayName": "afr_rate_weekend",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "afr_rate_1_day",
+              "displayName": "afr_rate_1_day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "afr_rate_next_day",
+              "displayName": "afr_rate_next_day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "56b40021-a30a-4640-873a-be70a05d4472",
+      "name": "Google Sheets4",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1300,
+        600
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1f13TPvhgdifnC1qhq1-3ouoywPuri03JPQNxsFSVYSE",
+          "mode": "list",
+          "cachedResultName": "TREVO MY - Good Hosts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1f13TPvhgdifnC1qhq1-3ouoywPuri03JPQNxsFSVYSE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 395108968,
+          "mode": "list",
+          "cachedResultName": "N8N Import - N30D Avai Cars",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1f13TPvhgdifnC1qhq1-3ouoywPuri03JPQNxsFSVYSE/edit#gid=395108968"
+        },
+        "clear": "specificRange",
+        "range": "A2:E"
+      },
+      "id": "8a444195-425e-4fff-a338-9f694d9a890b",
+      "name": "Google Sheets3",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        840,
+        820
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect distinct l.id, \nto_char(ladates.ymd,'YYYY-MM-DD') as ymd, \ncount(distinct ladates.ymd)as avai,\ncount(distinct bdates.ymd)as booked,\ncount(distinct ladates.ymd)-count(distinct bdates.ymd) as true_avai\nfrom listings l \nleft join listing_availability la on la.listing_id = l.id\nleft join listing_location ll on ll.listing_id = l.id\nleft join bookings b on b.listing_id = l.id and b.status = 'accepted'\nleft join (SELECT generate_series(NOW()::timestamp, NOW()::timestamp + interval '30 days', interval '1 day')::date ymd) ladates on \nladates.ymd between la.start_date::date and la.end_date::date\nleft join (SELECT generate_series(NOW()::timestamp, NOW()::timestamp + interval '30 days', interval '1 day')::date ymd) bdates on \nbdates.ymd between b.request_start_at::date and b.request_end_at ::date and bdates.ymd = ladates.ymd\nwhere 1=1\nand l.status = 'approved'\nand l.deleted_at is null\nand ll.country = 'Malaysia'\nand ladates.ymd is not null\n--and l.registration_no = 'VKL7526'\ngroup by 1,2\norder by 2",
+        "options": {}
+      },
+      "id": "2f65e4f4-05fd-4cbf-a9c0-87fd3b23e486",
+      "name": "Postgres2",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1060,
+        820
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1f13TPvhgdifnC1qhq1-3ouoywPuri03JPQNxsFSVYSE",
+          "mode": "list",
+          "cachedResultName": "TREVO MY - Good Hosts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1f13TPvhgdifnC1qhq1-3ouoywPuri03JPQNxsFSVYSE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 395108968,
+          "mode": "list",
+          "cachedResultName": "N8N Import - N30D Avai Cars",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1f13TPvhgdifnC1qhq1-3ouoywPuri03JPQNxsFSVYSE/edit#gid=395108968"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ymd",
+              "displayName": "ymd",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "avai",
+              "displayName": "avai",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "booked",
+              "displayName": "booked",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "true_avai",
+              "displayName": "true_avai",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "25123c2b-8dc8-4333-897a-d2748a763dae",
+      "name": "Google Sheets6",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1300,
+        820
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect distinct l.id as listing_id, \nl.url, \nbr.name as brand, \nm.name as model, \nlp.base_price, \ncase when ll.city_id in (1) then 'KV'   \nwhen ll.city_id in (2,12) then 'PGM' when ll.city_id in (48) then 'PGI'\nwhen ll.city_id in (3,19,20,21) then 'KK'   when ll.city_id in (4) then 'JB' \nwhen ll.city_id in (5) then 'IP'   when ll.city_id in (47) then 'NS'\nwhen ll.city_id in (13) then 'LGK' \nwhen ll.city_id in (14) then 'PRLS'\nwhen ll.city_id in (15) then 'MLK'\nwhen ll.city_id in (16) then 'PHG'\nwhen ll.city_id in (17) then 'TRGN'\nwhen ll.city_id in (18) then 'KLT'\nwhen ll.city_id in (22,23) then 'KCH'\nelse 'Others' end as City,\nll.address,\nl.allow_delivery,\nl.is_instant,\ncase when pp.id = '1' then 'yes'\nelse 'no' end as longterm,\nm.year,\nu.id, \nconcat(u.first_name,' ',u.last_name) as display_name,\nu.email, \nu.phone_number\nfrom listings l\n--\nleft join \n\t(select distinct ll.listing_id, \n\tll.country, \n\tll.city_id, \n\tconcat(ll.address_line_1,' ',ll.address_line_2,' ',ll.postal_code,' ',ll.country) as address,\n\tll.updated_at::timestamp\n\tfrom listing_location ll\n\tjoin \n\t\t(select distinct ll.listing_id, \n\t\tmax(ll.updated_at::timestamp)as updated_at\n\t\tfrom listing_location ll\n\t\tgroup by 1)max\n\t\ton max.listing_id = ll.listing_id and max.updated_at = ll.updated_at) ll \n\ton ll.listing_id = l.id\n--\nleft join listing_pricing lp on lp.listing_id = l.id\nleft join pricing_policies pp on pp.id = lp.pricing_policy_id\nleft join models m on m.id = l.model_id \nleft join brands br on br.id = m.brand_id \nleft join users u on u.id = l.user_id \nleft join listing_availability la on la.listing_id = l.id\nwhere 1=1\nand l.status = 'approved'\nand l.deleted_at is null\nand l.user_id in (2301647,2301657,2301669)\nand ll.country = 'Malaysia'\nand la.end_date::timestamp > NOW()::timestamp\n",
+        "options": {}
+      },
+      "id": "2b9b97f2-503c-44d2-a31e-05483849ff52",
+      "name": "Postgres3",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1060,
+        600
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-07-05T07:16:25.869Z",
+  "versionId": "0a4b7579-5a31-4f48-bd48-443ee386786c"
+}
