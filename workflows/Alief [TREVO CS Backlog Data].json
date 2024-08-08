@@ -1,0 +1,1006 @@
+{
+  "active": true,
+  "connections": {
+    "Freshdesk": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Current Timestamp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Current Timestamp": {
+      "main": [
+        [
+          {
+            "node": "Get Day Before",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Day Before": {
+      "main": [
+        [
+          {
+            "node": "Freshdesk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-02-09T08:31:26.245Z",
+  "id": "J7ffOTksXXe2dseT",
+  "name": "Alief [TREVO CS Backlog Data]",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "options": {
+          "include": [
+            "stats"
+          ],
+          "updatedSince": "={{ $json.newDate }}"
+        }
+      },
+      "id": "747c642b-310e-4883-90cd-51a16507401e",
+      "name": "Freshdesk",
+      "type": "n8n-nodes-base.freshdesk",
+      "typeVersion": 1,
+      "position": [
+        920,
+        160
+      ],
+      "credentials": {
+        "freshdeskApi": {
+          "id": "22",
+          "name": "SOCAR CS Freshdesk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "e9bcf276-bff3-4e20-902a-d0492dbe1d0f",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        400,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.custom_fields.cf_country }}",
+              "value2": "Malaysia"
+            },
+            {
+              "value1": "={{ $json.type }}",
+              "operation": "notEqual",
+              "value2": "SOCAR"
+            }
+          ]
+        }
+      },
+      "id": "01e588a7-3333-4d11-b7dd-76100eff7419",
+      "name": "Filter",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1ikjnAdiOzau7FRYsHNanTpupY5_yfFDZyRF1JMopVGM",
+          "mode": "list",
+          "cachedResultName": "TREVO CS Backlog API",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ikjnAdiOzau7FRYsHNanTpupY5_yfFDZyRF1JMopVGM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ikjnAdiOzau7FRYsHNanTpupY5_yfFDZyRF1JMopVGM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "cc Emails 0": "={{ $json.cc_emails[0] }}",
+            "cc Emails 1": "={{ $json.cc_emails[1] }}",
+            "cc Emails 2": "={{ $json.cc_emails[2] }}",
+            "cc Emails 3": "={{ $json.cc_emails[3] }}",
+            "cc Emails 4": "={{ $json.cc_emails[4] }}",
+            "cc Emails 5": "={{ $json.cc_emails[5] }}",
+            "fwd Emails 0": "={{ $json.fwd_emails[0] }}",
+            "fwd Emails 1": "={{ $json.fwd_emails[1] }}",
+            "fwd Emails 2": "={{ $json.fwd_emails[2] }}",
+            "fwd Emails 3": "={{ $json.fwd_emails[3] }}",
+            "fwd Emails 4": "={{ $json.fwd_emails[4] }}",
+            "reply cc emails 0": "={{ $json.reply_cc_emails[0] }}",
+            "reply cc emails 1": "={{ $json.reply_cc_emails[1] }}",
+            "reply cc emails 2": "={{ $json.reply_cc_emails[2] }}",
+            "reply cc emails 3": "={{ $json.reply_cc_emails[3] }}",
+            "reply cc emails 4": "={{ $json.reply_cc_emails[4] }}",
+            "reply cc emails 5": "={{ $json.reply_cc_emails[5] }}",
+            "ticket cc emails 0": "={{ $json.ticket_cc_emails[0] }}",
+            "ticket cc emails 1": "={{ $json.ticket_cc_emails[1] }}",
+            "ticket cc emails 2": "={{ $json.ticket_cc_emails[2] }}",
+            "fr escalated": "={{ $json.fr_escalated }}",
+            "spam": "={{ $json.spam }}",
+            "email config id": "={{ $json.email_config_id }}",
+            "group id": "={{ $json.group_id }}",
+            "priority": "={{ $json.priority }}",
+            "requester id": "={{ $json.requester_id }}",
+            "responder id": "={{ $json.responder_id }}",
+            "source": "={{ $json.source }}",
+            "company id": "={{ $json.company_id }}",
+            "status": "={{ $json.status }}",
+            "subject": "={{ $json.subject }}",
+            "association type": "={{ $json.association_type }}",
+            "support email": "={{ $json.support_email }}",
+            "to email": "={{ $json.to_emails }}",
+            "product id": "={{ $json.product_id }}",
+            "type": "={{ $json.type }}",
+            "due by": "={{ $json.due_by }}",
+            "fr due by": "={{ $json.fr_due_by }}",
+            "is escalated": "={{ $json.is_escalated }}",
+            "CR L1": "={{ $json.custom_fields.cf_level1 }}",
+            "CR L2": "={{ $json.custom_fields.cf_level2 }}",
+            "CR L3": "={{ $json.custom_fields.cf_level3 }}",
+            "MID": "={{ $json.custom_fields.cf_mid }}",
+            "Country": "={{ $json.custom_fields.cf_country }}",
+            "Source": "={{ $json.custom_fields.cf_source }}",
+            "Contact Name": "={{ $json.custom_fields.cf_fsm_contact_name }}",
+            "Contact Phone Number": "={{ $json.custom_fields.cf_fsm_phone_number }}",
+            "Booking Ref": "={{ $json.custom_fields.cf_booking_ref_num }}",
+            "Callback Required": "={{ $json.custom_fields.cf_call_back_required }}",
+            "Callback Issue": "={{ $json.custom_fields.cf_call_back_issue }}",
+            "Action Taken": "={{ $json.custom_fields.cf_actions_taken }}",
+            "Follow up Required": "={{ $json.custom_fields.cf_is_followup_required }}",
+            "Created At": "={{ $json.created_at }}",
+            "Updated At": "={{ $json.updated_at }}",
+            "Associated Tickets Count": "={{ $json.associated_tickets_count }}",
+            "Tags 0": "={{ $json.tags[0] }}",
+            "Tags 1": "={{ $json.tags[1] }}",
+            "Tags 2": "={{ $json.tags[2] }}",
+            "Agent Responded at": "={{ $json.stats.agent_responded_at }}",
+            "Requested Responded at": "={{ $json.stats.requester_responded_at }}",
+            "First Responded at": "={{ $json.stats.first_responded_at }}",
+            "Status Updated at": "={{ $json.stats.status_updated_at }}",
+            "Reopened at": "={{ $json.stats.reopened_at }}",
+            "Resolved at": "={{ $json.stats.resolved_at }}",
+            "Closed at": "={{ $json.stats.closed_at }}",
+            "Pending since": "={{ $json.stats.pending_since }}",
+            "Internal agent id": "={{ $json.internal_agent_id }}",
+            "Internal group id": "={{ $json.internal_group_id }}",
+            "nr due by": "={{ $json.nr_due_by }}",
+            "nr escalated": "={{ $json.nr_escalated }}",
+            "form_id": "={{ $json.form_id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "cc Emails 0",
+              "displayName": "cc Emails 0",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cc Emails 1",
+              "displayName": "cc Emails 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cc Emails 2",
+              "displayName": "cc Emails 2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cc Emails 3",
+              "displayName": "cc Emails 3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cc Emails 4",
+              "displayName": "cc Emails 4",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cc Emails 5",
+              "displayName": "cc Emails 5",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fwd Emails 0",
+              "displayName": "fwd Emails 0",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fwd Emails 1",
+              "displayName": "fwd Emails 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fwd Emails 2",
+              "displayName": "fwd Emails 2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fwd Emails 3",
+              "displayName": "fwd Emails 3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fwd Emails 4",
+              "displayName": "fwd Emails 4",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reply cc emails 0",
+              "displayName": "reply cc emails 0",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reply cc emails 1",
+              "displayName": "reply cc emails 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reply cc emails 2",
+              "displayName": "reply cc emails 2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reply cc emails 3",
+              "displayName": "reply cc emails 3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reply cc emails 4",
+              "displayName": "reply cc emails 4",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reply cc emails 5",
+              "displayName": "reply cc emails 5",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ticket cc emails 0",
+              "displayName": "ticket cc emails 0",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ticket cc emails 1",
+              "displayName": "ticket cc emails 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ticket cc emails 2",
+              "displayName": "ticket cc emails 2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fr escalated",
+              "displayName": "fr escalated",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "spam",
+              "displayName": "spam",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email config id",
+              "displayName": "email config id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "group id",
+              "displayName": "group id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "requester id",
+              "displayName": "requester id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "responder id",
+              "displayName": "responder id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company id",
+              "displayName": "company id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "subject",
+              "displayName": "subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "association type",
+              "displayName": "association type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "support email",
+              "displayName": "support email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "to email",
+              "displayName": "to email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "product id",
+              "displayName": "product id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "due by",
+              "displayName": "due by",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fr due by",
+              "displayName": "fr due by",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is escalated",
+              "displayName": "is escalated",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CR L1",
+              "displayName": "CR L1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CR L2",
+              "displayName": "CR L2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CR L3",
+              "displayName": "CR L3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "MID",
+              "displayName": "MID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Country",
+              "displayName": "Country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Contact Name",
+              "displayName": "Contact Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Contact Phone Number",
+              "displayName": "Contact Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Booking Ref",
+              "displayName": "Booking Ref",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Callback Required",
+              "displayName": "Callback Required",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Callback Issue",
+              "displayName": "Callback Issue",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Action Taken",
+              "displayName": "Action Taken",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Follow up Required",
+              "displayName": "Follow up Required",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Created At",
+              "displayName": "Created At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Updated At",
+              "displayName": "Updated At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Associated Tickets Count",
+              "displayName": "Associated Tickets Count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tags 0",
+              "displayName": "Tags 0",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tags 1",
+              "displayName": "Tags 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tags 2",
+              "displayName": "Tags 2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Agent Responded at",
+              "displayName": "Agent Responded at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Requested Responded at",
+              "displayName": "Requested Responded at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "First Responded at",
+              "displayName": "First Responded at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status Updated at",
+              "displayName": "Status Updated at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reopened at",
+              "displayName": "Reopened at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Resolved at",
+              "displayName": "Resolved at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Closed at",
+              "displayName": "Closed at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Pending since",
+              "displayName": "Pending since",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Internal agent id",
+              "displayName": "Internal agent id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Internal group id",
+              "displayName": "Internal group id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nr due by",
+              "displayName": "nr due by",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nr escalated",
+              "displayName": "nr escalated",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "form_id",
+              "displayName": "form_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "formatted date",
+              "displayName": "formatted date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f3eae86d-832f-475c-bfac-f9d74f6f20cd",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1760,
+        160
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "POVMRt7PE7R00O4v",
+          "name": "Alief - Google Sheet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $json.created_at }}",
+        "options": {
+          "timezone": false
+        }
+      },
+      "id": "07d005a5-3559-483f-83b9-45de3bab4635",
+      "name": "Date & Time",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        1380,
+        240
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "ef303efa-8c5b-4a1f-8495-98f1d784bbc5",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        1580,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "59f4ee3c-d9a5-4d61-83be-0cec85fd4159",
+      "name": "Get Current Timestamp",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        560,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "subtractFromDate",
+        "magnitude": "={{ $json.currentDate }}",
+        "duration": 1
+      },
+      "id": "b8cc2bd3-249f-4295-95e8-3ffe37a8f822",
+      "name": "Get Day Before",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        740,
+        160
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-02-23T08:11:38.479Z",
+  "versionId": "b286b875-92ec-4742-8c83-ea8c4a259f32"
+}
