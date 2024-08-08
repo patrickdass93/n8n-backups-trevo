@@ -1,0 +1,372 @@
+{
+  "active": false,
+  "connections": {
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Host_excess_mileage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-11-16T05:22:40.745Z",
+  "id": "jyauyljLqFOVyhUT",
+  "name": "[KAVI] Create Event",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "d02fe4b9-1c22-4ad3-9c2b-3b03786e2513",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        620,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"71fba47a-ab97-432f-a38a-cea34825fbff\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_Manual_Event\",\n            \"evtData\": {\n                \"Event_name\": \"20231209_availability\"\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "bf0350f2-9075-4cbf-8fec-837937ee5e88",
+      "name": "[CT] - Create Event1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        820,
+        0
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect *,\nA.dur_comp * 200 as given_mileage,\nA.travelled - (A.dur_comp*200)as exceeded\nfrom \n(select distinct b.ref_no,\nl.registration_no,\nbr.name as brand,\ncase when POSITION(' ' IN trim(regexp_replace(regexp_replace(INITCAP(m.name),'^([a-z]{1,3})-','\\1'),'([a-z]{3,})-','\\1 '))) > 0 \nthen trim(SUBSTR(trim(regexp_replace(regexp_replace(INITCAP(m.name),'^([a-z]{1,3})-','\\1'),'([a-z]{3,})-','\\1 ')),1, \nPOSITION(' ' IN trim(regexp_replace(regexp_replace(INITCAP(m.name),'^([a-z]{1,3})-','\\1'),'([a-z]{3,})-','\\1 ')))))\nelse trim(regexp_replace(regexp_replace(INITCAP(m.name),'^([a-z]{1,3})-','\\1'),'([a-z]{3,})-','\\1 ')) end as car_model_regex,\nl.user_id, \nconcat(u.first_name,' ',u.last_name)as host_name,\nu.email, \nu.phone_number,\nu.uuid,\nto_char(b.created_at::timestamp,'YYYY-MM-DD HH24:MI') as created_at,\nto_char(b.request_start_at::timestamp,'YYYY-MM-DD HH24:MI') as start_at,\nto_char(b.request_end_at::timestamp,'YYYY-MM-DD HH24:MI') as end_at,\nto_char(b.booking_end_at::timestamp,'YYYY-MM-DD HH24:MI') as guest_end_at,\nbi.mileage as start_mileage, \nbi2.mileage as end_mileage,\nnullif(bi2.mileage - bi.mileage,0) as travelled,\nsum(case when b.status in ('accepted', 'waiting_for_inspection', 'start_driving', 'return_car', 'completed') then (case when bl.pricing_id = '3' then 0.5\nwhen (extract(EPOCH from b.request_end_at)::int - extract(EPOCH from b.request_start_at)::int)%86400 < 2160 then\nfloor((extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400)\nelse ceil((extract(EPOCH from b.request_end_at) - extract(EPOCH from b.request_start_at))/86400) end)end) as dur_comp,\nd5.rental\nfrom bookings b \nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = b.listing_id\nleft join listings l on l.id = b.listing_id\nleft join users u on u.id = l.user_id\nleft join booking_lines bl on bl.booking_id = b.id and bl.slug = 'rental-fee'\nleft join booking_inspections bi on bi.booking_id = b.id and bi.type = 'start'\nleft join booking_inspections bi2 on bi2.booking_id = b.id and bi2.type = 'end'\nleft join models m on m.id = l.model_id\nleft join brands br on br.id = m.brand_id\nleft join\n(select bl.booking_id, bl.amount as rental from booking_lines bl where bl.slug = 'rental-fee') d5\non b.id = d5.booking_id\nwhere 1=1\nand ll.country = 'Malaysia'\nand b.status = 'completed'\n--and b.listing_id = '20035'\n--and b.request_end_at::timestamp between (NOW()::timestamp - interval'10 mins') and NOW()\ngroup by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,18\norder by 5)A\nlimit 5",
+        "options": {}
+      },
+      "id": "a391cefd-dafd-4e0e-af0d-9a7c7ee0a6f6",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        340,
+        0
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"71fba47a-ab97-432f-a38a-cea34825fbff\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_issue_report\",\n            \"evtData\": {\n                \"IR_issue_type\": \"accident\",\n                \"IR_host_name\": \"Kavindra Herat\",\n                \"IR_ref_no\": \"XYZ2022\",\n                \"IR_report_date\": \"2024-01-01\",\n                \"IR_report_time\": \"13:49\",\n                \"IR_trip_start\": \"2024-01-01\",\n                \"IR_trip_end\": \"2024-01-01\",\n                \"IR_car_brand\": \"BMW\",\n                \"IR_car_model\": \"E39\",\n                \"IR_reg_no\": \"XYZ1337\",\n                \"IR_photos\": \"Yes\",\n                \"IR_comment\": \"Kavindra was a great driver\"\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "dd433558-333a-4eb5-9d7c-6c104b8cb572",
+      "name": "[CT] - Host_Issue_report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1240,
+        0
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"71fba47a-ab97-432f-a38a-cea34825fbff\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_issue_report\",\n            \"evtData\": {\n                \"IR_issue_type\": \"accident\",\n                \"IR_host_name\": \"Kavindra Herat\",\n                \"IR_ref_no\": \"XYZ2022\",\n                \"IR_report_date\": \"2024-01-01\",\n                \"IR_report_time\": \"13:49\",\n                \"IR_trip_start\": \"2024-01-01\",\n                \"IR_trip_end\": \"2024-01-01\",\n                \"IR_car_brand\": \"BMW\",\n                \"IR_car_model\": \"E39\",\n                \"IR_reg_no\": \"XYZ1337\",\n                \"IR_photos\": \"Yes\",\n                \"IR_comment\": \"Kavindra was a great driver\"\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "dfd9bed4-0e02-4b0f-8f8b-b57a42e1d7c3",
+      "name": "[CT] - Host_Issue_report1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1040,
+        0
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"uuid\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_excess_mileage\",\n            \"evtData\": {\n                \"booking_ref\": \"{{ $json[\"ref_no\"] }}\",\n                \"listing_reg\": \"{{ $json[\"registration_no\"] }}\",\n                \"booking_start\": \"{{ $json[\"start_at\"] }}\",\n                \"booking_end\": \"{{ $json[\"end_at\"] }}\",\n                \"car_brand\": \"{{ $json[\"brand\"] }}\",\n                \"car_model\": \"{{ $json[\"car_model_regex\"] }}\",\n                \"host_name\": \"{{ $json[\"host_name\"] }}\"\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "e2a6ee11-3b9c-450d-bf8d-e46e10f19e38",
+      "name": "Host_excess_mileage",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        540,
+        0
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"71fba47a-ab97-432f-a38a-cea34825fbff\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_Availability\",\n            \"evtData\": {\n                \"HA_com_id\": \"Next3Month\"\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "f6c857d5-35f7-476a-8310-7c763b9894a1",
+      "name": "[CT] - Host_Availability1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        820,
+        -180
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"71fba47a-ab97-432f-a38a-cea34825fbff\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_HRF\",\n            \"evtData\": {\n                \"HRF_hostname\": \"Kavindra Herat\",\n                \"HRF_timestamp\": \"1/15/2024 18:41:38\",\n                \"HRF_type\": \"Listing Daily Rate\",\n                \"HRF_registration_no\": \"XYZ1234\",\n                \"HRF_status\": \"Successfully updated\",\n                \"HRF_comments\": \"unable to verify Host - please contact us\"\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "dabe9122-e2bc-459d-bcdb-8d9ba265da25",
+      "name": "[CT] - HRF Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1020,
+        -180
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"71fba47a-ab97-432f-a38a-cea34825fbff\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_TGReminder\",\n            \"evtData\": {\n                \"TGR_timestamp\": \"L1\",\n                \"TGR_carplate\": \"XYZ121\",\n                \"TGR_toexpire\": \"60\"\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "b57d1e55-c0de-4272-bb54-7baca68be210",
+      "name": "[CT] - TG Expiry Reminder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1240,
+        -180
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"71fba47a-ab97-432f-a38a-cea34825fbff\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_PreSignup\",\n            \"evtData\": {\n                \"PreS_InsuredAmountYN\": \"Y\",\n                \"PreS_timestamp\": \"immediate\"\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "17007e79-1de4-4b6a-95ca-8328619eab42",
+      "name": "[CT] - Host Pre Signup",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1440,
+        -180
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"71fba47a-ab97-432f-a38a-cea34825fbff\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_PreSignup\",\n            \"evtData\": {\n                \"PreS_InsuredAmountYN\": \"Y\",\n                \"PreS_timestamp\": \"immediate\"\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "940dd645-bade-4666-84cc-51dea521db33",
+      "name": "[CT] - Host Pre Signup1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        820,
+        -500
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"71fba47a-ab97-432f-a38a-cea34825fbff\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_TGReminder\",\n            \"evtData\": {\n                \"TGR_timestamp\": \"L7\",\n                \"TGR_carplate\": \"XYZ121\",\n                \"TGR_toexpire\": \"60\",\n                \"TGR_Allianz_YN\": \"Y\"\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "f7a187d5-0fd0-4ff9-bb0c-073c18d239d0",
+      "name": "[CT] - TG Expiry Reminder L7",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1040,
+        -500
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"71fba47a-ab97-432f-a38a-cea34825fbff\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_CFT\",\n            \"evtData\": {\n                \"time_stamp\": \"No_CFT\"\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "de990b3b-2dcc-4270-9803-019168f4f77a",
+      "name": "[CT] - No CFT PN & EDM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1440,
+        0
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"71fba47a-ab97-432f-a38a-cea34825fbff\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_DocUpload\",\n            \"evtData\": {\n                \"DocU_timestamp\": \"7D\",\n                \"DocU_HostName\": \"Name\"\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "84a12d17-9d1f-41c0-97eb-3ba2009386b6",
+      "name": "[CT] - Host Doc Upload",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        420,
+        -500
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"71fba47a-ab97-432f-a38a-cea34825fbff\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_Statement\",\n            \"evtData\": {\n                \"HS_timestamp\": \"Weekly\",\n                \"HS_STARTDATE\": \"XYZ121\",\n                \"HS_ENDDATE\": \"60\",\n                \"HS_HOSTNAME\": \"Kavindra Herat\",\n                \"HS_COMPBOOKING\": 25,\n                \"HS_ESTPAYOUT\": 500,\n                \"HS_COMPDAYS\": 20,\n                \"HS_COMRATE\": 0.15,\n                \"HS_PRICESURGE\": \"Enabled\",\n                \"HS_SST\": 70,\n                \"HS_PAYOUTSTART\": \"2024-03-10\",\n                \"HS_PAYOUTEND\": \"2024-03-20\",\n                \"HS_C1PLATE\": \"ABC123\",\n                \"HS_C1ACCEPTRATE\": 80,\n                \"HS_C1DAYSBOOKED\": 15,\n                \"HS_C1REQUESTBOOK\": 30,\n                \"HS_C1COMPBOOK\": 10,\n                \"HS_C1REJECTBOOK\": 5,\n                \"HS_C1DYNPRICING\": 3,\n                \"HS_C1ESTLOSS\": 100,\n                \"HS_C1SHIELDPLAN\": \"Shield 60\",\n                \"HS_C1PLATFORMCOMM\": 0.2,\n                \"HS_C1SST\": 70,\n                \"HS_C1ESTPAYOUT\": 450,\n                \"HS_C2PLATE\": \"DEF456\",\n                \"HS_C2ACCEPTRATE\": 75,\n                \"HS_C2DAYSBOOKED\": 18,\n                \"HS_C2REQUESTBOOK\": 25,\n                \"HS_C2COMPBOOK\": 12,\n                \"HS_C2REJECTBOOK\": 6,\n                \"HS_C2DYNPRICING\": 4,\n                \"HS_C2ESTLOSS\": 120,\n                \"HS_C2SHIELDPLAN\": \"Shield 70\",\n                \"HS_C2PLATFORMCOMM\": 0.18,\n                \"HS_C2SST\": 75,\n                \"HS_C2ESTPAYOUT\": 480,\n                \"HS_C3PLATE\": \"GHI789\",\n                \"HS_C3ACCEPTRATE\": 85,\n                \"HS_C3DAYSBOOKED\": 12,\n                \"HS_C3REQUESTBOOK\": 28,\n                \"HS_C3COMPBOOK\": 15,\n                \"HS_C3REJECTBOOK\": 8,\n                \"HS_C3DYNPRICING\": 5,\n                \"HS_C3ESTLOSS\": 90,\n                \"HS_C3SHIELDPLAN\": \"Shield 75\",\n                \"HS_C3PLATFORMCOMM\": 0.22,\n                \"HS_C3SST\": 80,\n                \"HS_C3ESTPAYOUT\": 420,\n                \"HS_C4PLATE\": \"JKL012\",\n                \"HS_C4ACCEPTRATE\": 70,\n                \"HS_C4DAYSBOOKED\": 22,\n                \"HS_C4REQUESTBOOK\": 20,\n                \"HS_C4COMPBOOK\": 8,\n                \"HS_C4REJECTBOOK\": 4,\n                \"HS_C4DYNPRICING\": 6,\n                \"HS_C4ESTLOSS\": 110,\n                \"HS_C4SHIELDPLAN\": \"Shield 60\",\n                \"HS_C4PLATFORMCOMM\": 0.17,\n                \"HS_C4SST\": 85,\n                \"HS_C4ESTPAYOUT\": 460,\n                \"HS_C5PLATE\": \"MNO345\",\n                \"HS_C5ACCEPTRATE\": 78,\n                \"HS_C5DAYSBOOKED\": 17,\n                \"HS_C5REQUESTBOOK\": 26,\n                \"HS_C5COMPBOOK\": 11,\n                \"HS_C5REJECTBOOK\": 7,\n                \"HS_C5DYNPRICING\": 7,\n                \"HS_C5ESTLOSS\": 95,\n                \"HS_C5SHIELDPLAN\": \"Shield 70\",\n                \"HS_C5PLATFORMCOMM\": 0.19,\n                \"HS_C5SST\": 90,\n                \"HS_C5ESTPAYOUT\": 490,\n                \"HS_C6PLATE\": \"PQR678\",\n                \"HS_C6ACCEPTRATE\": 88,\n                \"HS_C6DAYSBOOKED\": 14,\n                \"HS_C6REQUESTBOOK\": 32,\n                \"HS_C6COMPBOOK\": 13,\n                \"HS_C6REJECTBOOK\": 3,\n                \"HS_C6DYNPRICING\": 8,\n                \"HS_C6ESTLOSS\": 105,\n                \"HS_C6SHIELDPLAN\": \"Shield 75\",\n                \"HS_C6PLATFORMCOMM\": 0.21,\n                \"HS_C6SST\": 95,\n                \"HS_C6ESTPAYOUT\": 430\n            }\n        }\n    ]\n}\n",
+        "options": {}
+      },
+      "id": "ababc258-e7fd-4829-9997-b05bbc47a695",
+      "name": "[CT] - Host Weekly Statement",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1440,
+        -380
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"71fba47a-ab97-432f-a38a-cea34825fbff\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_Manual_Event\",\n            \"evtData\": {\n                \"Event_name\": \"hsd_raya24\"\n            }\n        }\n    ]\n}\n",
+        "options": {}
+      },
+      "id": "61fe0618-ca2d-4ba1-81c1-70bee0bc6335",
+      "name": "[CT] - HSD Raya Booster",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        800,
+        420
+      ],
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-04-05T09:32:01.514Z",
+  "versionId": "d4fae76f-7d61-465d-ad7f-183ba55231c5"
+}
