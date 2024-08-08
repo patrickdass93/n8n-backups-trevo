@@ -1,0 +1,201 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-12-04T05:07:47.730Z",
+  "id": "JRx4XmxBMipTF2SR",
+  "name": "[JIUN][FINANCE] - HDP Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "e510f156-2524-46e4-9016-ec8ed1ef4476",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        620,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1ExgiXoufFYE92Auk5VUibj2H3vkBCzHydyDtARvXnRA",
+          "mode": "list",
+          "cachedResultName": "[Sheet Num].XX-XXth Month'23 - Host Delivery Main Payout Sheet (Automated)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ExgiXoufFYE92Auk5VUibj2H3vkBCzHydyDtARvXnRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1336767463,
+          "mode": "list",
+          "cachedResultName": "N8N Import - Raw Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ExgiXoufFYE92Auk5VUibj2H3vkBCzHydyDtARvXnRA/edit#gid=1336767463"
+        },
+        "clear": "specificRange",
+        "range": "A2:Z"
+      },
+      "id": "13ee4618-dbfb-43be-b4ad-a97c303b6583",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        800,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1ExgiXoufFYE92Auk5VUibj2H3vkBCzHydyDtARvXnRA",
+          "mode": "list",
+          "cachedResultName": "[Sheet Num].XX-XXth Month'23 - Host Delivery Main Payout Sheet (Automated)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ExgiXoufFYE92Auk5VUibj2H3vkBCzHydyDtARvXnRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1336767463,
+          "mode": "list",
+          "cachedResultName": "N8N Import - Raw Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ExgiXoufFYE92Auk5VUibj2H3vkBCzHydyDtARvXnRA/edit#gid=1336767463"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "delivery_id",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "2cdd9c54-c650-48c6-8f9f-b021e841e1ff",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1160,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect\ndistinct ss.id as delivery_id,\nu.id as host_id,\nconcat(u.first_name,' ',u.last_name) as host_name,\nu.email as host_email,\npa.bank,\nconcat('''',pa.account_number) as account_number,\nb.id,\nb.ref_no,\nto_char(b.request_start_at,'YYYY-MM-DD')as request_start_at,\nto_char(b.request_end_at,'YYYY-MM-DD')as request_end_at,\nto_char(b.request_end_at, 'IYYY-IW')::text as week,\nss.type as delivery_type,\nc.abb_name as cities,\nss.gross_amount,\nss.meta->>'distance' AS distance_value\n--get_json_object(ss.meta, '$.distance') AS distance\nfrom self_service ss \nLEFT JOIN bookings b on b.id = ss.booking_id \nLEFT JOIN listings  l ON l.id=b.listing_id\nLEFT JOIN users u ON u.id=l.user_id\nLEFT JOIN (select * from payout_accounts where deleted_at is null and country = 'MY' and (is_primary = 'true' or is_primary is null)) pa on pa.user_id = u.id\nLEFT JOIN listing_location ll on ll.listing_id = l.id\nLEFT JOIN cities c on c.id = ll.city_id \nwhere 1=1\nand ss.status = 'completed'\nand (ss.type = 'host_self_delivery' or ss.type =  'host_self_return')\nand b.created_at >= '2023-10-01 00:00'\n--and b.ref_no = 'UN1JXZ37'\n--and (b.request_end_at >= '2023-11-27 00:00' and b.request_end_at <= '2023-12-03 23:59')",
+        "options": {}
+      },
+      "id": "ad27ae86-d376-4625-aefc-508cf7cfa2af",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        980,
+        400
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Raw Data",
+        "height": 80,
+        "width": 150
+      },
+      "id": "e34ff2e1-bcab-4038-adb9-8c7ed6ed2ab9",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        400,
+        420
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 300,
+    "errorWorkflow": "11"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": [
+        12
+      ]
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2022-12-15T07:35:21.640Z",
+      "updatedAt": "2022-12-15T07:35:21.640Z",
+      "id": "2",
+      "name": "MY"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-08-05T07:27:55.262Z",
+  "versionId": "19384b72-3b75-4cff-aab1-a5125df3c760"
+}
