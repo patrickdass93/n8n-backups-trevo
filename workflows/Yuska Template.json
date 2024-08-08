@@ -1,0 +1,1493 @@
+{
+  "active": false,
+  "connections": {
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "IF Channel WA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IB WA w-H-IMG wo-Button": {
+      "main": [
+        [
+          {
+            "node": "IF status sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Reformat DB Columns",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Status Sent": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Status Sent 2": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "IF status sent": {
+      "main": [
+        [
+          {
+            "node": "Set Status Sent ",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Status Failed ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF status sent 2": {
+      "main": [
+        [
+          {
+            "node": "Set Status Sent 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Status Failed 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Status Failed": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Status Failed 2": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "IB WA w-H-IMG w-Button": {
+      "main": [
+        [
+          {
+            "node": "IF status sent 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reformat DB Columns": {
+      "main": [
+        [
+          {
+            "node": "Insert Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reformat DB Columns1": {
+      "main": [
+        [
+          {
+            "node": "Insert Messages1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Channel WA": {
+      "main": [
+        [
+          {
+            "node": "IF TO",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reformat DB Columns1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF TO": {
+      "main": [
+        [
+          {
+            "node": "IF NO Header",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF NO Button": {
+      "main": [
+        [
+          {
+            "node": "IB WA w-H-IMG wo-Button",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IB WA w-H-IMG w-Button",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF NO Header": {
+      "main": [
+        [
+          {
+            "node": "IB WA wo-H wo-B",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IF NO Button",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF status sent 3": {
+      "main": [
+        [
+          {
+            "node": "Set Status Sent 3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Status Failed 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Status Sent 3": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Status Failed 3": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IB WA wo-H wo-B": {
+      "main": [
+        [
+          {
+            "node": "IF status sent 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Status Sent ": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Status Failed ": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Status Sent 1": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Status Failed 1": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-01-19T02:37:17.230Z",
+  "id": "29",
+  "name": "Yuska Template",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "c7ef2fd5-7a30-495e-9be1-e214ac30f293",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        -860,
+        1620
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "messageId",
+              "value": "={{ $json[\"body\"][\"messageId\"] }}"
+            },
+            {
+              "name": "from",
+              "value": "={{ $json[\"body\"][\"from\"] }}"
+            },
+            {
+              "name": "to",
+              "value": "={{ $json[\"body\"][\"to\"] }}"
+            },
+            {
+              "name": "templateName",
+              "value": "={{ $json[\"body\"][\"templateName\"] }}"
+            },
+            {
+              "name": "headerType",
+              "value": "={{ $json[\"body\"][\"headerType\"] }}"
+            },
+            {
+              "name": "headerTypeMediaUrl",
+              "value": "={{ $json[\"body\"][\"headerTypeMediaUrl\"] }}"
+            },
+            {
+              "name": "language",
+              "value": "={{ $json[\"body\"][\"language\"] }}"
+            },
+            {
+              "name": "placeholders",
+              "value": "={{ $json[\"body\"][\"placeholders\"] }}"
+            },
+            {
+              "name": "button",
+              "value": "={{ $json[\"body\"][\"button\"] }}"
+            },
+            {
+              "name": "campaignName",
+              "value": "={{ $json[\"body\"][\"campaignName\"] }}"
+            },
+            {
+              "name": "type",
+              "value": "={{ $json[\"body\"][\"type\"] }}"
+            },
+            {
+              "name": "sentAt",
+              "value": "={{ $json[\"body\"][\"sentAt\"] }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $json[\"body\"][\"status\"] }}"
+            },
+            {
+              "name": "uuid",
+              "value": "={{ $json[\"body\"][\"uuid\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9507b4c2-2345-4a50-b062-d76a31820f27",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -860,
+        1460
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ej52vr.api.infobip.com/whatsapp/1/message/template",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\t\"messages\":[{\n\t\t\"from\":\"{{$json[\"from\"]}}\",\n\t\t\"to\":\"{{$json[\"to\"]}}\",\n\t\t\"messageId\":\"{{$json[\"messageId\"]}}\",\n\t\t\"content\":{\n\t\t\t\"templateName\":\"{{$json[\"templateName\"]}}\",\n\t\t\t\"templateData\":{\n\t\t\t\t\"body\":{\"placeholders\":[{{$json[\"placeholders\"] ? $json[\"placeholders\"] : \"\"}}]},\n\t\t\t\t\"header\":{\n\t\t\t\t\t\"type\":\"{{$json[\"headerType\"]}}\",\n\t\t\t\t\t\"mediaUrl\":\"{{$json[\"headerTypeMediaUrl\"]}}\"\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"language\":\"{{$json[\"language\"]}}\"\n\t\t}\n\t}]\n}",
+        "options": {}
+      },
+      "id": "7702d1a7-262c-4345-8104-adb233c3d8a4",
+      "name": "IB WA w-H-IMG wo-Button",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        40,
+        920
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 300,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "24",
+          "name": "InfoBip Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "basicAuth",
+        "httpMethod": "POST",
+        "path": "22486dc9-8947-4baf-b8d6-7be5cb838e96",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "6f428293-d2e4-43a5-8400-588cf920e8db",
+      "name": "Webhook1",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -1060,
+        1460
+      ],
+      "webhookId": "cca6bb98-c416-4863-91ad-012ac90c488f",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "25",
+          "name": "n8n basic auth"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "d11a9d24-96c2-4128-b4f1-f249e5f27015",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        1500
+      ],
+      "disabled": true,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "8dbb2bba-99e4-4f8a-9fbe-f133c50f8a4b",
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        1700
+      ],
+      "alwaysOutputData": true,
+      "disabled": true,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {},
+      "id": "1280100a-daa7-4b05-b07c-050ffd4662a3",
+      "name": "Merge2",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        1640,
+        1600
+      ],
+      "disabled": true,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"messageId\"]}}",
+              "operation": "isEmpty"
+            }
+          ]
+        }
+      },
+      "id": "3087fabc-173c-4fec-9fe4-e1e9c3262ce1",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        1060
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "sent"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ee4c2ceb-f4ae-4f5a-b264-83cad4dc3a4d",
+      "name": "Set Status Sent",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        1340
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "sent"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3853f154-a583-4e38-86c6-34be212a51f2",
+      "name": "Set Status Sent 2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        1720
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"messages\"][0][\"status\"][\"description\"]}}",
+              "value2": "Message sent to next instance"
+            }
+          ]
+        }
+      },
+      "id": "1afdee92-8c5f-4dfe-81b8-ffcffbbd7d58",
+      "name": "IF status sent",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        220,
+        920
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"messages\"][0][\"status\"][\"description\"]}}",
+              "value2": "Message sent to next instance"
+            }
+          ]
+        }
+      },
+      "id": "fb820e44-2791-4657-a24f-6d2ea3fbcb68",
+      "name": "IF status sent 2",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        220,
+        1200
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "450f0af5-9e29-44a2-ba81-779edaa10f0d",
+      "name": "Set Status Failed",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        1480
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "51375c61-3702-48fc-abb0-ed447bf4e2e4",
+      "name": "Set Status Failed 2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        1880
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ej52vr.api.infobip.com/whatsapp/1/message/template",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"messages\":[{\n\"from\":\"{{$json[\"from\"]}}\",\n\"to\":\"{{$json[\"to\"]}}\",\n\"messageId\":\"{{$json[\"messageId\"]}}\",\n\"content\":{\n\"templateName\":\"{{$json[\"templateName\"]}}\",\n\"templateData\":{\n\"body\":{\"placeholders\":[{{$json[\"placeholders\"]||\"\"}}]},\n\"header\":{\n\"type\":\"{{$json[\"headerType\"]}}\",\n\"mediaUrl\":\"{{$json[\"headerTypeMediaUrl\"]}}\"\n},\n\"buttons\": [{\n\"type\": \"URL\",\n\"parameter\": \"{{$json[\"button\"]}}\"\n}]\n},\n\"language\":\"{{$json[\"language\"]}}\"\n}\n}]\n}",
+        "options": {}
+      },
+      "id": "bebbd648-d5c1-4e17-8a66-57219a712e99",
+      "name": "IB WA w-H-IMG w-Button",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        40,
+        1200
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 300,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "24",
+          "name": "InfoBip Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "message_id",
+              "value": "={{ $json[\"messageId\"] }}"
+            },
+            {
+              "name": "from",
+              "value": "={{ $json[\"from\"] }}"
+            },
+            {
+              "name": "to",
+              "value": "={{ $json[\"to\"] }}"
+            },
+            {
+              "name": "template_name",
+              "value": "={{ $json[\"templateName\"] }}"
+            },
+            {
+              "name": "header_type",
+              "value": "={{ $json[\"headerType\"] }}"
+            },
+            {
+              "name": "header_type_media_url",
+              "value": "={{ $json[\"headerTypeMediaUrl\"] }}"
+            },
+            {
+              "name": "language",
+              "value": "={{ $json[\"language\"] }}"
+            },
+            {
+              "name": "placeholders",
+              "value": "={{ $json[\"placeholders\"] }}"
+            },
+            {
+              "name": "button",
+              "value": "={{ $json[\"button\"] }}"
+            },
+            {
+              "name": "campaign_name",
+              "value": "={{ $json[\"campaignName\"] }}"
+            },
+            {
+              "name": "type",
+              "value": "={{ $json[\"type\"] }}"
+            },
+            {
+              "name": "msg_sent_ts",
+              "value": "={{ $json[\"sentAt\"] }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $json[\"status\"] }}"
+            },
+            {
+              "name": "uuid",
+              "value": "={{ $json[\"uuid\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d5fa15ff-92bd-4cd8-b189-daf96c47867d",
+      "name": "Reformat DB Columns",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        1080
+      ]
+    },
+    {
+      "parameters": {
+        "table": "messages",
+        "columns": "campaign_name,message_id,from,to,template_name,header_type,header_type_media_url,language,placeholders,button,type,msg_sent_ts,status,uuid",
+        "additionalFields": {
+          "mode": "transaction"
+        }
+      },
+      "id": "c4eaba6d-0648-46c3-b115-fdbbc499e49a",
+      "name": "Insert Messages",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        1080
+      ],
+      "alwaysOutputData": false,
+      "credentials": {
+        "postgres": {
+          "id": "23",
+          "name": "PG - Events DB"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "message_id",
+              "value": "={{ $json[\"messageId\"] }}"
+            },
+            {
+              "name": "from",
+              "value": "={{ $json[\"from\"] }}"
+            },
+            {
+              "name": "to",
+              "value": "={{ $json[\"to\"] }}"
+            },
+            {
+              "name": "template_name",
+              "value": "={{ $json[\"templateName\"] }}"
+            },
+            {
+              "name": "header_type",
+              "value": "={{ $json[\"headerType\"] }}"
+            },
+            {
+              "name": "header_type_media_url",
+              "value": "={{ $json[\"headerTypeMediaUrl\"] }}"
+            },
+            {
+              "name": "language",
+              "value": "={{ $json[\"language\"] }}"
+            },
+            {
+              "name": "placeholders",
+              "value": "={{ $json[\"placeholders\"] }}"
+            },
+            {
+              "name": "button",
+              "value": "={{ $json[\"button\"] }}"
+            },
+            {
+              "name": "campaign_name",
+              "value": "={{ $json[\"campaignName\"] }}"
+            },
+            {
+              "name": "type",
+              "value": "={{ $json[\"type\"] }}"
+            },
+            {
+              "name": "msg_sent_ts",
+              "value": "={{ $json[\"sentAt\"] }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $json[\"status\"] }}"
+            },
+            {
+              "name": "uuid",
+              "value": "={{ $json[\"uuid\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ad23fd45-47b9-4341-814d-cadcdff7ddb6",
+      "name": "Reformat DB Columns1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        1480
+      ]
+    },
+    {
+      "parameters": {
+        "table": "messages",
+        "columns": "campaign_name,message_id,from,to,template_name,header_type,header_type_media_url,language,placeholders,button,type,msg_sent_ts,status",
+        "additionalFields": {
+          "mode": "transaction"
+        }
+      },
+      "id": "5ad26ead-89ec-4279-a2f0-51076d717c0c",
+      "name": "Insert Messages1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        1480
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "23",
+          "name": "PG - Events DB"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"type\"]}}",
+              "value2": "WA"
+            }
+          ]
+        }
+      },
+      "id": "00d43691-034d-4d6e-9c18-7a5a0c14d384",
+      "name": "IF Channel WA",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        1460
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"to\"]}}",
+              "value2": "+6287822253632"
+            },
+            {
+              "value1": "={{$json[\"to\"]}}",
+              "value2": "+6281779234615"
+            },
+            {
+              "value1": "={{$json[\"to\"]}}",
+              "value2": "+6287822253638"
+            },
+            {
+              "value1": "={{$json[\"to\"]}}",
+              "value2": "+6281809010109"
+            },
+            {
+              "value1": "={{$json[\"to\"]}}",
+              "value2": "+6287870372606"
+            }
+          ]
+        },
+        "combineOperation": "any"
+      },
+      "id": "938943ab-c1d2-4f46-8370-434945e5a766",
+      "name": "IF TO",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        1280
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"headerType\"]||\"\"}}",
+              "operation": "isEmpty"
+            }
+          ]
+        }
+      },
+      "id": "926575b8-9934-49ea-8778-4e8427db667d",
+      "name": "IF NO Header",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        1160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"button\"]||\"\"}}",
+              "operation": "isEmpty"
+            }
+          ]
+        }
+      },
+      "id": "4c5d0ceb-9561-4fb7-b957-c14d50d1f1dd",
+      "name": "IF NO Button",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        1060
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"messages\"][0][\"status\"][\"description\"]}}",
+              "value2": "Message sent to next instance"
+            }
+          ]
+        }
+      },
+      "id": "737dadc5-098d-45f0-ab92-adc5055869aa",
+      "name": "IF status sent 3",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        220,
+        560
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "sent"
+            },
+            {
+              "name": "messageId",
+              "value": "={{$node[\"IF NO Header\"].json[\"messageId\"]}}"
+            },
+            {
+              "name": "from",
+              "value": "={{$node[\"IF NO Header\"].json[\"from\"]}}"
+            },
+            {
+              "name": "to",
+              "value": "={{$node[\"IF NO Header\"].json[\"to\"]}}"
+            },
+            {
+              "name": "templateName",
+              "value": "={{$node[\"IF NO Header\"].json[\"templateName\"]}}"
+            },
+            {
+              "name": "headerType",
+              "value": "={{$node[\"IF NO Header\"].json[\"headerType\"]}}"
+            },
+            {
+              "name": "headerTypeMediaUrl",
+              "value": "={{$node[\"IF NO Header\"].json[\"headerTypeMediaUrl\"]}}"
+            },
+            {
+              "name": "language",
+              "value": "={{$node[\"IF NO Header\"].json[\"language\"]}}"
+            },
+            {
+              "name": "placeholders",
+              "value": "={{$node[\"IF NO Header\"].json[\"placeholders\"]}}"
+            },
+            {
+              "name": "button",
+              "value": "={{$node[\"IF NO Header\"].json[\"button\"]}}"
+            },
+            {
+              "name": "campaignName",
+              "value": "={{$node[\"IF NO Header\"].json[\"campaignName\"]}}"
+            },
+            {
+              "name": "type",
+              "value": "={{$node[\"IF NO Header\"].json[\"type\"]}}"
+            },
+            {
+              "name": "sentAt",
+              "value": "={{$node[\"IF NO Header\"].json[\"sentAt\"]}}"
+            },
+            {
+              "name": "uuid",
+              "value": "={{$node[\"IF NO Header\"].json[\"uuid\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "be2b472a-b1ec-450c-9d3e-46e4cbeddb99",
+      "name": "Set Status Sent 3",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        460,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "failed"
+            },
+            {
+              "name": "messageId",
+              "value": "={{$node[\"IF NO Header\"].json[\"messageId\"]}}"
+            },
+            {
+              "name": "from",
+              "value": "={{$node[\"IF NO Header\"].json[\"from\"]}}"
+            },
+            {
+              "name": "to",
+              "value": "={{$node[\"IF NO Header\"].json[\"to\"]}}"
+            },
+            {
+              "name": "templateName",
+              "value": "={{$node[\"IF NO Header\"].json[\"templateName\"]}}"
+            },
+            {
+              "name": "headerType",
+              "value": "={{$node[\"IF NO Header\"].json[\"headerType\"]}}"
+            },
+            {
+              "name": "headerTypeMediaUrl",
+              "value": "={{$node[\"IF NO Header\"].json[\"headerTypeMediaUrl\"]}}"
+            },
+            {
+              "name": "language",
+              "value": "={{$node[\"IF NO Header\"].json[\"language\"]}}"
+            },
+            {
+              "name": "placeholders",
+              "value": "={{$node[\"IF NO Header\"].json[\"placeholders\"]}}"
+            },
+            {
+              "name": "button",
+              "value": "={{$node[\"IF NO Header\"].json[\"button\"]}}"
+            },
+            {
+              "name": "campaignName",
+              "value": "={{$node[\"IF NO Header\"].json[\"campaignName\"]}}"
+            },
+            {
+              "name": "type",
+              "value": "={{$node[\"IF NO Header\"].json[\"type\"]}}"
+            },
+            {
+              "name": "sentAt",
+              "value": "={{$node[\"IF NO Header\"].json[\"sentAt\"]}}"
+            },
+            {
+              "name": "uuid",
+              "value": "={{$node[\"IF NO Header\"].json[\"uuid\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "789fd989-1982-48bb-acb9-496979716188",
+      "name": "Set Status Failed 3",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        460,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ej52vr.api.infobip.com/whatsapp/1/message/template",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\t\"messages\":[{\n\t\t\"from\":\"{{$json[\"from\"]}}\",\n\t\t\"to\":\"{{$json[\"to\"]}}\",\n\t\t\"messageId\":\"{{$json[\"messageId\"]}}\",\n\t\t\"content\":{\n\t\t\t\"templateName\":\"{{$json[\"templateName\"]}}\",\n\t\t\t\"templateData\":{\n\t\t\t\t\"body\":{\"placeholders\":[{{$json[\"placeholders\"||\"\"]}}]}\n\t\t\t},\n\t\t\t\"language\":\"{{$json[\"language\"]}}\"\n\t\t}\n\t}]\n}",
+        "options": {}
+      },
+      "id": "79d64eb5-a83d-4da5-b344-41c03e45465a",
+      "name": "IB WA wo-H wo-B",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        40,
+        560
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 300,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "24",
+          "name": "InfoBip Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "sent"
+            },
+            {
+              "name": "messageId",
+              "value": "={{$node[\"IF NO Header\"].json[\"messageId\"]}}"
+            },
+            {
+              "name": "from",
+              "value": "={{$node[\"IF NO Header\"].json[\"from\"]}}"
+            },
+            {
+              "name": "to",
+              "value": "={{$node[\"IF NO Header\"].json[\"to\"]}}"
+            },
+            {
+              "name": "templateName",
+              "value": "={{$node[\"IF NO Header\"].json[\"templateName\"]}}"
+            },
+            {
+              "name": "headerType",
+              "value": "={{$node[\"IF NO Header\"].json[\"headerType\"]}}"
+            },
+            {
+              "name": "headerTypeMediaUrl",
+              "value": "={{$node[\"IF NO Header\"].json[\"headerTypeMediaUrl\"]}}"
+            },
+            {
+              "name": "language",
+              "value": "={{$node[\"IF NO Header\"].json[\"language\"]}}"
+            },
+            {
+              "name": "placeholders",
+              "value": "={{$node[\"IF NO Header\"].json[\"placeholders\"]}}"
+            },
+            {
+              "name": "button",
+              "value": "={{$node[\"IF NO Header\"].json[\"button\"]}}"
+            },
+            {
+              "name": "campaignName",
+              "value": "={{$node[\"IF NO Header\"].json[\"campaignName\"]}}"
+            },
+            {
+              "name": "type",
+              "value": "={{$node[\"IF NO Header\"].json[\"type\"]}}"
+            },
+            {
+              "name": "sentAt",
+              "value": "={{$node[\"IF NO Header\"].json[\"sentAt\"]}}"
+            },
+            {
+              "name": "uuid",
+              "value": "={{$node[\"IF NO Header\"].json[\"uuid\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "29fe1baa-a88e-428d-a13b-2c45a140e4f1",
+      "name": "Set Status Sent ",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        460,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "failed"
+            },
+            {
+              "name": "messageId",
+              "value": "={{$node[\"IF NO Header\"].json[\"messageId\"]}}"
+            },
+            {
+              "name": "from",
+              "value": "={{$node[\"IF NO Header\"].json[\"from\"]}}"
+            },
+            {
+              "name": "to",
+              "value": "={{$node[\"IF NO Header\"].json[\"to\"]}}"
+            },
+            {
+              "name": "templateName",
+              "value": "={{$node[\"IF NO Header\"].json[\"templateName\"]}}"
+            },
+            {
+              "name": "headerType",
+              "value": "={{$node[\"IF NO Header\"].json[\"headerType\"]}}"
+            },
+            {
+              "name": "headerTypeMediaUrl",
+              "value": "={{$node[\"IF NO Header\"].json[\"headerTypeMediaUrl\"]}}"
+            },
+            {
+              "name": "language",
+              "value": "={{$node[\"IF NO Header\"].json[\"language\"]}}"
+            },
+            {
+              "name": "placeholders",
+              "value": "={{$node[\"IF NO Header\"].json[\"placeholders\"]}}"
+            },
+            {
+              "name": "button",
+              "value": "={{$node[\"IF NO Header\"].json[\"button\"]}}"
+            },
+            {
+              "name": "campaignName",
+              "value": "={{$node[\"IF NO Header\"].json[\"campaignName\"]}}"
+            },
+            {
+              "name": "type",
+              "value": "={{$node[\"IF NO Header\"].json[\"type\"]}}"
+            },
+            {
+              "name": "sentAt",
+              "value": "={{$node[\"IF NO Header\"].json[\"sentAt\"]}}"
+            },
+            {
+              "name": "uuid",
+              "value": "={{$node[\"IF NO Header\"].json[\"uuid\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "af3af9fe-35a6-45a8-ae78-a8267d064b14",
+      "name": "Set Status Failed ",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        460,
+        940
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "failed"
+            },
+            {
+              "name": "messageId",
+              "value": "={{$node[\"IF NO Header\"].json[\"messageId\"]}}"
+            },
+            {
+              "name": "from",
+              "value": "={{$node[\"IF NO Header\"].json[\"from\"]}}"
+            },
+            {
+              "name": "to",
+              "value": "={{$node[\"IF NO Header\"].json[\"to\"]}}"
+            },
+            {
+              "name": "templateName",
+              "value": "={{$node[\"IF NO Header\"].json[\"templateName\"]}}"
+            },
+            {
+              "name": "headerType",
+              "value": "={{$node[\"IF NO Header\"].json[\"headerType\"]}}"
+            },
+            {
+              "name": "headerTypeMediaUrl",
+              "value": "={{$node[\"IF NO Header\"].json[\"headerTypeMediaUrl\"]}}"
+            },
+            {
+              "name": "language",
+              "value": "={{$node[\"IF NO Header\"].json[\"language\"]}}"
+            },
+            {
+              "name": "placeholders",
+              "value": "={{$node[\"IF NO Header\"].json[\"placeholders\"]}}"
+            },
+            {
+              "name": "button",
+              "value": "={{$node[\"IF NO Header\"].json[\"button\"]}}"
+            },
+            {
+              "name": "campaignName",
+              "value": "={{$node[\"IF NO Header\"].json[\"campaignName\"]}}"
+            },
+            {
+              "name": "type",
+              "value": "={{$node[\"IF NO Header\"].json[\"type\"]}}"
+            },
+            {
+              "name": "sentAt",
+              "value": "={{$node[\"IF NO Header\"].json[\"sentAt\"]}}"
+            },
+            {
+              "name": "uuid",
+              "value": "={{$node[\"IF NO Header\"].json[\"uuid\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "26f79e0f-f56a-4714-97ce-feb45e7420c1",
+      "name": "Set Status Failed 1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        460,
+        1360
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "sent"
+            },
+            {
+              "name": "messageId",
+              "value": "={{$node[\"IF NO Header\"].json[\"messageId\"]}}"
+            },
+            {
+              "name": "from",
+              "value": "={{$node[\"IF NO Header\"].json[\"from\"]}}"
+            },
+            {
+              "name": "to",
+              "value": "={{$node[\"IF NO Header\"].json[\"to\"]}}"
+            },
+            {
+              "name": "templateName",
+              "value": "={{$node[\"IF NO Header\"].json[\"templateName\"]}}"
+            },
+            {
+              "name": "headerType",
+              "value": "={{$node[\"IF NO Header\"].json[\"headerType\"]}}"
+            },
+            {
+              "name": "headerTypeMediaUrl",
+              "value": "={{$node[\"IF NO Header\"].json[\"headerTypeMediaUrl\"]}}"
+            },
+            {
+              "name": "language",
+              "value": "={{$node[\"IF NO Header\"].json[\"language\"]}}"
+            },
+            {
+              "name": "placeholders",
+              "value": "={{$node[\"IF NO Header\"].json[\"placeholders\"]}}"
+            },
+            {
+              "name": "button",
+              "value": "={{$node[\"IF NO Header\"].json[\"button\"]}}"
+            },
+            {
+              "name": "campaignName",
+              "value": "={{$node[\"IF NO Header\"].json[\"campaignName\"]}}"
+            },
+            {
+              "name": "type",
+              "value": "={{$node[\"IF NO Header\"].json[\"type\"]}}"
+            },
+            {
+              "name": "sentAt",
+              "value": "={{$node[\"IF NO Header\"].json[\"sentAt\"]}}"
+            },
+            {
+              "name": "uuid",
+              "value": "={{$node[\"IF NO Header\"].json[\"uuid\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3efd5a7f-7972-425d-8aef-9a72c293941c",
+      "name": "Set Status Sent 1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        460,
+        1180
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-01-19T02:37:38.351Z",
+  "versionId": "b505c9e3-2982-4105-aff8-9c3ccbcf18e2"
+}
