@@ -1,0 +1,950 @@
+{
+  "active": true,
+  "connections": {
+    "HubSpot": {
+      "main": [
+        [
+          {
+            "node": "Format End Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HubSpot",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Item Lists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item Lists": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format End Date": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Current Date for Sheet Update": {
+      "main": [
+        [
+          {
+            "node": "Format Date for Sheet Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Date for Sheet Update": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets3": {
+      "main": [
+        [
+          {
+            "node": "Current Date for Sheet Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-11-07T06:07:28.595Z",
+  "id": "IV175Nk0jvtVFRUs",
+  "name": "[KAVI] TG SC Insurance PO Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "appToken",
+        "resource": "deal",
+        "operation": "search",
+        "returnAll": true,
+        "filterGroupsUi": {
+          "filterGroupsValues": [
+            {
+              "filtersUi": {
+                "filterValues": [
+                  {
+                    "propertyName": "hs_is_closed",
+                    "value": "true"
+                  },
+                  {
+                    "propertyName": "dealstage",
+                    "value": "closedwon"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "properties": [
+            "hubspot_owner_id",
+            "hs_is_closed",
+            "dealstage",
+            "hs_all_owner_ids",
+            "host_name",
+            "dealname",
+            "hs_user_ids_of_all_owners",
+            "hubspot_team_id",
+            "gross_premium",
+            "hs_all_collaborator_owner_ids",
+            "closedate",
+            "hs_lastmodifieddate",
+            "amount",
+            "c_n_number"
+          ],
+          "sortBy": "closedate"
+        }
+      },
+      "id": "965a976a-e4c7-4e8c-a0ec-ddf89059785e",
+      "name": "HubSpot",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        300
+      ],
+      "credentials": {
+        "hubspotAppToken": {
+          "id": "28",
+          "name": "HubSpot App Token Account (Kavi)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "7e256b33-da68-4b11-abbb-c40c26e033f4",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        1120,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1epzWjj2Kk4A8V01NbXuZBRYDjALfOA5XGkJ0QVfLGwI",
+          "mode": "list",
+          "cachedResultName": "[TREVO MY] TG SC Incentive Automation '23",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1epzWjj2Kk4A8V01NbXuZBRYDjALfOA5XGkJ0QVfLGwI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1008485322,
+          "mode": "list",
+          "cachedResultName": "Users",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1epzWjj2Kk4A8V01NbXuZBRYDjALfOA5XGkJ0QVfLGwI/edit#gid=1008485322"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "email": "={{ $json.email }}",
+            "first_name": "={{ $json.firstName }}",
+            "last_name": "={{ $json.lastName }}",
+            "id_2": "={{ $json.userId }}",
+            "created_date": "={{ $json.createdAt }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "id_2",
+              "displayName": "id_2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_name",
+              "displayName": "last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "created_date",
+              "displayName": "created_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "team",
+              "displayName": "team",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "3ece251c-61a8-404f-8725-9764b2061690",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1680,
+        120
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.hubspot.com/crm/v3/owners",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "hubspotAppToken",
+        "options": {}
+      },
+      "id": "1c17680f-dc77-436c-aa2e-f538d615d753",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1320,
+        120
+      ],
+      "credentials": {
+        "hubspotAppToken": {
+          "id": "28",
+          "name": "HubSpot App Token Account (Kavi)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "results",
+        "options": {}
+      },
+      "id": "3529cf90-f124-4f9c-980d-83f1dd7e5b97",
+      "name": "Item Lists",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 3,
+      "position": [
+        1500,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $json.properties.closedate }}",
+        "options": {}
+      },
+      "id": "1da2cf97-dc43-4876-8304-99b41a9d4d3e",
+      "name": "Format End Date",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "036afbcb-4f31-427f-a79a-96064f586010",
+      "name": "Current Date for Sheet Update",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $json.currentDate }}",
+        "options": {}
+      },
+      "id": "b9b382d1-2fec-4a50-9cc5-9e502f601027",
+      "name": "Format Date for Sheet Update",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1epzWjj2Kk4A8V01NbXuZBRYDjALfOA5XGkJ0QVfLGwI",
+          "mode": "list",
+          "cachedResultName": "[TREVO MY] TG SC Incentive Automation '23",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1epzWjj2Kk4A8V01NbXuZBRYDjALfOA5XGkJ0QVfLGwI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1731124572,
+          "mode": "list",
+          "cachedResultName": "LastUpdated",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1epzWjj2Kk4A8V01NbXuZBRYDjALfOA5XGkJ0QVfLGwI/edit#gid=1731124572"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "LastUpdated": "={{ $json.formattedDate }}"
+          },
+          "matchingColumns": [
+            "LastUpdated"
+          ],
+          "schema": [
+            {
+              "id": "LastUpdated",
+              "displayName": "LastUpdated",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "037233a1-e65b-4c02-b240-f2f16f4d6cf9",
+      "name": "Google Sheets2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1860,
+        480
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1epzWjj2Kk4A8V01NbXuZBRYDjALfOA5XGkJ0QVfLGwI",
+          "mode": "list",
+          "cachedResultName": "[TREVO MY] TG SC Incentive Automation '23",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1epzWjj2Kk4A8V01NbXuZBRYDjALfOA5XGkJ0QVfLGwI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1731124572,
+          "mode": "list",
+          "cachedResultName": "LastUpdated",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1epzWjj2Kk4A8V01NbXuZBRYDjALfOA5XGkJ0QVfLGwI/edit#gid=1731124572"
+        },
+        "clear": "specificRows",
+        "startIndex": 2,
+        "rowsToDelete": 5
+      },
+      "id": "cac084cd-05fa-4425-a148-e2923b8fba6f",
+      "name": "Google Sheets3",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1320,
+        480
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1epzWjj2Kk4A8V01NbXuZBRYDjALfOA5XGkJ0QVfLGwI",
+          "mode": "list",
+          "cachedResultName": "[TREVO MY] TG SC Incentive Automation '23",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1epzWjj2Kk4A8V01NbXuZBRYDjALfOA5XGkJ0QVfLGwI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Raw",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1epzWjj2Kk4A8V01NbXuZBRYDjALfOA5XGkJ0QVfLGwI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('HubSpot').item.json.id }}",
+            "createddate": "={{ $json.properties.createdate }}",
+            "dealstage": "={{ $('HubSpot').item.json.properties.dealstage }}",
+            "hs_is_closed": "={{ $json.properties.hs_is_closed }}",
+            "created_at": "={{ $json.createdAt }}",
+            "last_modified": "={{ $json.properties.hs_lastmodifieddate }}",
+            "createdAt": "={{ $json.createdAt }}",
+            "updatedAt": "={{ $json.updatedAt }}",
+            "archived": "={{ $json.archived }}",
+            "owner_id": "={{ $('HubSpot').item.json.properties.hs_all_owner_ids }}",
+            "registration_no": "={{ $('HubSpot').item.json.properties.dealname }}",
+            "host_name": "={{ $('HubSpot').item.json.properties.host_name }}",
+            "is_closed": "={{ $('HubSpot').item.json.properties.hs_is_closed }}",
+            "owned_user_id": "={{ $('HubSpot').item.json.properties.hs_user_ids_of_all_owners }}",
+            "gross_premium": "={{ $('HubSpot').item.json.properties.amount }}",
+            "closed_date": "={{ $json.formattedDate }}",
+            "last_updated_at": "={{ $('HubSpot').item.json.properties.hs_lastmodifieddate }}",
+            "hb_owner_id": "={{ $('HubSpot').item.json.properties.c_n_number }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "registration_no",
+              "displayName": "registration_no",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "dealstage",
+              "displayName": "dealstage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "gross_premium",
+              "displayName": "gross_premium",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "host_name",
+              "displayName": "host_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "owner_id",
+              "displayName": "owner_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is_closed",
+              "displayName": "is_closed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "owned_user_id",
+              "displayName": "owned_user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "hb_owner_id",
+              "displayName": "hb_owner_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "closed_date",
+              "displayName": "closed_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_updated_at",
+              "displayName": "last_updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "30753b5b-8788-4d59-a148-7a72fa65e5d0",
+      "name": "Google Sheets4",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1980,
+        -80
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1epzWjj2Kk4A8V01NbXuZBRYDjALfOA5XGkJ0QVfLGwI",
+          "mode": "list",
+          "cachedResultName": "[TREVO MY] TG SC Incentive Automation '23",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1epzWjj2Kk4A8V01NbXuZBRYDjALfOA5XGkJ0QVfLGwI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Raw",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1epzWjj2Kk4A8V01NbXuZBRYDjALfOA5XGkJ0QVfLGwI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('HubSpot').item.json.id }}",
+            "registration_no": "={{ $('HubSpot').item.json.properties.dealname }}",
+            "dealstage": "={{ $('HubSpot').item.json.properties.dealstage }}",
+            "c/n no": "={{ $('HubSpot').item.json.properties.c_n_number }}",
+            "gross_premium": "={{ $('HubSpot').item.json.properties.gross_premium }}",
+            "host_name": "={{ $('HubSpot').item.json.properties.host_name }}",
+            "owner_id": "={{ $('HubSpot').item.json.properties.hs_all_owner_ids }}",
+            "owned_user_id": "={{ $('HubSpot').item.json.properties.hubspot_owner_id }}",
+            "is_closed": "={{ $('HubSpot').item.json.properties.hs_is_closed }}",
+            "closed_date": "={{ $json.formattedDate }}",
+            "last_updated_at": "={{ $('HubSpot').item.json.updatedAt }}",
+            "amount": "={{ $('HubSpot').item.json.properties.amount }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "registration_no",
+              "displayName": "registration_no",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "dealstage",
+              "displayName": "dealstage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "c/n no",
+              "displayName": "c/n no",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "gross_premium",
+              "displayName": "gross_premium",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "host_name",
+              "displayName": "host_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "owner_id",
+              "displayName": "owner_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_closed",
+              "displayName": "is_closed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "amount",
+              "displayName": "amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "closed_date",
+              "displayName": "closed_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_updated_at",
+              "displayName": "last_updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "end_month",
+              "displayName": "end_month",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "sc_name",
+              "displayName": "sc_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "sc_firstname",
+              "displayName": "sc_firstname",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "sc_lastname",
+              "displayName": "sc_lastname",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Incentive",
+              "displayName": "Incentive",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "#ERROR!",
+              "displayName": "#ERROR!",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "b273b819-2ff2-474e-af9a-50ef70221587",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1720,
+        300
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1epzWjj2Kk4A8V01NbXuZBRYDjALfOA5XGkJ0QVfLGwI",
+          "mode": "list",
+          "cachedResultName": "[TREVO MY] TG SC Incentive Automation '23",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1epzWjj2Kk4A8V01NbXuZBRYDjALfOA5XGkJ0QVfLGwI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Raw",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1epzWjj2Kk4A8V01NbXuZBRYDjALfOA5XGkJ0QVfLGwI/edit#gid=0"
+        },
+        "clear": "specificRange",
+        "range": "A2:K"
+      },
+      "id": "af7ad041-12e5-4552-a92a-3236cada9265",
+      "name": "Google Sheets5",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1860,
+        120
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      },
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-11-07T06:07:54.106Z",
+      "updatedAt": "2023-11-07T06:07:54.106Z",
+      "id": "5gO4LfOY3csIvbws",
+      "name": "Hubspot"
+    },
+    {
+      "createdAt": "2024-06-13T09:00:07.228Z",
+      "updatedAt": "2024-06-13T09:00:07.228Z",
+      "id": "qyitjXnM7vfQk24X",
+      "name": "TG"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-06-13T09:00:14.456Z",
+  "versionId": "1f728901-a0b1-4171-9699-3bcf26a70f31"
+}
