@@ -1,0 +1,234 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "IF1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF1": {
+      "main": [
+        [
+          {
+            "node": "Function1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function1": {
+      "main": [
+        [
+          {
+            "node": "[CT] - EH Form Submission",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-01-31T07:05:55.241Z",
+  "id": "jxUvo484fJshrSC8",
+  "name": "[KAVI] EH Entrepreneur Host Form Confirmation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "50 07-23 * * *"
+            }
+          ]
+        }
+      },
+      "id": "4da19eb0-4e9f-4c2d-a840-a37eeb769c8c",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        820,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1l9LNSuH9gvMgmgbixn6akw36ZTjFEOXtZdTp8YXBUx0",
+          "mode": "list",
+          "cachedResultName": "2023 June Entrepreneur Host Program Form",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1l9LNSuH9gvMgmgbixn6akw36ZTjFEOXtZdTp8YXBUx0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 605259090,
+          "mode": "list",
+          "cachedResultName": "Form Responses 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1l9LNSuH9gvMgmgbixn6akw36ZTjFEOXtZdTp8YXBUx0/edit#gid=605259090"
+        },
+        "options": {}
+      },
+      "id": "dbdb243e-b5ed-4ed8-bdab-84b606994941",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1040,
+        380
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.Tagged }}",
+              "value2": "Yes"
+            }
+          ]
+        }
+      },
+      "id": "2648ffe2-1f52-4829-abf7-4a8bc5e44c32",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "dateTime": [
+            {
+              "value1": "={{ $json.Timestamp }}",
+              "value2": "2024-02-13T02:59:32.000Z"
+            }
+          ]
+        }
+      },
+      "id": "dba3e095-7c0c-474c-8737-0c84f4eff3cf",
+      "name": "IF1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"UUID\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_EH\",\n            \"evtData\": {\n                \"EH_EventType\": \"form_submission\",\n                \"EH_HostName\": \"{{ $json[\"Full name as per IC / Company's Full Name as per SSM\"] }}\"\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "69966b7a-cfb3-4428-8233-1ae8d695c28b",
+      "name": "[CT] - EH Form Submission",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1860,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"row_number\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['row_number']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        380
+      ],
+      "id": "d8b11208-c19e-41a4-8144-3f8a059792ed"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds": [
+        140,
+        141,
+        142,
+        136,
+        135,
+        134,
+        133,
+        131,
+        125,
+        126,
+        128,
+        123,
+        121,
+        120,
+        116,
+        118,
+        115,
+        114,
+        110,
+        109,
+        107,
+        104
+      ]
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-08-07T15:50:36.876Z",
+  "versionId": "6502ca68-fb20-4db6-832d-6e54bf679b59"
+}
