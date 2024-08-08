@@ -1,0 +1,195 @@
+{
+  "active": false,
+  "connections": {
+    "SendInBlue": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches": {
+      "main": [
+        [
+          {
+            "node": "SendInBlue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-04-15T01:42:50.832Z",
+  "id": "62",
+  "name": "[TEMP] Host MFT Referral",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "upsert",
+        "email": "={{ $json.email }}",
+        "upsertAttributes": {
+          "upsertAttributesValues": [
+            {
+              "fieldName": "RPHOSTNAME",
+              "fieldValue": "={{ $json.host_name }}"
+            },
+            {
+              "fieldName": "RPREFCODE",
+              "fieldValue": "={{ $json.referral_code }}"
+            },
+            {
+              "fieldName": "RPCARMODEL",
+              "fieldValue": "={{ $json.model2 }}"
+            },
+            {
+              "fieldName": "RPLISTINGURL",
+              "fieldValue": "={{ $json.model3 }}"
+            }
+          ]
+        }
+      },
+      "id": "dada4841-b316-4bbc-994f-6fb2074d9d62",
+      "name": "SendInBlue",
+      "type": "n8n-nodes-base.sendInBlue",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        100
+      ],
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\"to\":[{\"email\":\"{{ $node[\"Google Sheets\"].json[\"email\"] }}\"}],\n\"templateId\":558\n}\n",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        300
+      ],
+      "id": "39d8a90a-53ee-47e0-9ef1-48816b98b483",
+      "retryOnFail": true,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {},
+      "id": "d2a66fa4-fd96-4a26-b80d-5ea6bcdb61bb",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        620,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1UUGkGfMZdonin7IxL27jmQbtkxMiShZZXsib6seItcc",
+          "mode": "list",
+          "cachedResultName": "Temp Host MFT EDM",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UUGkGfMZdonin7IxL27jmQbtkxMiShZZXsib6seItcc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UUGkGfMZdonin7IxL27jmQbtkxMiShZZXsib6seItcc/edit#gid=0"
+        },
+        "options": {
+          "outputFormatting": {
+            "values": {
+              "general": "UNFORMATTED_VALUE",
+              "date": "FORMATTED_STRING"
+            }
+          }
+        }
+      },
+      "id": "c05397f9-2ad3-4be3-8dcf-a73bf65fcc8a",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        800,
+        280
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 500,
+        "options": {}
+      },
+      "id": "eef77bd9-9d68-4fde-9f4c-953ac8bfda03",
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 2,
+      "position": [
+        960,
+        280
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-04-20T01:58:01.223Z",
+  "versionId": "9e12fafa-71d1-472d-b44f-23ef0b28ebf2"
+}
