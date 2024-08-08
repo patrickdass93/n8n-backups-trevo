@@ -1,0 +1,165 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-03-22T01:28:13.215Z",
+  "id": "46",
+  "name": "[JIUN] [HOST COMMUNITY] - TREVO All Listings and Hosts",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "217f5b24-0dc5-436c-90c8-dbbc0208dbed",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        580,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect\ndistinct l.registration_no, \nl.user_id as user_id, \nu.uuid,\nconcat( u.first_name,' ',u.last_name)as name,\nu.email,\nu.phone_number,\ncase when ht.host_type is null then 'Organic' else ht.host_type end as host_type,\nto_char(clt.clt,'YYYY-MM-DD HH24:MI')as clt\nfrom listings l\nleft join listing_location ll on ll.listing_id=l.id \nleft join users u on u.id=l.user_id \nleft join\n        (select distinct l.user_id, t.name as host_type\n        from listings l\n        left join tag_taggables tt on tt.taggable_id = l.user_id \n        left join tags t on t.id = tt.tag_id\n        where t.name ~* '(entrepreneur|commercial)')ht\n        on ht.user_id = l.user_id\nleft join\n\t\t(select distinct b.listing_id, \n\t\tmax(b.request_end_at::timestamp)as clt\n\t\tfrom bookings b \n\t\twhere b.status = 'completed'\n\t\tgroup by 1)clt\n\t\ton clt.listing_id = l.id\nwhere l.status ='approved'\nand ll.country = 'Malaysia'\nand l.deleted_at is null \norder by 2",
+        "additionalFields": {}
+      },
+      "id": "a76fd50c-34ad-4969-93dd-47b64f5182e0",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        980,
+        280
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1QRxmz2J4R8ryPPXNRh4-l7h1gVn_4lNHKmIWrQxtWDw",
+          "mode": "list",
+          "cachedResultName": "TREVO MY - All Hosts (Organic + Commercial)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QRxmz2J4R8ryPPXNRh4-l7h1gVn_4lNHKmIWrQxtWDw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1384729570,
+          "mode": "list",
+          "cachedResultName": "21 Mar",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QRxmz2J4R8ryPPXNRh4-l7h1gVn_4lNHKmIWrQxtWDw/edit#gid=1384729570"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "registration_no",
+        "options": {}
+      },
+      "id": "66b39e08-16b9-43db-8c61-426083034179",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1180,
+        280
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1QRxmz2J4R8ryPPXNRh4-l7h1gVn_4lNHKmIWrQxtWDw",
+          "mode": "list",
+          "cachedResultName": "TREVO MY - All Hosts (Organic + Commercial)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QRxmz2J4R8ryPPXNRh4-l7h1gVn_4lNHKmIWrQxtWDw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1384729570,
+          "mode": "list",
+          "cachedResultName": "21 Mar",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QRxmz2J4R8ryPPXNRh4-l7h1gVn_4lNHKmIWrQxtWDw/edit#gid=1384729570"
+        },
+        "clear": "specificRange",
+        "range": "A2:J"
+      },
+      "id": "dbb46aa5-8e33-4f72-ad64-6474b7d6468d",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        780,
+        280
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2023-11-28T06:33:38.103Z",
+  "versionId": "d7ad6d82-451d-4b64-924b-79c194da08df"
+}
