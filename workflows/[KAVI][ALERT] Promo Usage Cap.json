@@ -1,0 +1,600 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Promo Usage",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Promo Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Promo Usage": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Promo Details": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "IF2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "IF1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF1": {
+      "main": [
+        [
+          {
+            "node": "IF3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function - No Duplicates in Same Quarter": {
+      "main": [
+        [
+          {
+            "node": "Promo Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF2": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF3": {
+      "main": [
+        [
+          {
+            "node": "Function - No Duplicates in Same Quarter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-01-12T03:57:54.372Z",
+  "id": "nY7YDYkAdb5WOqp6",
+  "name": "[KAVI][ALERT] Promo Usage Cap",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "3de47808-f003-4363-aadf-9cacbdb20864",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        700,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select bcp.promo_id\n, COUNT(distinct case when b.status in ('completed','accepted','requested', 'processing') then b.id end) as promos_used\nfrom booking_common_promos bcp \nleft join bookings b on b.id = bcp.booking_id \ngroup by 1 ",
+        "options": {}
+      },
+      "id": "0c84d58b-4757-4fc3-ba90-4af71817d8e3",
+      "name": "Promo Usage",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        920,
+        280
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT DISTINCT \n    p.id AS promo_id,\n    p.code,\n    p.name, \n    p.description, \n    p.created_at, \n    p.updated_at, \n    pm.max_cap,\n    pc.country,\n    pp.promo_start,\n    pp.promo_end,\n    s.status,\n    NOW()::DATE AS current_date,\n    CONCAT(NOW()::DATE,'-',p.id) AS promo_date_id\nFROM \n    promos p \nLEFT JOIN \n   ( SELECT \n   \tc.promo_id, \n   \tc.value->'default'->0 AS max_cap\n   FROM entities e \n   LEFT JOIN conditions c ON c.entity_id = e.id \n   WHERE e.slug = 'max_promo_use' ) pm ON pm.promo_id = p.id\nLEFT JOIN \n    ( SELECT \n   \tc.promo_id, \n   \tc.value->>'default' AS country\n   FROM entities e \n   LEFT JOIN conditions c ON c.entity_id = e.id \n   WHERE e.slug = 'country' ) pc ON pc.promo_id = p.id\nLEFT JOIN \n    ( SELECT \n   \tc.promo_id, \n   \tCASE WHEN e.slug = 'promo_period' THEN c.value->'default'->0 END AS promo_start,\n    CASE WHEN e.slug = 'promo_period' THEN c.value->'default'->1 END AS promo_end\n   FROM entities e \n   LEFT JOIN conditions c ON c.entity_id = e.id \n   WHERE e.slug = 'promo_period' ) pp ON pp.promo_id = p.id\nLEFT JOIN \n    ( SELECT \n   \tc.promo_id, \n   \tc.value->>'default' AS status\n   FROM entities e \n   LEFT JOIN conditions c ON c.entity_id = e.id \n   WHERE e.slug = 'status' ) s ON s.promo_id = p.id\nWHERE \n    1=1 \n    AND pm.max_cap IS NOT NULL\n    AND pc.country = 'MY'\nORDER BY 1;\n",
+        "options": {}
+      },
+      "id": "5e0a2069-2606-47b1-9ecd-eaeb528a8fd5",
+      "name": "Promo Details",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        920,
+        460
+      ],
+      "retryOnFail": false,
+      "credentials": {
+        "postgres": {
+          "id": "10",
+          "name": "Promos DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "promo_id",
+              "field2": "promo_id"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "45839ecf-3756-4ce5-96dc-8f68a16c98ee",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        1140,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"promo_date_id\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['promo_date_id']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function - No Duplicates in Same Quarter",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        2940,
+        340
+      ],
+      "id": "acd26503-dcf9-4695-8db9-fab187e497e6"
+    },
+    {
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "usage_percentage",
+              "value": "={{ Math.round((parseFloat($json[\"promos_used\"]) / parseFloat($json[\"max_cap\"])) * 100) }}\n"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": true
+        }
+      },
+      "id": "5e7ddb51-b4dc-4246-b918-a2cf179e1183",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $json.promo_end }}",
+        "outputFieldName": "formatted_promo_end",
+        "options": {}
+      },
+      "id": "05df64f0-2bac-4e41-a628-959fe47c2a5d",
+      "name": "Date & Time",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        1660,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "b6088856-99d6-4737-934a-08a58bfb1a42",
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        1860,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "dateTime": [
+            {
+              "value1": "={{ $json.formatted_promo_end }}",
+              "value2": "={{ $json.current_date }}"
+            }
+          ]
+        }
+      },
+      "id": "908ccc06-85ad-4792-af31-dbc67e53734b",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        2280,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.usage_percentage }}",
+              "operation": "largerEqual",
+              "value2": 90
+            }
+          ]
+        }
+      },
+      "id": "64be6d1a-b752-474a-90e0-2739518e3690",
+      "name": "IF1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        2500,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAtIW1dxg",
+        "messageUi": {
+          "text": "=*PROMO ALERT*\n\nAttention: The folowing promo is nearing its max cap threshold.\n\n*Name*: {{ $json[\"name\"] }}\n*Code*: {{ $json[\"code\"] }}\n*Max Cap*: {{ $json[\"max_cap\"] }}\n*Current Utilization*: {{ $json[\"promos_used\"] }}"
+        },
+        "additionalFields": {}
+      },
+      "id": "cbb30546-26b7-44f9-83fa-4d40f7b93767",
+      "name": "Promo Alert",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        3120,
+        340
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "Google Chat [Pat]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.max_cap }}",
+              "operation": "larger",
+              "value2": 10
+            }
+          ]
+        }
+      },
+      "id": "48dfff7a-7fbb-438e-a22c-c025fa0f441f",
+      "name": "IF2",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "operation": "notEqual",
+              "value2": "inactive"
+            }
+          ]
+        }
+      },
+      "id": "5e1dac16-91ee-4fa8-b7e9-b7eb72dad016",
+      "name": "IF3",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        2720,
+        340
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds": [
+        "2024-08-05-1ea8729f-d720-411a-9a0d-6085ca78ee2e",
+        "2024-08-05-5c7248b0-3dd2-47dd-ac79-da9af3f2845f",
+        "2024-08-02-1ea8729f-d720-411a-9a0d-6085ca78ee2e",
+        "2024-08-01-1ea8729f-d720-411a-9a0d-6085ca78ee2e",
+        "2024-07-31-1ea8729f-d720-411a-9a0d-6085ca78ee2e",
+        "2024-07-28-1ea8729f-d720-411a-9a0d-6085ca78ee2e",
+        "2024-07-28-5c7248b0-3dd2-47dd-ac79-da9af3f2845f",
+        "2024-07-24-d7ae96cc-a6c2-462c-9272-ede6671804c7",
+        "2024-07-22-d7ae96cc-a6c2-462c-9272-ede6671804c7",
+        "2024-07-22-5c7248b0-3dd2-47dd-ac79-da9af3f2845f",
+        "2024-07-14-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-07-13-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-07-12-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-07-11-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-07-10-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-07-09-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-07-08-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-07-07-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-07-04-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-07-03-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-07-02-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-07-01-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-06-29-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-06-28-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-06-27-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-06-26-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-06-25-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-06-23-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-06-22-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-06-21-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-06-20-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-06-19-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-06-16-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-06-15-eb97b976-ed5c-4a4c-88a0-502c17a49eda",
+        "2024-06-13-673b9531-fd96-44f7-b658-7eb1e85ae132",
+        "2024-06-10-673b9531-fd96-44f7-b658-7eb1e85ae132",
+        "2024-06-08-673b9531-fd96-44f7-b658-7eb1e85ae132",
+        "2024-06-02-bc1444ba-dd58-40ad-89ee-a6dd9fe92fd2",
+        "2024-06-01-bc1444ba-dd58-40ad-89ee-a6dd9fe92fd2",
+        "2024-05-31-bc1444ba-dd58-40ad-89ee-a6dd9fe92fd2",
+        "2024-05-29-bc1444ba-dd58-40ad-89ee-a6dd9fe92fd2",
+        "2024-05-17-36de5f24-32bb-45a3-8f85-6807769d34a3",
+        "2024-05-16-36de5f24-32bb-45a3-8f85-6807769d34a3",
+        "2024-05-15-36de5f24-32bb-45a3-8f85-6807769d34a3",
+        "2024-05-11-36de5f24-32bb-45a3-8f85-6807769d34a3",
+        "2024-05-10-4333257b-7acc-41bb-ab33-438aa1868509",
+        "2024-05-04-1e8ed314-81d3-4b2a-b03b-82926a65e36a",
+        "2024-05-03-1e8ed314-81d3-4b2a-b03b-82926a65e36a",
+        "2024-05-02-1e8ed314-81d3-4b2a-b03b-82926a65e36a",
+        "2024-04-29-1e8ed314-81d3-4b2a-b03b-82926a65e36a",
+        "2024-04-28-1e8ed314-81d3-4b2a-b03b-82926a65e36a",
+        "2024-04-27-1e8ed314-81d3-4b2a-b03b-82926a65e36a",
+        "2024-04-26-1e8ed314-81d3-4b2a-b03b-82926a65e36a",
+        "2024-04-25-1e8ed314-81d3-4b2a-b03b-82926a65e36a",
+        "2024-04-24-1e8ed314-81d3-4b2a-b03b-82926a65e36a",
+        "2024-04-23-1e8ed314-81d3-4b2a-b03b-82926a65e36a",
+        "2024-04-22-1e8ed314-81d3-4b2a-b03b-82926a65e36a",
+        "2024-04-21-1e8ed314-81d3-4b2a-b03b-82926a65e36a",
+        "2024-04-20-1e8ed314-81d3-4b2a-b03b-82926a65e36a",
+        "2024-04-19-1e8ed314-81d3-4b2a-b03b-82926a65e36a",
+        "2024-04-16-f718de06-05df-4da7-92a4-027206860062",
+        "2024-04-15-1e8ed314-81d3-4b2a-b03b-82926a65e36a",
+        "2024-04-15-f718de06-05df-4da7-92a4-027206860062",
+        "2024-04-14-f718de06-05df-4da7-92a4-027206860062",
+        "2024-04-13-f718de06-05df-4da7-92a4-027206860062",
+        "2024-04-12-f718de06-05df-4da7-92a4-027206860062",
+        "2024-04-11-f718de06-05df-4da7-92a4-027206860062",
+        "2024-04-10-f718de06-05df-4da7-92a4-027206860062",
+        "2024-04-09-f718de06-05df-4da7-92a4-027206860062",
+        "2024-04-08-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-04-08-f718de06-05df-4da7-92a4-027206860062",
+        "2024-04-07-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-04-07-f718de06-05df-4da7-92a4-027206860062",
+        "2024-04-06-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-04-06-f718de06-05df-4da7-92a4-027206860062",
+        "2024-04-05-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-04-05-f718de06-05df-4da7-92a4-027206860062",
+        "2024-04-04-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-04-04-f718de06-05df-4da7-92a4-027206860062",
+        "2024-04-03-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-04-03-f718de06-05df-4da7-92a4-027206860062",
+        "2024-04-02-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-04-02-5fbed119-1d3b-4303-82ee-c7ddbb92de6b",
+        "2024-04-02-f718de06-05df-4da7-92a4-027206860062",
+        "2024-04-01-f718de06-05df-4da7-92a4-027206860062",
+        "2024-03-31-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-03-31-f718de06-05df-4da7-92a4-027206860062",
+        "2024-03-30-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-03-30-d6b46429-1f23-4aac-bed9-82908ae73b6d",
+        "2024-03-30-f718de06-05df-4da7-92a4-027206860062",
+        "2024-03-29-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-03-29-d6b46429-1f23-4aac-bed9-82908ae73b6d",
+        "2024-03-29-f718de06-05df-4da7-92a4-027206860062",
+        "2024-03-28-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-03-28-d6b46429-1f23-4aac-bed9-82908ae73b6d",
+        "2024-03-28-f718de06-05df-4da7-92a4-027206860062",
+        "2024-03-27-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-03-27-d6b46429-1f23-4aac-bed9-82908ae73b6d",
+        "2024-03-27-f718de06-05df-4da7-92a4-027206860062",
+        "2024-03-26-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-03-26-d6b46429-1f23-4aac-bed9-82908ae73b6d",
+        "2024-03-26-f718de06-05df-4da7-92a4-027206860062",
+        "2024-03-25-f718de06-05df-4da7-92a4-027206860062",
+        "2024-03-25-3d8f7c19-7d38-4b96-811e-c58eedcb4aaa",
+        "2024-03-25-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-03-25-d6b46429-1f23-4aac-bed9-82908ae73b6d",
+        "2024-03-24-3d8f7c19-7d38-4b96-811e-c58eedcb4aaa",
+        "2024-03-24-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-03-24-d6b46429-1f23-4aac-bed9-82908ae73b6d",
+        "2024-03-23-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-03-23-d6b46429-1f23-4aac-bed9-82908ae73b6d",
+        "2024-03-22-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-03-22-d6b46429-1f23-4aac-bed9-82908ae73b6d",
+        "2024-03-21-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-03-21-d6b46429-1f23-4aac-bed9-82908ae73b6d",
+        "2024-03-20-d6b46429-1f23-4aac-bed9-82908ae73b6d",
+        "2024-03-19-d6b46429-1f23-4aac-bed9-82908ae73b6d",
+        "2024-03-18-f718de06-05df-4da7-92a4-027206860062",
+        "2024-03-18-3d8f7c19-7d38-4b96-811e-c58eedcb4aaa",
+        "2024-03-18-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-03-18-d6b46429-1f23-4aac-bed9-82908ae73b6d",
+        "2024-03-17-2da631f5-2553-4f9b-af9e-7b8ed3b20390",
+        "2024-03-17-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-03-17-d6b46429-1f23-4aac-bed9-82908ae73b6d",
+        "2024-03-16-d6b46429-1f23-4aac-bed9-82908ae73b6d",
+        "2024-03-16-2da631f5-2553-4f9b-af9e-7b8ed3b20390",
+        "2024-03-16-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-03-15-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-03-15-2da631f5-2553-4f9b-af9e-7b8ed3b20390",
+        "2024-03-14-2da631f5-2553-4f9b-af9e-7b8ed3b20390",
+        "2024-03-13-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-03-13-2da631f5-2553-4f9b-af9e-7b8ed3b20390",
+        "2024-03-12-5a79685c-9a99-43e8-9aa5-ed7567fe8a7e",
+        "2024-03-12-2da631f5-2553-4f9b-af9e-7b8ed3b20390",
+        "2024-03-11-2da631f5-2553-4f9b-af9e-7b8ed3b20390",
+        "2024-03-11-2765c512-63cf-4b2f-8f2a-27b7226c6adb",
+        "2024-03-10-2765c512-63cf-4b2f-8f2a-27b7226c6adb",
+        "2024-03-09-2765c512-63cf-4b2f-8f2a-27b7226c6adb",
+        "2024-03-08-2765c512-63cf-4b2f-8f2a-27b7226c6adb",
+        "2024-03-07-2765c512-63cf-4b2f-8f2a-27b7226c6adb",
+        "2024-02-29-2765c512-63cf-4b2f-8f2a-27b7226c6adb",
+        "2024-02-28-2765c512-63cf-4b2f-8f2a-27b7226c6adb",
+        "2024-02-27-2765c512-63cf-4b2f-8f2a-27b7226c6adb",
+        "2024-02-24-2765c512-63cf-4b2f-8f2a-27b7226c6adb",
+        "2024-02-23-2765c512-63cf-4b2f-8f2a-27b7226c6adb",
+        "2024-02-22-2765c512-63cf-4b2f-8f2a-27b7226c6adb",
+        "2024-02-20-2765c512-63cf-4b2f-8f2a-27b7226c6adb",
+        "2024-02-19-2765c512-63cf-4b2f-8f2a-27b7226c6adb",
+        "2024-02-15-2765c512-63cf-4b2f-8f2a-27b7226c6adb",
+        "2024-01-27-ad69052e-18ff-45cb-a655-f0b529bdc797",
+        "2024-01-26-ad69052e-18ff-45cb-a655-f0b529bdc797",
+        "2024-01-25-ad69052e-18ff-45cb-a655-f0b529bdc797",
+        "2024-01-24-ad69052e-18ff-45cb-a655-f0b529bdc797",
+        "2024-01-22-ad69052e-18ff-45cb-a655-f0b529bdc797",
+        "2024-01-19-ad69052e-18ff-45cb-a655-f0b529bdc797",
+        "2024-01-19-0d85b971-a02a-4ed7-b66e-dda43b9a8797",
+        "2024-01-18-2cc90925-8ae1-4752-86ef-f73967232127",
+        "2024-01-18-0d85b971-a02a-4ed7-b66e-dda43b9a8797",
+        "2024-01-17-0d85b971-a02a-4ed7-b66e-dda43b9a8797",
+        "2024-01-16-0d85b971-a02a-4ed7-b66e-dda43b9a8797",
+        "2024-01-15-0d85b971-a02a-4ed7-b66e-dda43b9a8797"
+      ]
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-07-02T04:45:26.645Z",
+      "updatedAt": "2023-07-02T04:45:26.645Z",
+      "id": "12",
+      "name": "Alert"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-08-05T10:00:39.477Z",
+  "versionId": "e93ccede-e7b5-4bab-86dc-f13c48c917aa"
+}
