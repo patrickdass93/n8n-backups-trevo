@@ -1,0 +1,139 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SendInBlue": {
+      "main": [
+        [
+          {
+            "node": "SIB API1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "SendInBlue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-07-11T08:15:10.865Z",
+  "id": "WErmd9CnOM9HnocJ",
+  "name": "[JIUN][One Time Use] - EH Final Reminder eDM",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "5cfe1854-0362-4ba6-b43d-a9f457289a67",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        580,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "update",
+        "identifier": "={{ $json.email }}",
+        "updateAttributes": {
+          "updateAttributesValues": [
+            {
+              "fieldName": "CPHOSTNAME",
+              "fieldValue": "={{ $json.concat }}"
+            }
+          ]
+        }
+      },
+      "id": "9873af91-29a6-4aee-8113-5e3a62b92c2e",
+      "name": "SendInBlue",
+      "type": "n8n-nodes-base.sendInBlue",
+      "typeVersion": 1,
+      "position": [
+        980,
+        280
+      ],
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\"to\":[{\"email\":\"{{ $('Postgres').item.json[\"email\"] }}\"}],\n\"templateId\":683\n}\n",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1180,
+        280
+      ],
+      "id": "3510e03c-c09f-4c59-91be-4869a83fde77",
+      "retryOnFail": true,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=select distinct concat(u.first_name,' ',u.last_name),\nu.email\nfrom users u \nwhere u.email in ('b.z.y-2587@hotmail.com',\n'dafliqresources@gmail.com',\n'azrimohammad60@gmail.com',\n'laisanadventure88@gmail.com',\n'championcar68@gmail.com',\n'japhet.laisanadventure@gmail.com',\n'alaxlim28@gmail.com',\n'venuskah@gmail.com',\n'tiffany_wongyi@hotmail.com',\n'shirlyyc2902@gmail.com',\n'kenny32.hamilton@gmail.com',\n'faizalrosli705@gmail.com',\n'wei_chian@hotmail.com',\n'mdnizam55@yahoo.com',\n'deicidee@gmail.com',\n'ketemuiz4u@gmail.com',\n'king.lau68@live.com',\n'cheeonn9198@gmail.com',\n'fralyc77@gmail.com',\n'mafiqhafeez@gmail.com',\n'account@epicrides.com.my',\n'chanwooilim@gmail.com',\n'jiunyew98@gmail.com')",
+        "options": {}
+      },
+      "id": "150960d6-b202-4109-a479-d3a82f127f74",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        780,
+        280
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-07-11T08:44:52.983Z",
+  "versionId": "a9997fe8-d368-4934-b883-e087ffe980ef"
+}
