@@ -1,0 +1,548 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets2": {
+      "main": [
+        [
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-07-12T08:25:47.866Z",
+  "id": "fkKGqznRESlbFyKc",
+  "name": "[ANGELINE & JIUN] [ENTREPRENEUR HOST] - EH Rebate Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "04c3e34b-ce42-4786-820d-2bc688c27905",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        540,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1CP8lgBkSHke6D6ksHepdqnHs7kANmy3bASJjj0HlxSY",
+          "mode": "list",
+          "cachedResultName": "Month '23 - EH Rebate Payout Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CP8lgBkSHke6D6ksHepdqnHs7kANmy3bASJjj0HlxSY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 145182982,
+          "mode": "list",
+          "cachedResultName": "[N8N Import] - Raw Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CP8lgBkSHke6D6ksHepdqnHs7kANmy3bASJjj0HlxSY/edit#gid=145182982"
+        },
+        "clear": "specificRange",
+        "range": "A2:Z"
+      },
+      "id": "0b32cc42-82aa-4028-a4b5-f8b16343aa58",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        720,
+        200
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect \ndistinct u.id as UID,\nconcat(u.first_name,'',u.last_name)as name , \ncase when ht.host_type is null then 'Organic' else ht.host_type end as host_type ,\nu.email , \nu.phone_number ,\ncase when pa.name is not null then pa.name else concat(u.first_name,' ',u.last_name) end beneficiary_name, \nCONCAT('''',pa.account_number)::TEXT as \"Payout Account Number\",\npa.bank,\nb.ref_no ,\nb.listing_id ,\nl.registration_no ,\nround((coalesce(d5.rental,0) + coalesce(ext.rental,0) - p.amount - coalesce(bh.total_handover_fee,0) + coalesce(mp.mileage_payout_amount,0) - p.sst_amount)/(coalesce(d5.rental,0) + coalesce(ext.rental,0)),2)*100 as comission_perc,\nm.name as car_model ,\ncase when ll.city_id in (1) then '1. KV'   \nwhen ll.city_id in (2,12) then '2. PG'\nwhen ll.city_id in (3,19,20,21) then '3. KK'  \nwhen ll.city_id in (4,15) then '4. JB' \nwhen ll.city_id in (5) then '5. IP' \nwhen ll.city_id in (47) then '6. NS'\nwhen ll.city_id in (13) then '7. LGK'\nelse '8. Others' end as city  ,\nb.created_at ,\nb.request_start_at ,\nb.request_end_at ,\nto_char(b.request_end_at::timestamp,'IYYY-IW')as request_end_week,\nto_char(b.request_end_at::timestamp,'YYYY-MM')as request_end_month,\nb.status , \nd5.rental::numeric + coalesce(ext.rental::numeric,'0') as rental\nfrom bookings b\nleft join listings l on l.id = b.listing_id\nleft join users u on u.id = l.user_id\nleft join listing_location ll on ll.listing_id = l.id\nleft join models m on m.id = l.model_id\nleft join listing_commission_class lcc on lcc.listing_id = l.id \nleft join commission_class cc on cc.id = lcc.commission_id \nleft join payouts p on p.booking_id = b.id \nLEFT JOIN payout_accounts pa ON pa.id = p.payout_account_id\nleft join \n\t(select bl.booking_id, bl.amount as rental \n\tfrom booking_lines bl \n\twhere bl.slug = 'rental-fee') d5\n\ton b.id = d5.booking_id\n--\nleft join --this is a subquery to get host_type\n    (select distinct l.user_id, l.id, t.name as host_type\n    from listings l\n    left join tag_taggables tt on tt.taggable_id = l.user_id \n    left join tags t on t.id = tt.tag_id\n    where t.name ~* '(entrepreneur|commercial)')ht\n    on ht.user_id = l.user_id\n--    \nleft join\n\t(select distinct b.id, \n\tb.ref_no, \n\tsum(bh.handover_fee)as total_handover_fee\n\tfrom bookings b \n\tleft join booking_handover bh on bh.booking_id = b.id\n\twhere 1=1\n\t--and b.ref_no = 'YHLUKSAS'\n\tgroup by 1,2)bh\n\ton bh.id = b.id\n--\nleft join\n\t(select distinct b.ref_no, \n\tbl.name as mileage_package,\n\tbl.amount as mileage_pack_amount,  \n\tcase when b.created_at >= '2024-03-01 00:00' then bl.amount - (bl.amount * 0.15) - ((bl.amount * 0.15) * 0.08)\n\telse bl.amount - (bl.amount * 0.15) - ((bl.amount * 0.15) * 0.06) end as mileage_payout_amount\n\tfrom booking_lines bl \n\tleft join bookings b on b.id = bl.booking_id \n\twhere bl.name ~* '(Mileage)'\n\tand bl.currency = 'myr')mp\n\ton mp.ref_no = b.ref_no\n--\nleft join\n\t(select distinct b.ref_no, \n\tto_char(be.created_at::timestamp, 'YYYY-MM-DD HH24:MI')as created_at,\n\tbe.gross_amount, \n\td6.rental, \n\tbe.gross_amount - d6.rental as scdw\n\tfrom booking_extension be \n\tleft join bookings b on b.id = be.booking_id\n\tleft join\n\t(select bl.booking_id, be.status, bl.amount as rental\n\tfrom booking_lines bl \n\tleft join booking_extension be on be.booking_id = bl.booking_id and bl.entity_id = be.id\n\twhere bl.slug = 'extension'\n\tand be.status = 'accepted') d6\n\ton be.booking_id = d6.booking_id\n\tleft join listing_commission_class lcc on lcc.listing_id = b.listing_id\n\tleft join commission_class cc on cc.id = lcc.commission_id \n\twhere be.status = 'accepted')ext\n\ton ext.ref_no = b.ref_no\n--\nwhere b.status = 'completed'\nand l.deleted_at is null\nand ll.country = 'Malaysia'\nand b.request_end_at >= '2023-06-01 00:00'\ngroup by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21\nhaving (case when ht.host_type is null then 'Organic' else ht.host_type end) = 'Entrepreneur Host' \norder by b.request_end_at",
+        "options": {}
+      },
+      "id": "4c746eab-afc3-44bd-a0b4-4a40a69e32bb",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        900,
+        200
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1CP8lgBkSHke6D6ksHepdqnHs7kANmy3bASJjj0HlxSY",
+          "mode": "list",
+          "cachedResultName": "Month '23 - EH Rebate Payout Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CP8lgBkSHke6D6ksHepdqnHs7kANmy3bASJjj0HlxSY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 145182982,
+          "mode": "list",
+          "cachedResultName": "[N8N Import] - Raw Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CP8lgBkSHke6D6ksHepdqnHs7kANmy3bASJjj0HlxSY/edit#gid=145182982"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "uid"
+          ],
+          "schema": [
+            {
+              "id": "uid",
+              "displayName": "uid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "host_type",
+              "displayName": "host_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone_number",
+              "displayName": "phone_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "beneficiary_name",
+              "displayName": "beneficiary_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Payout Account Number",
+              "displayName": "Payout Account Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "bank",
+              "displayName": "bank",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ref_no",
+              "displayName": "ref_no",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "listing_id",
+              "displayName": "listing_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "registration_no",
+              "displayName": "registration_no",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "comission_perc",
+              "displayName": "comission_perc",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "car_model",
+              "displayName": "car_model",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "request_start_at",
+              "displayName": "request_start_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "request_end_at",
+              "displayName": "request_end_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "request_end_week",
+              "displayName": "request_end_week",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "request_end_month",
+              "displayName": "request_end_month",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "rental",
+              "displayName": "rental",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "0d8934d2-9a4d-4bc2-870a-19166ac15dee",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1100,
+        200
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1CP8lgBkSHke6D6ksHepdqnHs7kANmy3bASJjj0HlxSY",
+          "mode": "list",
+          "cachedResultName": "Month '23 - EH Rebate Payout Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CP8lgBkSHke6D6ksHepdqnHs7kANmy3bASJjj0HlxSY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1167312622,
+          "mode": "list",
+          "cachedResultName": "[N8N Import] - Qualified Host",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CP8lgBkSHke6D6ksHepdqnHs7kANmy3bASJjj0HlxSY/edit#gid=1167312622"
+        },
+        "clear": "specificRange",
+        "range": "A2:Z"
+      },
+      "id": "97f05828-baff-4978-9084-ff137e57ef18",
+      "name": "Google Sheets2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        720,
+        20
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nwith listing as\n(select distinct l.id, \nl.created_at,\nl.user_id,\nconcat(u.first_name,' ',u.last_name)as host_name\nfrom listings l\nleft join users u on u.id = l.user_id \nleft join tag_taggables tt on tt.taggable_id = l.user_id \nleft join tags t on t.id = tt.tag_id \nleft join bookings b on b.listing_id = l.id\nleft join listing_location ll on ll.listing_id = l.id\nwhere 1=1\nand t.name = 'Entrepreneur Host'\nand l.status = 'approved'\nand l.deleted_at is null\nand ll.country = 'Malaysia'\nand l.created_at < DATE_TRUNC('month', CURRENT_DATE)),\n--\nbooking as\n(select distinct l.id as listing_id, \nl.user_id, \nconcat(u.first_name,' ',u.last_name)as host_name, \nb.active_car,\nb.spec_req, \nb.fuld_booking, \nb.afr\nfrom listings l \nleft join listing_location ll on ll.listing_id = l.id\nleft join tag_taggables tt on tt.taggable_id = l.user_id \nleft join tags t on t.id = tt.tag_id \nleft join users u on u.id = l.user_id \nleft join\n--\n        (select distinct b.listing_id, \n        l.user_id,\n        count(distinct case when b.status = 'completed' then b.listing_id end) as active_car,\n        count(distinct case when (\n\t\t(b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')) or --fulfilled\n\t\t(b.status = 'rejected' AND (b.reason !~* '(guest)' OR b.reason IS NULL) and no.nightowl = 'no') OR --exclude rejected with guest fault reasons and nightowl \n\t\t(b.status IN ('withdrawn', 'cancelled') AND b.reason ~* '(host|owner|avai|car)' and no.nightowl = 'no' AND b.reason !~* '(after i read|dont need|extended|rebook|rebooking|wrong date|wrong time|I didnt|manual|I want|I need|sorry|I would|mistake|my own car|wrong|change)') -- withdrawn with host fault reason and not guest fault reason and not nightowl\n\t\t) then b.id end) as spec_req,\n        count(distinct case when b.status in ('accepted', 'waiting_for_inspection', 'start_driving', 'return_car', 'completed') then b.id end) as fuld_booking, \n        round(count(distinct case when b.status in ('accepted', 'waiting_for_inspection', 'start_driving', 'return_car', 'completed') then b.id end)::numeric/nullif(count(distinct case when ((b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')) or (b.status = 'rejected' AND (b.reason !~* '(guest)' OR b.reason IS NULL)) OR (b.status IN ('withdrawn', 'cancelled') AND b.reason ~* '(host|owner|avai|car)' AND b.reason !~* '(after i read|dont need|extended|rebook|rebooking|wrong date|wrong time|I didnt|manual|I want|I need|sorry|I would|mistake|my own car|wrong|change)')) then b.id end),0)*100,2) as afr\n        from bookings b \n        left join listings l on l.id = b.listing_id \n        left join listing_location ll on ll.listing_id = l.id\n        left join\n\t\t\t(select distinct b.ref_no, \n\t\t\tcase when \n\t\t\t((EXTRACT(HOUR FROM b.created_at) in (23,0,1,2,3,4,5,6,7)) and    \n\t\t\t(EXTRACT(HOUR FROM b.request_start_at) in (6,7,8,9)) and\n\t\t\t((EXTRACT(EPOCH FROM (b.request_start_at - b.created_at)) / 3600) < 12)) then 'yes' else 'no' end as nightowl\n\t\t\tfrom bookings b)no\n\t\ton no.ref_no = b.ref_no\n        where 1=1\n        and ll.country = 'Malaysia'\n        --and l.user_id = '32897'\n        and b.created_at between (DATE_TRUNC('month', CURRENT_DATE) - interval '1 month') and DATE_TRUNC('month', CURRENT_DATE) - interval '1 minute'\n        group by 1,2)b\n        on b.listing_id = l.id\n--\nwhere 1=1\nand ll.country = 'Malaysia'\nand t.name = 'Entrepreneur Host'\nand l.status = 'approved'\nand l.deleted_at is null),\n--\navai as --avai days as per HOST ELIGIBILITY REQUIREMENT on TREVO Terms of Service \n(select distinct l.id as listing_id, \nl.user_id, \ncount(distinct dates.ymd)as avai_days\nfrom listings l \nleft join listing_availability la on la.listing_id = l.id\njoin (SELECT generate_series(DATE_TRUNC('month', CURRENT_DATE - interval '1 month'), DATE_TRUNC('month', CURRENT_DATE) - interval '1 day', interval '1 day')::date ymd) dates \non dates.ymd between la.start_date::date and la.end_date::date\ngroup by 1),\n--\nbooking_active as\n(select distinct l.id, \ncount(distinct b.listing_id)as active_car\nfrom bookings b \nleft join listings l on l.id = b.listing_id \nleft join listing_location ll on ll.listing_id = b.listing_id\nwhere b.status = 'completed'\nand ll.country = 'Malaysia'\nand b.request_start_at between (DATE_TRUNC('month', CURRENT_DATE) - interval '1 month') and DATE_TRUNC('month', CURRENT_DATE) - interval '1 minute'\ngroup by 1)\n--\nselect distinct l.id, \nl.user_id, \nl.host_name,\ncoalesce(b.afr,0) as afr,\ncoalesce(ba.active_car,0) as active_car,\ncase when a.avai_days >= '21' then 'Yes' else 'No'end as avai\nfrom listing l \nleft join booking b on b.listing_id = l.id\nleft join booking_active ba on ba.id = l.id\nleft join avai a on a.listing_id = l.id\norder by 2",
+        "options": {}
+      },
+      "id": "cac2f0b1-4698-4f4c-87f7-4284ba8fa247",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        900,
+        20
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1CP8lgBkSHke6D6ksHepdqnHs7kANmy3bASJjj0HlxSY",
+          "mode": "list",
+          "cachedResultName": "Month '23 - EH Rebate Payout Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CP8lgBkSHke6D6ksHepdqnHs7kANmy3bASJjj0HlxSY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1167312622,
+          "mode": "list",
+          "cachedResultName": "[N8N Import] - Qualified Host",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CP8lgBkSHke6D6ksHepdqnHs7kANmy3bASJjj0HlxSY/edit#gid=1167312622"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "host_name",
+              "displayName": "host_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "afr",
+              "displayName": "afr",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "active_car",
+              "displayName": "active_car",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "avai",
+              "displayName": "avai",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "4a1bd26a-a413-4875-8f46-b0fedff4945a",
+      "name": "Google Sheets3",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1100,
+        20
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-04-03T06:42:26.385Z",
+  "versionId": "c78317ca-2152-4136-8e16-de203ea4e42b"
+}
