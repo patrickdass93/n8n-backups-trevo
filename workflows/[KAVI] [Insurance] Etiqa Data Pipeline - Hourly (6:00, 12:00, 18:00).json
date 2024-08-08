@@ -1,0 +1,1553 @@
+{
+  "active": false,
+  "connections": {
+    "Get Bookings Data": {
+      "main": [
+        [
+          {
+            "node": "Get User Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User Data": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Google Sheets - Read Sent Bookings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Clear Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Clear Data - Date Helper Subsheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "Date & Time1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive1": {
+      "main": [
+        [
+          {
+            "node": "Google Drive v",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive v": {
+      "main": [
+        [
+          {
+            "node": "FTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FTP1": {
+      "main": [
+        [
+          {
+            "node": "Spreadsheet File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Read Sent Bookings": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - 6 Hour Update",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets - Data To be Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Data To be Sent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Google Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear Data": {
+      "main": [
+        [
+          {
+            "node": "Get Bookings Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-04-19T02:31:27.943Z",
+  "id": "qsA6SscHPE9HTd33",
+  "name": "[KAVI] [Insurance] Etiqa Data Pipeline - Hourly (6:00, 12:00, 18:00)",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH \n    my_users AS (\n        SELECT DISTINCT ON (u.id)\n            u.id AS user_id\n            , u.uuid AS user_uuid\n            , UPPER(CASE WHEN u.display_name IS NOT NULL THEN u.display_name ELSE concat(u.first_name,' ',u.last_name) END) AS user_name\n            , id_number\n            , u.nationality\n            , to_char(u.dob,'YYYYMMDD') as dob\n\n        FROM users u\n        LEFT JOIN user_attributions ua ON ua.user_id = u.id\n        LEFT JOIN user_kyc kyc on kyc.user_id = u.id\n            AND kyc_type_id = 3\n                \n        WHERE 1=1\n            AND ((ua.key = 'current-country' AND ua.value IN ('MY','others'))\n                OR (ua.key = 'signup-country' AND ua.value IN ('MY','others')))\n    )\n    \n    , etika_insured AS (\n        SELECT DISTINCT ON (li.listing_id) \n            li.listing_id\n            , li.insured_amount\n            , li.expiry\n            , l.registration_no\n            , l.created_at::DATE as list_date\n            , h.user_uuid as host_uuid\n            , h.user_name as host_name\n            , h.id_number as host_id_number\n        FROM listings l\n        JOIN my_users h on h.user_id = l.user_id\n        JOIN listing_insurance li on li.listing_id = l.id\n            AND li.status = 'approved'\n            AND name IN ('Etiqa')\n        WHERE 1=1\n            AND l.status = 'approved'\n            AND l.deleted_at IS NULL\n    )    \n\n    , my_bookings AS (\n        SELECT DISTINCT ON (b.id) \n            b.id as booking_id\n            , CASE \n                WHEN b.status IN ('start_driving','waiting_for_inspection','return_car') THEN 'driving'\n                WHEN b.status IN ('cancelled') \n                        AND (\n                            b.reason ~~* '%host%'\n                            OR b.reason ~~* '%owner%'\n                            OR b.reason ~~* '%car'\n                        ) THEN 'rejected'\n                ELSE b.status END AS booking_status\n            , to_char(b.created_at,'YYYYMMDD') as booking_request_date\n            , to_char(b.created_at,'HH24:MI:SS') as booking_request_time\n            , to_char(b.request_start_at,'YYYYMMDD') as booking_start_date\n            , to_char(b.request_start_at,'HH24:MI:SS') as booking_start_time\n            , to_char(b.request_end_at,'YYYYMMDD') as booking_end_date\n            , to_char(b.request_end_at,'HH24:MI:SS') as booking_end_time\n            , request_start_at as booking_start_ts\n            , request_end_at as booking_end_ts\n            , bst.created_at AT TIME ZONE 'Asia/Kuala_Lumpur' as booking_cancellation_ts \n            , CEIL(EXTRACT(EPOCH FROM b.request_end_at - b.request_start_at)/86400) AS booking_dur_days\n            , user_uuid\n            , user_name\n            , id_number\n            , nationality\n            , dob\n            , registration_no\n            , host_uuid\n            , host_name\n            , host_id_number\n            , CEIL(EXTRACT(EPOCH FROM bst.created_at - b.request_start_at)/3600) as cancellation_lagtime\n        FROM bookings b\n        LEFT JOIN booking_status_tracking bst on bst.booking_id = b.id\n            AND bst.status = 'cancelled'\n        JOIN etika_insured l on l.listing_id = b.listing_id\n        LEFT JOIN my_users u on u.user_id = b.user_id\n        WHERE 1=1\n            AND b.status NOT IN ('withdrawn','payment_failed','requested','rejected')\n            AND b.request_start_at::DATE = DATE_TRUNC('day', NOW() AT TIME ZONE 'Asia/Kuala_Lumpur')\n    )\n    \nSELECT DISTINCT ON (booking_id)\n    booking_id\n    , booking_request_date\n    , booking_request_time\n    , booking_start_date\n    , booking_start_time\n    , booking_end_date\n    , booking_end_time\n    , (booking_start_ts - interval '1 hour')::TIME as delivery_time\n    , (booking_end_ts + interval '1 hour')::TIME as pickup_time\n    , user_uuid\n    , user_name\n    , nationality\n    , dob\n    , registration_no\n    , booking_dur_days\n    , booking_dur_days * 6 as premium_calculation\n    , CASE WHEN booking_cancellation_ts IS NULL THEN NULL ELSE 'P' END AS cancellation\n    , booking_status\n\nFROM my_bookings\nWHERE 1=1\n    AND booking_status NOT IN ('withdrawn','payment_failed','requested','rejected')\n    AND (cancellation_lagtime > -24 OR cancellation_lagtime IS NULL)\n    \nORDER BY 1 ASC\nLIMIT 50",
+        "options": {}
+      },
+      "id": "930412d1-5d22-44c9-9a53-8a0efb87e9a6",
+      "name": "Get Bookings Data",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        340,
+        280
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT DISTINCT on (user_id)\n    user_id AS user_uuid\n    , id_number\nFROM kyc\nWHERE 1=1\n    AND kyc_type_id = 'cf9d2056-84e8-4724-8dfa-e8b41bfba4f2'\n    AND country = 'MY'\n    AND status = 'approved'\n    AND id_number IS NOT NULL\n    AND user_id IN ('{{ $json.user_uuid }}')",
+        "options": {}
+      },
+      "id": "a0e8c2e3-93cd-43e4-9296-1679f7600bc8",
+      "name": "Get User Data",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        500,
+        400
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "postgres": {
+          "id": "11",
+          "name": "KYC DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "user_uuid",
+              "field2": "user_uuid"
+            }
+          ]
+        },
+        "options": {
+          "clashHandling": {
+            "values": {
+              "resolveClash": "preferInput1"
+            }
+          }
+        }
+      },
+      "id": "e44228ff-903e-4f5e-9a12-6ca982a8285d",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        680,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 6,12,18 * * *"
+            }
+          ]
+        }
+      },
+      "id": "d73373c4-ecb5-43b8-a45d-d5fa50051669",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        20,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "17nVlxDf1_mvpOiWeyMkWqb5ydvLt8cBPgm9uiWOY6Bk",
+          "mode": "list",
+          "cachedResultName": "TREVO X Etiqa Test Data - 6 Hour",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17nVlxDf1_mvpOiWeyMkWqb5ydvLt8cBPgm9uiWOY6Bk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 881661788,
+          "mode": "list",
+          "cachedResultName": "Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17nVlxDf1_mvpOiWeyMkWqb5ydvLt8cBPgm9uiWOY6Bk/edit#gid=881661788"
+        },
+        "clear": "specificRange",
+        "range": "A2:Z"
+      },
+      "id": "cae508ed-eafa-4a08-b116-d21fe3684311",
+      "name": "Clear Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        180,
+        280
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google Sheets [Pat]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "path": "=MBB/{{ $json.name }}.csv"
+      },
+      "id": "eed5c924-f2fd-4476-bcd6-158ec4fb5252",
+      "name": "FTP",
+      "type": "n8n-nodes-base.ftp",
+      "typeVersion": 1,
+      "position": [
+        2300,
+        380
+      ],
+      "credentials": {
+        "ftp": {
+          "id": "W1Z48U7S6PiaXxTg",
+          "name": "Etiqa FTP Server"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "id": "8c333c2a-addf-4783-9752-d9594599fc9b",
+      "name": "Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1520,
+        740
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fields": {
+          "values": [
+            {
+              "name": "Item Count",
+              "type": "numberValue",
+              "numberValue": "={{ $input.all().length }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "27b9cb0a-2ebd-48c6-b936-2981c08d7c05",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        1180,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "options": {
+          "timezone": ""
+        }
+      },
+      "id": "f36e9bf4-05e6-42a2-b9cd-8e7d417baa50",
+      "name": "Date & Time",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $json.currentDate }}",
+        "format": "custom",
+        "customFormat": "yyyyLLdd",
+        "options": {}
+      },
+      "id": "fde07298-6b18-4a45-9a35-08d1eb58c718",
+      "name": "Date & Time1",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        1660,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "binaryPropertyName": "data",
+          "googleFileConversion": {
+            "conversion": {}
+          }
+        }
+      },
+      "id": "ea0e9567-204d-4761-b035-b8faea6c8a7b",
+      "name": "Google Drive2",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1340,
+        740
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "12",
+          "name": "Google account - Kavi"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1VpIVRaukZjLIS6P9H_KidV4EPsw4c6JtRtzDwc6TZNc",
+          "mode": "list",
+          "cachedResultName": "TREVO X Etiqa Test Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VpIVRaukZjLIS6P9H_KidV4EPsw4c6JtRtzDwc6TZNc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1780852183,
+          "mode": "list",
+          "cachedResultName": "Date Helper",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VpIVRaukZjLIS6P9H_KidV4EPsw4c6JtRtzDwc6TZNc/edit#gid=1780852183"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $json.formattedDate }}"
+          },
+          "matchingColumns": [
+            "Date"
+          ],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "60c1cccc-f86b-4ee7-aa62-c982cd6f4fa9",
+      "name": "Google Sheets2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1700,
+        920
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "1VpIVRaukZjLIS6P9H_KidV4EPsw4c6JtRtzDwc6TZNc",
+          "mode": "list",
+          "cachedResultName": "TREVO X Etiqa Test Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VpIVRaukZjLIS6P9H_KidV4EPsw4c6JtRtzDwc6TZNc/edit?usp=drivesdk"
+        },
+        "name": "=EGIB_P2PBOOKING_TREVO_{{ $json.Date }}",
+        "sameFolder": false,
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1TR-8PnUGgRvPSIBphjbSCk7HQ0IItjgq",
+          "mode": "list",
+          "cachedResultName": "Booking Detail Files",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1TR-8PnUGgRvPSIBphjbSCk7HQ0IItjgq"
+        },
+        "options": {}
+      },
+      "id": "b248ac11-413b-46c7-80e0-8ccfb079ce5d",
+      "name": "Google Drive1",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1980,
+        380
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "12",
+          "name": "Google account - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fileName": "={{ $('Google Drive1').item.json.name }}",
+        "options": {}
+      },
+      "id": "e9daf1a6-9506-411c-bbc2-04d4af08cb31",
+      "name": "Write Binary File1",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        1720,
+        740
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/drive/v3/files/1VpIVRaukZjLIS6P9H_KidV4EPsw4c6JtRtzDwc6TZNc/export",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "mimeType",
+              "value": "text/csv"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4d2e6e6f-c55e-46fd-91ed-407ff0f0842f",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1340,
+        560
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "12",
+          "name": "Google account - Kavi"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1VpIVRaukZjLIS6P9H_KidV4EPsw4c6JtRtzDwc6TZNc",
+          "mode": "list",
+          "cachedResultName": "TREVO X Etiqa Test Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VpIVRaukZjLIS6P9H_KidV4EPsw4c6JtRtzDwc6TZNc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 474706995,
+          "mode": "list",
+          "cachedResultName": "EGIB_P2PBOOKING_TREVO_20240415",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VpIVRaukZjLIS6P9H_KidV4EPsw4c6JtRtzDwc6TZNc/edit#gid=474706995"
+        },
+        "options": {}
+      },
+      "id": "30803759-2fb6-4d14-afc9-e7890b2228af",
+      "name": "Google Sheets3",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1520,
+        560
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "sheetsToFormat": "text/csv"
+            }
+          },
+          "fileName": "={{ $json.name }}.csv"
+        }
+      },
+      "id": "867ce71b-6799-4076-8530-b9a5174dc726",
+      "name": "Google Drive v",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 1,
+      "position": [
+        2140,
+        380
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "12",
+          "name": "Google account - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "=MBB/EGIB_P2PBOOKING_TREVO_20240416"
+      },
+      "id": "62167ed2-d997-4642-9bc9-8d269eee8d9b",
+      "name": "FTP1",
+      "type": "n8n-nodes-base.ftp",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        920
+      ],
+      "credentials": {
+        "ftp": {
+          "id": "W1Z48U7S6PiaXxTg",
+          "name": "Etiqa FTP Server"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "toFile",
+        "fileFormat": "csv",
+        "options": {
+          "fileName": "tester"
+        }
+      },
+      "id": "d9ca38c8-f492-407a-a4ef-d0ad9758e882",
+      "name": "Spreadsheet File",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        920
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "17nVlxDf1_mvpOiWeyMkWqb5ydvLt8cBPgm9uiWOY6Bk",
+          "mode": "list",
+          "cachedResultName": "TREVO X Etiqa Test Data - 6 Hour",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17nVlxDf1_mvpOiWeyMkWqb5ydvLt8cBPgm9uiWOY6Bk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1780852183,
+          "mode": "list",
+          "cachedResultName": "Date Helper",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17nVlxDf1_mvpOiWeyMkWqb5ydvLt8cBPgm9uiWOY6Bk/edit#gid=1780852183"
+        },
+        "clear": "specificRows",
+        "startIndex": 2,
+        "rowsToDelete": 50
+      },
+      "id": "f83241f4-4aa2-4d51-b404-fd1b0401a0e6",
+      "name": "Clear Data - Date Helper Subsheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        180,
+        100
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google Sheets [Pat]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "17nVlxDf1_mvpOiWeyMkWqb5ydvLt8cBPgm9uiWOY6Bk",
+          "mode": "list",
+          "cachedResultName": "TREVO X Etiqa Test Data - 6 Hour",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17nVlxDf1_mvpOiWeyMkWqb5ydvLt8cBPgm9uiWOY6Bk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 404598041,
+          "mode": "list",
+          "cachedResultName": "Daily Data Helper",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17nVlxDf1_mvpOiWeyMkWqb5ydvLt8cBPgm9uiWOY6Bk/edit#gid=404598041"
+        },
+        "options": {}
+      },
+      "id": "2e4b4c23-8e70-4376-8d09-d7946dcebd8f",
+      "name": "Google Sheets - Read Sent Bookings",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        680,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google Sheets [Pat]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "booking_id",
+              "field2": "Booking ID"
+            }
+          ]
+        },
+        "joinMode": "keepNonMatches",
+        "options": {}
+      },
+      "id": "1c0b4508-fd6e-4bbb-b5c4-5a7f16d22db6",
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        840,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "17nVlxDf1_mvpOiWeyMkWqb5ydvLt8cBPgm9uiWOY6Bk",
+          "mode": "list",
+          "cachedResultName": "TREVO X Etiqa Test Data - 6 Hour",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17nVlxDf1_mvpOiWeyMkWqb5ydvLt8cBPgm9uiWOY6Bk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 404598041,
+          "mode": "list",
+          "cachedResultName": "Daily Data Helper",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17nVlxDf1_mvpOiWeyMkWqb5ydvLt8cBPgm9uiWOY6Bk/edit#gid=404598041"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Booking ID": "={{ $json.booking_id }}",
+            "Booking Created Date": "={{ $json.booking_request_date }}",
+            "Booking Created Timestamp": "={{ $json.booking_request_time }}",
+            "Booking Start Date": "={{ $json.booking_start_date }}",
+            "Booking Start Timestamp": "={{ $json.booking_start_time }}",
+            "Booking End Date": "={{ $json.booking_end_date }}",
+            "Booking End Timestamp": "={{ $json.booking_end_time }}",
+            "Delivery Time": "={{ $json.delivery_time }}",
+            "Pick-Up Time": "={{ $json.pickup_time }}",
+            "Driver's Name": "={{ $json.user_name }}",
+            "Driver's NRIC/Passport": "={{ $json.id_number }}",
+            "Driver's Nationality": "={{ $json.nationality }}",
+            "Driver's DOB": "={{ $json.dob }}",
+            "Vehicle Reg No": "={{ $json.registration_no }}",
+            "No. of Booking (Days)": "={{ $json.booking_dur_days }}",
+            "Premium Calculation (RM)": "={{ $json.premium_calculation }}",
+            "Full Cancel (F)/Partial Cancel (P)": "={{ $json.cancellation }}"
+          },
+          "matchingColumns": [
+            "Booking ID"
+          ],
+          "schema": [
+            {
+              "id": "Booking ID",
+              "displayName": "Booking ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Booking Created Date",
+              "displayName": "Booking Created Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Booking Created Timestamp",
+              "displayName": "Booking Created Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Booking Start Date",
+              "displayName": "Booking Start Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Booking Start Timestamp",
+              "displayName": "Booking Start Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Booking End Date",
+              "displayName": "Booking End Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Booking End Timestamp",
+              "displayName": "Booking End Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Delivery Time",
+              "displayName": "Delivery Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Pick-Up Time",
+              "displayName": "Pick-Up Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Driver's Name",
+              "displayName": "Driver's Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Driver's NRIC/Passport",
+              "displayName": "Driver's NRIC/Passport",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Driver's Nationality",
+              "displayName": "Driver's Nationality",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Driver's DOB",
+              "displayName": "Driver's DOB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vehicle Reg No",
+              "displayName": "Vehicle Reg No",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "No. of Booking (Days)",
+              "displayName": "No. of Booking (Days)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Premium Calculation (RM)",
+              "displayName": "Premium Calculation (RM)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Full Cancel (F)/Partial Cancel (P)",
+              "displayName": "Full Cancel (F)/Partial Cancel (P)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ffda0f8c-9216-4e8e-b639-70c0b7e69821",
+      "name": "Google Sheets - 6 Hour Update",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1020,
+        180
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google Sheets [Pat]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "17nVlxDf1_mvpOiWeyMkWqb5ydvLt8cBPgm9uiWOY6Bk",
+          "mode": "list",
+          "cachedResultName": "TREVO X Etiqa Test Data - 6 Hour",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17nVlxDf1_mvpOiWeyMkWqb5ydvLt8cBPgm9uiWOY6Bk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 881661788,
+          "mode": "list",
+          "cachedResultName": "Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17nVlxDf1_mvpOiWeyMkWqb5ydvLt8cBPgm9uiWOY6Bk/edit#gid=881661788"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Booking ID": "={{ $json.booking_id }}",
+            "Booking Created Date": "={{ $json.booking_request_date }}",
+            "Booking Created Timestamp": "={{ $json.booking_request_time }}",
+            "Booking Start Date": "={{ $json.booking_start_date }}",
+            "Booking Start Timestamp": "={{ $json.booking_start_time }}",
+            "Booking End Date": "={{ $json.booking_end_date }}",
+            "Booking End Timestamp": "={{ $json.booking_end_time }}",
+            "Delivery Time": "={{ $json.delivery_time }}",
+            "Pick-Up Time": "={{ $json.pickup_time }}",
+            "Driver's Name": "={{ $json.user_name }}",
+            "Driver's NRIC/Passport": "={{ $json.id_number }}",
+            "Driver's Nationality": "={{ $json.nationality }}",
+            "Driver's DOB": "={{ $json.dob }}",
+            "Vehicle Reg No": "={{ $json.registration_no }}",
+            "No. of Booking (Days)": "={{ $json.booking_dur_days }}",
+            "Premium Calculation (RM)": "={{ $json.premium_calculation }}",
+            "Full Cancel (F)/Partial Cancel (P)": "={{ $json.cancellation }}"
+          },
+          "matchingColumns": [
+            "Booking ID"
+          ],
+          "schema": [
+            {
+              "id": "Booking ID",
+              "displayName": "Booking ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Booking Created Date",
+              "displayName": "Booking Created Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Booking Created Timestamp",
+              "displayName": "Booking Created Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Booking Start Date",
+              "displayName": "Booking Start Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Booking Start Timestamp",
+              "displayName": "Booking Start Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Booking End Date",
+              "displayName": "Booking End Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Booking End Timestamp",
+              "displayName": "Booking End Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Delivery Time",
+              "displayName": "Delivery Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Pick-Up Time",
+              "displayName": "Pick-Up Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Driver's Name",
+              "displayName": "Driver's Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Driver's NRIC/Passport",
+              "displayName": "Driver's NRIC/Passport",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Driver's Nationality",
+              "displayName": "Driver's Nationality",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Driver's DOB",
+              "displayName": "Driver's DOB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vehicle Reg No",
+              "displayName": "Vehicle Reg No",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "No. of Booking (Days)",
+              "displayName": "No. of Booking (Days)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Premium Calculation (RM)",
+              "displayName": "Premium Calculation (RM)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Full Cancel (F)/Partial Cancel (P)",
+              "displayName": "Full Cancel (F)/Partial Cancel (P)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "98e6bc4a-16a0-4751-ac92-8dd033f9e218",
+      "name": "Google Sheets - Data To be Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1020,
+        380
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google Sheets [Pat]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "17nVlxDf1_mvpOiWeyMkWqb5ydvLt8cBPgm9uiWOY6Bk",
+          "mode": "list",
+          "cachedResultName": "TREVO X Etiqa Test Data - 6 Hour",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17nVlxDf1_mvpOiWeyMkWqb5ydvLt8cBPgm9uiWOY6Bk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 881661788,
+          "mode": "list",
+          "cachedResultName": "Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17nVlxDf1_mvpOiWeyMkWqb5ydvLt8cBPgm9uiWOY6Bk/edit#gid=881661788"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Booking ID": "trailer",
+            "Booking Created Date": "={{ $json['Item Count'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Booking ID",
+              "displayName": "Booking ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Booking Created Date",
+              "displayName": "Booking Created Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Booking Created Timestamp",
+              "displayName": "Booking Created Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Booking Start Date",
+              "displayName": "Booking Start Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Booking Start Timestamp",
+              "displayName": "Booking Start Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Booking End Date",
+              "displayName": "Booking End Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Booking End Timestamp",
+              "displayName": "Booking End Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Delivery Time",
+              "displayName": "Delivery Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Pick-Up Time",
+              "displayName": "Pick-Up Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Driver's Name",
+              "displayName": "Driver's Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Driver's NRIC/Passport",
+              "displayName": "Driver's NRIC/Passport",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Driver's Nationality",
+              "displayName": "Driver's Nationality",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Driver's DOB",
+              "displayName": "Driver's DOB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Vehicle Reg No",
+              "displayName": "Vehicle Reg No",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "No. of Booking (Days)",
+              "displayName": "No. of Booking (Days)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Premium Calculation (RM)",
+              "displayName": "Premium Calculation (RM)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Full Cancel (F)/Partial Cancel (P)",
+              "displayName": "Full Cancel (F)/Partial Cancel (P)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1295ebbf-189c-443f-8e56-2be150d7cf89",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1340,
+        380
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google Sheets [Pat]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "17nVlxDf1_mvpOiWeyMkWqb5ydvLt8cBPgm9uiWOY6Bk",
+          "mode": "list",
+          "cachedResultName": "TREVO X Etiqa Test Data - 6 Hour",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17nVlxDf1_mvpOiWeyMkWqb5ydvLt8cBPgm9uiWOY6Bk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1780852183,
+          "mode": "list",
+          "cachedResultName": "Date Helper",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17nVlxDf1_mvpOiWeyMkWqb5ydvLt8cBPgm9uiWOY6Bk/edit#gid=1780852183"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $json.formattedDate }}"
+          },
+          "matchingColumns": [
+            "Date"
+          ],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ee0f80a3-8934-4f99-ac2c-b8fc3b415880",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1820,
+        380
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google Sheets [Pat]"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "all",
+    "errorWorkflow": "11"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-11-07T06:07:39.984Z",
+      "updatedAt": "2023-11-07T06:07:39.984Z",
+      "id": "tJPYx3rezCqNjki3",
+      "name": "Insurance"
+    },
+    {
+      "createdAt": "2023-11-28T06:22:09.206Z",
+      "updatedAt": "2023-11-28T06:22:09.206Z",
+      "id": "WpsHYyT3PE1K3S2D",
+      "name": "Core"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-07-03T03:25:06.245Z",
+  "versionId": "6f5a8b21-0e47-45ef-90bf-1ac92636d406"
+}
