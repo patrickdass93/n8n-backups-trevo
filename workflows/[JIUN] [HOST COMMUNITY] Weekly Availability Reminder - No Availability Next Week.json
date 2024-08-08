@@ -1,0 +1,161 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Postgres3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres3": {
+      "main": [
+        [
+          {
+            "node": "Function1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function1": {
+      "main": [
+        [
+          {
+            "node": "[CT] - Host_Availability",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-07-11T06:01:29.582Z",
+  "id": "AC6cakdAFE7EcuxH",
+  "name": "[JIUN] [HOST COMMUNITY] Weekly Availability Reminder - No Availability Next Week",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 12
+            }
+          ]
+        }
+      },
+      "id": "40ca7ffb-6fc6-4c4d-a278-3b9df4b5b03e",
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        720,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## No avai last week",
+        "height": 126.25147162703084,
+        "width": 217.6701200847657
+      },
+      "id": "5b8fac0b-7e46-4d41-a5d1-22914a8b2f65",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        440,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"uuid\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"No_avai_past_week\"\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "0b2d7fcf-4f85-4dae-8345-5488723388c2",
+      "name": "[CT] - Host_Availability",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1320,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nwith list_avai as\n(select distinct l.id, \nl.user_id,\nmax(la.end_date) as max_avai\nfrom listings l\nleft join listing_availability la on la.listing_id = l.id\nleft join listing_location ll on ll.listing_id = l.id\nwhere 1=1\nand l.status = 'approved'\nand l.deleted_at is null\nand ll.country = 'Malaysia'\ngroup by 1,2\nhaving max(la.end_date) < NOW() - interval '7 days'),\n--\nhosts as\n(select distinct u.id, \nconcat(u.first_name,' ',u.last_name)as host_name, \nu.email, \nu.phone_number,\nu.uuid\nfrom users u),\n--\nbad_host as\n(select distinct l.id, t.name as tag\nfrom listings l \nleft join tag_taggables tt on tt.taggable_id = l.id\nleft join tags t on t.id = tt.tag_id \nwhere t.name = 'Bad Host'),\n--\nclt as\n(select distinct b.listing_id,\nmax(b.request_end_at)as CLT\nfrom bookings b \nwhere b.status = 'completed'\ngroup by 1)\n--\nselect distinct la.user_id as host_id, \nh.*\nfrom list_avai la\nleft join hosts h on h.id  = la.user_id\nleft join bad_host bh on bh.id = la.id\nleft join clt clt on clt.listing_id = la.id\nwhere 1=1\nand bh.tag is null\nand clt.clt >= NOW() - interval '90 days'\nand la.user_id = '5162'",
+        "additionalFields": {}
+      },
+      "id": "3ec46869-1e34-40a1-8983-b6b74ce527ba",
+      "name": "Postgres3",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        920,
+        720
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"host_id\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['host_id']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        720
+      ],
+      "id": "bf35a271-c2c4-40b8-8815-5ef1d50d2a9f"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11",
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "all"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "node:Schedule Trigger1": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds": [
+        5162
+      ]
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-08-05T04:00:54.051Z",
+  "versionId": "698b044c-1aac-4a48-8155-50f12b47da7a"
+}
