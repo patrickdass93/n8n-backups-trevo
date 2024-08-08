@@ -1,0 +1,549 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Switch - STRIKE 1,2,3,4,5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch - STRIKE 1,2,3,4,5": {
+      "main": [
+        [
+          {
+            "node": "Function - No Duplicates in Same Quarter1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Function - No Duplicates in Same Quarter2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Function - No Duplicates in Same Quarter3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function - No Duplicates in Same Quarter": {
+      "main": [
+        [
+          {
+            "node": "Event - 1st Rejection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function - No Duplicates in Same Quarter1": {
+      "main": [
+        [
+          {
+            "node": "Event - Final Violation (10th Rejection)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function - No Duplicates in Same Quarter2": {
+      "main": [
+        [
+          {
+            "node": "Event - 4th Violation (9th Rejection)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function - No Duplicates in Same Quarter3": {
+      "main": [
+        [
+          {
+            "node": "Event - 3rd Violation (6th Rejection)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-11-06T08:12:32.110Z",
+  "id": "q7z5aXAoXkolzNFw",
+  "name": "[KAVI] HSP - Comms (3,4,5)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "50 07-23 * * *"
+            }
+          ]
+        }
+      },
+      "id": "92b5875e-a2bf-425c-81cb-fd33969079ff",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E",
+          "mode": "list",
+          "cachedResultName": "HSP Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 759945530,
+          "mode": "list",
+          "cachedResultName": "Rejection - Confirmation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qx7wAfvluLOC2Td_mofTJvAb4TsOY96JXEBS1_dME-E/edit#gid=759945530"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRange",
+              "headerRow": 3,
+              "firstDataRow": 4
+            }
+          },
+          "outputFormatting": {
+            "values": {
+              "general": "UNFORMATTED_VALUE",
+              "date": "FORMATTED_STRING"
+            }
+          }
+        }
+      },
+      "id": "79e6d5d2-6f36-4169-9bf2-70d7df07453f",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        940,
+        260
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json['Rejection Strike'] }}",
+              "operation": "equal",
+              "value2": 2
+            }
+          ]
+        }
+      },
+      "id": "bfc65160-c777-43f6-9cf3-737de2060d5e",
+      "name": "IF - Strike 1 OR 2",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        1500
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "value1": "={{ $json['Rejection Score'] }}",
+        "rules": {
+          "rules": [
+            {
+              "operation": "equal",
+              "value2": 5
+            },
+            {
+              "operation": "equal",
+              "value2": 4,
+              "output": 1
+            },
+            {
+              "operation": "equal",
+              "value2": 3,
+              "output": 2
+            }
+          ]
+        }
+      },
+      "id": "95c692fb-d0b0-4b62-b37d-04955ae2dd6f",
+      "name": "Switch - STRIKE 1,2,3,4,5",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"UUID\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_HSP_Rejections\",\n            \"evtData\": {\n                \"offence_no\": \"HSP_rejections_1\",\n                \"HSP_rejection_registration_no\": \"{{ $json[\"Registration No\"] }}\"\n\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "92f24d2f-62f7-4bf7-b2a3-58ef501bd923",
+      "name": "Event - 1st Rejection",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1860,
+        1620
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"Quarter_ID\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['Quarter_ID']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function - No Duplicates in Same Quarter",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1660,
+        1620
+      ],
+      "id": "9c73d38d-109a-4feb-b232-f0414d98cca3",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"key\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['key']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function - No Duplicates in Same Quarter1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        -40
+      ],
+      "id": "f17d446d-edf0-48ae-a344-4d7d6a347e93"
+    },
+    {
+      "parameters": {
+        "content": "## 1st & 2nd Violation"
+      },
+      "id": "43240c96-0257-4e54-bd3a-f4e84ae99707",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2140,
+        1520
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 3rd Violation"
+      },
+      "id": "50e44810-d973-4137-a65a-d7ea48e3269c",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2140,
+        940
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Final Violation Confirmed",
+        "height": 277.53738902763814,
+        "width": 524.9391249154853
+      },
+      "id": "da3fb9b0-6f5b-459b-8755-9cbf55b17954",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        -111.50608750845169
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"UUID\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_HSP_Rejections\",\n            \"evtData\": {\n                \"offence_no\": \"HSP_rejections_10\",\n                \"HSP_rejection_registration_no\": \"{{ $json[\"Registration No\"] }}\"\n\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "e9e6e3b2-a532-4037-84df-d335f4fb772e",
+      "name": "Event - Final Violation (10th Rejection)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1620,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds_1 = items.map(item => item.json[\"key\"]);\nconst oldListingIds_1 = staticData.oldListingIds_1; \n\nif (!oldListingIds_1) {\n  staticData.oldListingIds_1 = newListingIds_1;\n  return items;\n}\n\nconst ActualNewListingIds_1 = newListingIds_1.filter(id => !oldListingIds_1.includes(id));\nconst actualNewListing_1 = items.filter(data => ActualNewListingIds_1.includes(data.json['key']));\nstaticData.oldListingIds_1 = [...ActualNewListingIds_1, ...oldListingIds_1];\n\nreturn actualNewListing_1;\n"
+      },
+      "name": "Function - No Duplicates in Same Quarter2",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        252
+      ],
+      "id": "27179996-e478-4622-b731-b8b81304bd3c"
+    },
+    {
+      "parameters": {
+        "content": "## 4th Violation Confirmed",
+        "height": 277.53738902763814,
+        "width": 524.9391249154853
+      },
+      "id": "a7b48217-28ed-4585-80dd-cd32c4f95eae",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"UUID\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_HSP_Rejections\",\n            \"evtData\": {\n                \"offence_no\": \"HSP_rejections_9\",\n                \"HSP_rejection_registration_no\": \"{{ $json[\"Registration No\"] }}\"\n\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "9584fdc0-d9e9-4f71-9c03-a037c620a0b6",
+      "name": "Event - 4th Violation (9th Rejection)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1620,
+        252
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds_2 = items.map(item => item.json[\"key\"]);\nconst oldListingIds_2 = staticData.oldListingIds_2; \n\nif (!oldListingIds_2) {\n  staticData.oldListingIds_2 = newListingIds_2;\n  return items;\n}\n\nconst ActualNewListingIds_2 = newListingIds_2.filter(id => !oldListingIds_2.includes(id));\nconst actualNewListing_2 = items.filter(data => ActualNewListingIds_2.includes(data.json['key']));\nstaticData.oldListingIds_2 = [...ActualNewListingIds_2, ...oldListingIds_2];\n\nreturn actualNewListing_2;\n"
+      },
+      "name": "Function - No Duplicates in Same Quarter3",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        552
+      ],
+      "id": "12eeea0f-1bf7-4d7a-a421-13c19a5d225d"
+    },
+    {
+      "parameters": {
+        "content": "## 3rd Violation Confirmed",
+        "height": 277.53738902763814,
+        "width": 524.9391249154853
+      },
+      "id": "e2d3627d-03f3-4d8e-84ba-c7c557c647e3",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"UUID\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_HSP_Rejections\",\n            \"evtData\": {\n                \"offence_no\": \"HSP_rejections_6\",\n                \"HSP_rejection_registration_no\": \"{{ $json[\"Registration No\"] }}\"\n\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "cfc452a7-68f3-4739-ad3b-b6e2f5370a3d",
+      "name": "Event - 3rd Violation (6th Rejection)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1620,
+        552
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds": [
+        "#N/A (Did not find value '31130' in VLOOKUP evaluation.)",
+        "SYR4230-2024-Q2-5",
+        "#N/A (Did not find value '40359' in VLOOKUP evaluation.)",
+        "VAJ4218-2024-Q2-5",
+        "#N/A (Did not find value '50552' in VLOOKUP evaluation.)",
+        null,
+        "BPH8256-2024-Q2-5",
+        "#N/A (Did not find value '53046' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '37845' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '51636' in VLOOKUP evaluation.)",
+        "SAC8347F-2024-Q1-5",
+        "SD50-2024-Q1-5",
+        "#N/A (Did not find value '38773' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '13915' in VLOOKUP evaluation.)",
+        "VAQ7624-2023-Q4-5",
+        "VS6864-2023-Q4-5"
+      ],
+      "oldListingIds_1": [
+        "#N/A (Did not find value '48181' in VLOOKUP evaluation.)",
+        "TCT4004-2024-Q2-4",
+        "ST2522W-2024-Q2-4",
+        "#N/A (Did not find value '52664' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '29418' in VLOOKUP evaluation.)",
+        "ST7259Y-2024-Q2-4",
+        "#N/A (Did not find value '38773' in VLOOKUP evaluation.)",
+        "VAQ7624-2023-Q4-4"
+      ],
+      "oldListingIds_2": [
+        "#N/A (Did not find value '51726' in VLOOKUP evaluation.)",
+        "MDM8880-2024-Q3-3",
+        "DCY9216-2024-Q3-3",
+        "SYV1734-2024-Q3-3",
+        "#N/A (Did not find value '40028' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '45700' in VLOOKUP evaluation.)",
+        "SYV1734-2024-Q2-3",
+        "BRH826-2024-Q2-3",
+        "#N/A (Did not find value '54226' in VLOOKUP evaluation.)",
+        "QTY4239-2024-Q2-3",
+        "#N/A (Did not find value '50993' in VLOOKUP evaluation.)",
+        "SYQ2023-2024-Q2-3",
+        "QAA5248Q-2024-Q2-3",
+        "#N/A (Did not find value '51513' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '52665' in VLOOKUP evaluation.)",
+        "SAC7384A-2024-Q2-3",
+        "#N/A (Did not find value '39887' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '41608' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '41268' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '34435' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '48170' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '48181' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '43267' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '47942' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '48724' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '48868' in VLOOKUP evaluation.)",
+        "SB2955G-2024-Q2-3",
+        "SYH291-2024-Q2-3",
+        "SYB1279-2024-Q2-3",
+        "SYK856-2024-Q1-3",
+        "SB9309C-2024-Q1-3",
+        "SAC3056B-2024-Q1-3",
+        "MDM8880-2024-Q1-3",
+        "SWA9139-2024-Q1-3",
+        "TCT4004-2024-Q1-3",
+        "SD27N-2024-Q1-3",
+        "#N/A (Did not find value '40371' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '51636' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '52584' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '22600' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '39767' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '44388' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '52022' in VLOOKUP evaluation.)",
+        "SYN584-2024-Q1-3",
+        "SMD7796-2024-Q1-3",
+        "SS7026W-2024-Q1-3",
+        "W8288H-2024-Q1-3",
+        "SAC8347F-2024-Q1-3",
+        "SWE5773-2024-Q1-3",
+        "VJU4622-2024-Q1-3",
+        "#N/A (Did not find value '36334' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '38231' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '48174' in VLOOKUP evaluation.)",
+        "#N/A (Did not find value '32453' in VLOOKUP evaluation.)",
+        "ST563X-2024-Q1-3",
+        "VAH3493-2024-Q1-3",
+        "VCM4397-2023-Q4-3",
+        "VFN4756-2023-Q4-3"
+      ]
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-05-12T02:58:38.207Z",
+      "updatedAt": "2023-05-12T02:58:38.207Z",
+      "id": "8",
+      "name": "Host Community"
+    },
+    {
+      "createdAt": "2023-11-07T03:10:47.123Z",
+      "updatedAt": "2023-11-07T03:10:47.123Z",
+      "id": "jXdALFMnSoT0xTcb",
+      "name": "HSP"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-08-08T04:52:23.123Z",
+  "versionId": "9dbee99c-6879-4cae-8ea8-f5658958a68e"
+}
