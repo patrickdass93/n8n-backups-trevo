@@ -1,0 +1,62 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-12-28T08:06:24.136Z",
+  "id": "rkMYypQ4LStSJXfR",
+  "name": "My workflow 10",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "6992fc99-4166-4ce6-b64b-81eb2f7ad076",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        600,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT SUM(gross_amount)\nFROM bookings\nWHERE 1=1\n  AND status IN ('completed','accepted','start_driving','waiting_for_inspection','return_car')\nAND currency = 'MYR'",
+        "options": {}
+      },
+      "id": "62b4ef67-68c8-4b99-a5c3-ffabac3e4898",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        820,
+        320
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-12-28T08:06:24.136Z",
+  "versionId": "cdc8f90e-b7a6-4503-a58e-39e88beb3385"
+}
