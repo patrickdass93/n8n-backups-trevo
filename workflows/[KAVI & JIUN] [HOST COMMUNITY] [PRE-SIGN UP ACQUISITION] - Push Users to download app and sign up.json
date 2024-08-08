@@ -1,0 +1,3413 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets3": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets4": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets6": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF3": {
+      "main": [
+        [
+          {
+            "node": "Function3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Function",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF1": {
+      "main": [
+        [
+          {
+            "node": "Function4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF2": {
+      "main": [
+        [
+          {
+            "node": "Function5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SIB API - Avai Reminder3": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SIB API - Avai Reminder4": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Set1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set2": {
+      "main": [
+        [
+          {
+            "node": "Merge4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge4": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SIB API - Avai Reminder": {
+      "main": [
+        [
+          {
+            "node": "Merge4",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Set3": {
+      "main": [
+        [
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge5": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SIB API - Avai Reminder1": {
+      "main": [
+        [
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Set4": {
+      "main": [
+        [
+          {
+            "node": "Merge6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge6": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SIB API - Avai Reminder2": {
+      "main": [
+        [
+          {
+            "node": "Merge6",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "SIB API - Avai Reminder5": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Set5": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF5": {
+      "main": [
+        [
+          {
+            "node": "Function7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function6": {
+      "main": [
+        [
+          {
+            "node": "Set1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SIB API - Avai Reminder4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function3": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SIB API - Avai Reminder3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function": {
+      "main": [
+        [
+          {
+            "node": "Set2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SIB API - Avai Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function4": {
+      "main": [
+        [
+          {
+            "node": "Set3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SIB API - Avai Reminder1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function7": {
+      "main": [
+        [
+          {
+            "node": "Set5",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SIB API - Avai Reminder5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function5": {
+      "main": [
+        [
+          {
+            "node": "Set4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SIB API - Avai Reminder2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets5": {
+      "main": [
+        [
+          {
+            "node": "IF2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "IF5",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "IF4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "IF1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "IF3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF4": {
+      "main": [
+        [
+          {
+            "node": "Function6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-04-06T05:42:05.564Z",
+  "id": "57",
+  "name": "[KAVI & JIUN] [HOST COMMUNITY] [PRE-SIGN UP ACQUISITION] - Push Users to download app and sign up",
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n  \"to\": [{\"email\": \"{{ $json['Email'] }}\" }],\n  \"templateId\": 507,\n  \"params\": { \"HAESTPAYOUT\": \"{{ $json['est_payout_10d'] }}\", \n\"RPAYPERCENT\": \"{{ $json[\"percentage_to_installment\"] }}%\",\n\"HACOMPBOOKING\": \"{{ $json[\"Days to cover monthly installment\"] }}\"}\n}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API - Avai Reminder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        2520,
+        -80
+      ],
+      "id": "6df32bbb-47ca-4ade-9486-feb5e8643637",
+      "retryOnFail": false,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "2a2c187c-7a78-432e-872e-6c8def563aeb",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        500,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo",
+          "mode": "list",
+          "cachedResultName": "Lead Compilation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1711038561,
+          "mode": "list",
+          "cachedResultName": "[N8N Export] - Emails",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit#gid=1711038561"
+        },
+        "options": {}
+      },
+      "id": "975e8f75-ccce-4e13-8269-e361b9954c86",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        980,
+        -140
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=select distinct u.id, u.email, u.status, \nto_char(u.created_at,'YYYY-MM-DD HH24:MI') as sign_up_at\nfrom users u \nwhere 1=1\nand u.status = 'active'\nand u.email in ({{ $json[\"Email\"] }})\n",
+        "additionalFields": {}
+      },
+      "id": "db706f60-c942-4147-9ff3-856b0032df0a",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        -140
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo",
+          "mode": "list",
+          "cachedResultName": "Lead Compilation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 654220443,
+          "mode": "list",
+          "cachedResultName": "RAW Sign Ups",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit#gid=654220443"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "id",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "f048366d-4989-40a1-8dcd-202d03b364d3",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1300,
+        -140
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo",
+          "mode": "list",
+          "cachedResultName": "Lead Compilation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 654220443,
+          "mode": "list",
+          "cachedResultName": "RAW Sign Ups",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit#gid=654220443"
+        },
+        "clear": "specificRange",
+        "range": "A2:D"
+      },
+      "id": "76f26218-05e0-4f00-8f12-a3202853c2d2",
+      "name": "Google Sheets2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        660,
+        -140
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo",
+          "mode": "list",
+          "cachedResultName": "Lead Compilation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1885787370,
+          "mode": "list",
+          "cachedResultName": "Raw Listings",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit#gid=1885787370"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "id",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "e11fa5ae-cf26-4696-a33e-e28984876c7a",
+      "name": "Google Sheets3",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1780,
+        -140
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo",
+          "mode": "list",
+          "cachedResultName": "Lead Compilation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1324467916,
+          "mode": "list",
+          "cachedResultName": "[N8N Export] - Summary",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit#gid=1324467916"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Signed-Up",
+              "lookupValue": "No"
+            }
+          ]
+        },
+        "options": {
+          "outputFormatting": {
+            "values": {
+              "general": "UNFORMATTED_VALUE",
+              "date": "FORMATTED_STRING"
+            }
+          },
+          "returnAllMatches": "returnAllMatches"
+        }
+      },
+      "id": "6b3cdab6-5d62-4936-95ee-63ee9641b207",
+      "name": "Google Sheets5",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1940,
+        -140
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json[\"Vehicle Sum Insured\"] }}",
+              "operation": "largerEqual"
+            },
+            {
+              "value1": "={{ $json[\"Days Since Submission\"] }}",
+              "operation": "isEmpty"
+            }
+          ]
+        }
+      },
+      "id": "254e458d-1a4b-4f77-8ef4-40fdc6aea3d0",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        2160,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Immediate",
+        "height": 140.82487223071521,
+        "width": 410.63557971930726
+      },
+      "id": "5e97eec2-8757-4118-80be-42c790988c1f",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3600,
+        -220
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json[\"Vehicle Sum Insured\"] }}",
+              "operation": "largerEqual"
+            },
+            {
+              "value1": "={{ $json[\"Days Since Submission\"] }}",
+              "operation": "equal",
+              "value2": 3
+            }
+          ]
+        }
+      },
+      "id": "5939390d-2e56-47cf-9220-781f8801f73f",
+      "name": "IF1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        2160,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 3rd Day",
+        "height": 147.81641168289292,
+        "width": 449.9453281072197
+      },
+      "id": "17ba0342-5b7d-45a9-82dd-c03aaf51ed24",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3600,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n  \"to\": [{\"email\": \"{{ $json['Email'] }}\" }],\n  \"templateId\": 533,\n  \"params\": { \"NASILEMAK\": \"{{$json[\"Nasi Lemak\"]}}\", \n\"COFFEE\": \"{{$json[\"Cups of Coffee\"]}}\",\n\"MOVTIX\": \"{{ $json[\"2x Movie Tickets\"] }}\",\n\"AIRTIX\": \"{{ $json[\"Flights to Maldives\"] }}\",\n\"HAESTPAYOUT\": \"{{$json[\"est_payout_10d\"]}}\",\n\"RPAYPERCENT\": \"{{$json[\"percentage_to_installment\"]}}%\"}\n}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API - Avai Reminder1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        2520,
+        260
+      ],
+      "id": "ab48e08d-602c-4089-9f16-17da94fc58ac",
+      "retryOnFail": false,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo",
+          "mode": "list",
+          "cachedResultName": "Lead Compilation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1885787370,
+          "mode": "list",
+          "cachedResultName": "Raw Listings",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit#gid=1885787370"
+        },
+        "clear": "specificRange",
+        "range": "A2:D"
+      },
+      "id": "d1b94332-5a9e-4a92-868f-d2537b2d3e3d",
+      "name": "Google Sheets4",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        820,
+        -140
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=select distinct l.id, \nconcat(u.first_name,' ',u.last_name)as host_name, \nu.email, \nto_char(l.created_at,'YYYY-MM-DD HH24:MI') as created_at\nfrom listings l \nleft join users u on u.id = l.user_id\nwhere l.status = 'approved'\nand l.deleted_at is null\nand u.email in ({{ $json[\"Email\"] }})\n",
+        "additionalFields": {}
+      },
+      "id": "4a9e8865-049a-4dd5-b4e9-64ba3fa45758",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1620,
+        -140
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo",
+          "mode": "list",
+          "cachedResultName": "Lead Compilation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1711038561,
+          "mode": "list",
+          "cachedResultName": "[N8N Export] - Emails",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit#gid=1711038561"
+        },
+        "options": {}
+      },
+      "id": "64b9ecb4-ee7f-4410-86a8-5b69d1b3cb86",
+      "name": "Google Sheets6",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1460,
+        -140
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json[\"Vehicle Sum Insured\"] }}",
+              "operation": "largerEqual"
+            },
+            {
+              "value1": "={{ $json[\"Days Since Submission\"] }}",
+              "operation": "equal",
+              "value2": 5
+            }
+          ]
+        }
+      },
+      "id": "4310351e-1796-4c43-a1ac-c8b3788bfc6d",
+      "name": "IF2",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        2160,
+        660
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n  \"to\": [{\"email\": \"{{ $json[\"Email\"] }}\" }],\n  \"templateId\": 537\n}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API - Avai Reminder2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        2520,
+        660
+      ],
+      "id": "17e5c090-5fb9-4874-9c91-63124af1cd58",
+      "retryOnFail": false,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 5th Day",
+        "height": 119.44286256163855,
+        "width": 438.1511695536732
+      },
+      "id": "8681f23d-8ec9-4c5a-9cf6-2b6f31893ead",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3600,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Immediate (W/O Insured Amount)",
+        "height": 151.87679858389168,
+        "width": 398.84142116576066
+      },
+      "id": "494c6abe-a796-4064-8ceb-6ac2c383d024",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3600,
+        -620
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json[\"Days Since Submission\"] }}",
+              "operation": "isEmpty"
+            }
+          ],
+          "string": [
+            {
+              "value1": "={{ $json[\"Vehicle Sum Insured\"] }}",
+              "value2": "N/A"
+            }
+          ]
+        }
+      },
+      "id": "150188f3-3b94-445e-9d5c-174134e7ed44",
+      "name": "IF3",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        2160,
+        -520
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n  \"to\": [{\"email\": \"{{ $json[\"Email\"] }}\" }],\n  \"templateId\": 537\n}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API - Avai Reminder3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        2520,
+        -520
+      ],
+      "id": "6be5d633-7471-46dd-9d0b-a5e49bc0acfc",
+      "retryOnFail": false,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds_1 = items.map(item => item.json[\"Email\"]);\nconst oldListingIds_1 = staticData.oldListingIds_1; \n\nif (!oldListingIds_1) {\n  staticData.oldListingIds_1 = newListingIds_1;\n  return items;\n}\n\nconst ActualNewListingIds_1 = newListingIds_1.filter(id => !oldListingIds_1.includes(id));\nconst actualNewListing_1 = items.filter(data => ActualNewListingIds_1.includes(data.json['Email']));\nstaticData.oldListingIds_1 = [...ActualNewListingIds_1, ...oldListingIds_1];\n\nreturn actualNewListing_1;\n"
+      },
+      "name": "Function3",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        2340,
+        -520
+      ],
+      "id": "df3749fc-3874-48bf-a367-33a5f3386aef"
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"Email\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['Email']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        2340,
+        -140
+      ],
+      "id": "4110d3cc-1f95-4fb5-9526-0a8deaea7e87"
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds_3 = items.map(item => item.json[\"Email\"]);\nconst oldListingIds_3 = staticData.oldListingIds_3; \n\nif (!oldListingIds_3) {\n  staticData.oldListingIds_3 = newListingIds_3;\n  return items;\n}\n\nconst ActualNewListingIds_3 = newListingIds_3.filter(id => !oldListingIds_3.includes(id));\nconst actualNewListing_3 = items.filter(data => ActualNewListingIds_3.includes(data.json['Email']));\nstaticData.oldListingIds_3 = [...ActualNewListingIds_3, ...oldListingIds_3];\n\nreturn actualNewListing_3;\n"
+      },
+      "name": "Function4",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        2340,
+        280
+      ],
+      "id": "d13bc99e-884e-477e-b80c-926b541da100"
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds_4 = items.map(item => item.json[\"Email\"]);\nconst oldListingIds_4 = staticData.oldListingIds_4; \n\nif (!oldListingIds_4) {\n  staticData.oldListingIds_4 = newListingIds_4;\n  return items;\n}\n\nconst ActualNewListingIds_4 = newListingIds_4.filter(id => !oldListingIds_4.includes(id));\nconst actualNewListing_4 = items.filter(data => ActualNewListingIds_4.includes(data.json['Email']));\nstaticData.oldListingIds_4 = [...ActualNewListingIds_4, ...oldListingIds_4];\n\nreturn actualNewListing_4;\n"
+      },
+      "name": "Function5",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        2340,
+        660
+      ],
+      "id": "82790c69-449e-4deb-b891-6abf8853c3e9"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo",
+          "mode": "list",
+          "cachedResultName": "Lead Compilation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 609378,
+          "mode": "list",
+          "cachedResultName": "[N8N] 1st EDM",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit#gid=609378"
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "timestamp",
+              "fieldValue": "={{ $node[\"Schedule Trigger\"].json[\"Readable date\"] }}"
+            },
+            {
+              "fieldId": "messageId",
+              "fieldValue": "={{ $json.messageId }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $json.Email }}"
+            },
+            {
+              "fieldId": "type",
+              "fieldValue": "={{ $json.type }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b6d74d92-5d09-40cf-8149-1b0e72181fd7",
+      "name": "Google Sheets7",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        2860,
+        -600
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "type",
+              "value": "Immediate Email (W/O Insured Amount)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "497485e8-c857-4bae-8fc5-d8c51424adab",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        2520,
+        -660
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "07cb89da-4d26-4ef8-b390-3410f13e6b67",
+      "name": "Merge3",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        2680,
+        -600
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## 7th Day (W/O Insured Amount)",
+        "height": 95.85454545454536,
+        "width": 289.74545454545466
+      },
+      "id": "4b5a97ce-6f67-441a-920d-9d1119c5a3a0",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3600,
+        1360
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n  \"to\": [{\"email\": \"{{ $json[\"Email\"] }}\" }],\n  \"templateId\": 556\n}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API - Avai Reminder4",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        2520,
+        1440
+      ],
+      "id": "c9685314-e952-4da4-bb99-ae77935e6a0c",
+      "retryOnFail": false,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"Email\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['Email']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function6",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        2340,
+        1440
+      ],
+      "id": "730ca566-d9c0-4f64-bdf8-63142858a7d9"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo",
+          "mode": "list",
+          "cachedResultName": "Lead Compilation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 609378,
+          "mode": "list",
+          "cachedResultName": "[N8N] 1st EDM",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit#gid=609378"
+        },
+        "columnToMatchOn": "email",
+        "valueToMatchOn": "={{ $json.Email }}",
+        "fieldsUi": {
+          "values": [
+            {
+              "column": "messageId",
+              "fieldValue": "={{ $json.messageId }}"
+            },
+            {
+              "column": "timestamp",
+              "fieldValue": "={{ $node[\"Schedule Trigger\"].json[\"Readable date\"] }}"
+            },
+            {
+              "column": "type",
+              "fieldValue": "={{ $json.type }}"
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "d4711767-c9ed-4634-8adc-7ef156ac1dfc",
+      "name": "Google Sheets8",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        2860,
+        1360
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "type",
+              "value": "7th Day Email (W/O Insured Amount)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "79b996dd-ce93-41c8-ba68-aa02306ca5bf",
+      "name": "Set1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        2520,
+        1300
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "eec27c1f-0c38-4dce-b1e5-fc982a48174e",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        2680,
+        1360
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "type",
+              "value": "Immediate (W/ Insured Amount)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3ee831d7-1f2d-4703-9e5b-db619f24d67d",
+      "name": "Set2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        2520,
+        -280
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "06dfe550-f040-4224-a56d-1436d38ce768",
+      "name": "Merge4",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        2680,
+        -220
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "type",
+              "value": "3rd Day (W/ Insured Amount)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9c9c4cd8-b398-466c-9eb0-0fa8ae4f8f06",
+      "name": "Set3",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        2520,
+        120
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "6b89d94d-0a3d-4431-8fc5-dd0e8b626226",
+      "name": "Merge5",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        2680,
+        180
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "type",
+              "value": "5th Day (W/ Insured Amount)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "337443ef-bc3a-4dde-a0c6-1d718bb40309",
+      "name": "Set4",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        2520,
+        480
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "9628058b-814c-445b-bcd1-f40e988c8725",
+      "name": "Merge6",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        2680,
+        580
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## 7th Day",
+        "height": 95.85454545454536,
+        "width": 289.74545454545466
+      },
+      "id": "c3fb2061-b428-4bce-a9e1-f35fed1ee6f5",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3600,
+        940
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n  \"to\": [{\"email\": \"{{ $json[\"Email\"] }}\" }],\n  \"templateId\": 556\n}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API - Avai Reminder5",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        2520,
+        1040
+      ],
+      "id": "0c0a137f-2ea8-465b-a4f8-47db81866a46",
+      "retryOnFail": false,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds_5 = items.map(item => item.json[\"Email\"]);\nconst oldListingIds_5 = staticData.oldListingIds_5; \n\nif (!oldListingIds_5) {\n  staticData.oldListingIds_5 = newListingIds_5;\n  return items;\n}\n\nconst ActualNewListingIds_5 = newListingIds_5.filter(id => !oldListingIds_5.includes(id));\nconst actualNewListing_5 = items.filter(data => ActualNewListingIds_5.includes(data.json['Email']));\nstaticData.oldListingIds_5 = [...ActualNewListingIds_5, ...oldListingIds_5];\n\nreturn actualNewListing_5;\n"
+      },
+      "name": "Function7",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        2340,
+        1040
+      ],
+      "id": "bb74e16c-df98-4de8-a189-df152fad4698"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "type",
+              "value": "7th Day Email (W/ Insured Amount)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5860a57a-d6df-4f39-9c61-bde677c661ec",
+      "name": "Set5",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        2520,
+        900
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "4fe694a0-73c1-4a42-9278-47e331f94274",
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        2680,
+        960
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json[\"Vehicle Sum Insured\"] }}",
+              "operation": "largerEqual"
+            },
+            {
+              "value1": "={{ $json[\"Days Since Submission\"] }}",
+              "operation": "equal",
+              "value2": 7
+            }
+          ]
+        }
+      },
+      "id": "289ff82d-d550-4550-8870-35c0014868b6",
+      "name": "IF5",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        2160,
+        1040
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo",
+          "mode": "list",
+          "cachedResultName": "Lead Compilation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 609378,
+          "mode": "list",
+          "cachedResultName": "[N8N] 1st EDM",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit#gid=609378"
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "timestamp",
+              "fieldValue": "={{ $node[\"Schedule Trigger\"].json[\"Readable date\"] }}"
+            },
+            {
+              "fieldId": "messageId",
+              "fieldValue": "={{ $json.messageId }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $json.Email }}"
+            },
+            {
+              "fieldId": "type",
+              "fieldValue": "={{ $json.type }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f434c77d-b971-4cbd-a9f3-6e203099f881",
+      "name": "Google Sheets9",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        2860,
+        -220
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo",
+          "mode": "list",
+          "cachedResultName": "Lead Compilation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 609378,
+          "mode": "list",
+          "cachedResultName": "[N8N] 1st EDM",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit#gid=609378"
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "timestamp",
+              "fieldValue": "={{ $node[\"Schedule Trigger\"].json[\"Readable date\"] }}"
+            },
+            {
+              "fieldId": "messageId",
+              "fieldValue": "={{ $json.messageId }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $json.Email }}"
+            },
+            {
+              "fieldId": "type",
+              "fieldValue": "={{ $json.type }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6dfadc0f-3920-4cf9-b592-ed74eef6d6cd",
+      "name": "Google Sheets10",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        2860,
+        180
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo",
+          "mode": "list",
+          "cachedResultName": "Lead Compilation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 609378,
+          "mode": "list",
+          "cachedResultName": "[N8N] 1st EDM",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit#gid=609378"
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "timestamp",
+              "fieldValue": "={{ $node[\"Schedule Trigger\"].json[\"Readable date\"] }}"
+            },
+            {
+              "fieldId": "messageId",
+              "fieldValue": "={{ $json.messageId }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $json.Email }}"
+            },
+            {
+              "fieldId": "type",
+              "fieldValue": "={{ $json.type }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c608c635-e5c8-43f4-8e70-4f0944275cc5",
+      "name": "Google Sheets11",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        2860,
+        580
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo",
+          "mode": "list",
+          "cachedResultName": "Lead Compilation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 609378,
+          "mode": "list",
+          "cachedResultName": "[N8N] 1st EDM",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14_TuNFR8BzmHXDTGFwDvDZHZ4zGWVVtOVv1ZRBjxdRo/edit#gid=609378"
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "timestamp",
+              "fieldValue": "={{ $node[\"Schedule Trigger\"].json[\"Readable date\"] }}"
+            },
+            {
+              "fieldId": "messageId",
+              "fieldValue": "={{ $json.messageId }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $json.Email }}"
+            },
+            {
+              "fieldId": "type",
+              "fieldValue": "={{ $json.type }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9b089756-9053-4df1-b833-8439cf2fe3bb",
+      "name": "Google Sheets12",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        2860,
+        960
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"71fba47a-ab97-432f-a38a-cea34825fbff\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_PreSignup\",\n            \"evtData\": {\n                \"PreS_InsuredAmountYN\": \"Y\",\n                \"PreS_timestamp\": \"7D\"\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "4a9b549f-cb6b-47bf-863c-c88a37f2fde8",
+      "name": "[CT] - Host Pre Signup 7D Reminder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        3200,
+        1340
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"71fba47a-ab97-432f-a38a-cea34825fbff\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_PreSignup\",\n            \"evtData\": {\n                \"PreS_InsuredAmountYN\": \"Y\",\n                \"PreS_timestamp\": \"7D\"\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "092308ed-b4b7-447d-9e00-8f1b65103ed7",
+      "name": "[CT] - Host Pre Signup 7D Reminder1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        3180,
+        980
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"71fba47a-ab97-432f-a38a-cea34825fbff\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_PreSignup\",\n            \"evtData\": {\n                \"PreS_InsuredAmountYN\": \"Y\",\n                \"PreS_timestamp\": \"7D\"\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "9ba605db-1d21-4d15-847c-750d88376385",
+      "name": "[CT] - Host Pre Signup 7D Reminder2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        3200,
+        -600
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json[\"Days Since Submission\"] }}",
+              "operation": "equal",
+              "value2": 7
+            }
+          ],
+          "string": [
+            {
+              "value1": "={{ $json[\"Vehicle Sum Insured\"] }}",
+              "value2": "N/A"
+            }
+          ]
+        }
+      },
+      "id": "13b7c169-eec1-48af-a8fc-f8552a9aace3",
+      "name": "IF4",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        2160,
+        1440
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "callerPolicy": "any",
+    "errorWorkflow": "11",
+    "saveDataErrorExecution": "all",
+    "saveManualExecutions": false,
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds": [
+        "ceomell2196@gmail.com",
+        "maolamka@gmail.com",
+        "anas.atarek@gmail.com",
+        "saypoiate@gmail.com",
+        "blake.gg.93@gmail.com",
+        "amelya1@yahoo.co.uk",
+        "wanasikin1981@gmail.com",
+        "myirggroup@gmail.com",
+        "azman2602@gmail.com",
+        "arifhaiqal.mz@gmail.com",
+        "ann_scadoll@yahoo.com",
+        "liaugouhao@gmail.com",
+        "adrienteoh3@gmail.com",
+        "ridwan.protonedar@gmail.com",
+        "yanimusanif@gmail.com",
+        "sitinurella89@gmail.com",
+        "zaki4590@gmail.com",
+        "qtransporthuat@gmail.com",
+        "muhdadibmr@gmail.com",
+        "ajimboy10a@gmail.com",
+        "anderson890713@gmail.com",
+        "aeronyeoh.813@gmail.com",
+        "omarshehroz14@gmail.com",
+        "weechiuntan@gmai.com",
+        "shaukah89@gmail.com",
+        "smartrent.carrental@gmail.com",
+        "alinaong8687@gmail.com",
+        "amcarlink@gmail.com",
+        "m.asyrafafifi@gmail.com",
+        "bruunney@gmail.com",
+        "nesh_ganesan@yahoo.com",
+        "saras.lachimana@trevo.my",
+        "smfirdaus18@gmail.com",
+        "wwlung.96@gmail.com",
+        "kay.rules@yahoo.com",
+        "sunnycschang20@gmail.com",
+        "vigi.lim@trevo.my",
+        "rashed.rauf89@gmail.com",
+        "jacklin@trevo.my",
+        "amirulsyafiqezanie@gmail.com",
+        "saras2408@ymail.com",
+        "nguianncia@gmail.com",
+        "yingyingjas@gmail.com",
+        "r0kawa@gmail.com",
+        "edward_lajinga@yahoo.com",
+        "azian.mokhti@gmail.com",
+        "tasiko@hotmail.com",
+        "nazifget@gmail.com",
+        "haziq.asyaraf@gmail.com",
+        "radenanwar@gmail.com",
+        "tory_chan@hotmail.com",
+        "zicksi@gmail.com",
+        "kusa_2701@yahoo.com",
+        "jovin_ajo@yahoo.com",
+        "graceyong8@gmail.com",
+        "husainabdghani@gmail.com",
+        "rudin12.salleh@gmail.com",
+        "azriadi.arbai@gmail.com",
+        "risznafisaharris@gmail.com",
+        "yongjianjian71@gmail.com",
+        "shirley.teoh@hotmail.com",
+        "alifnizar4@gmail.com",
+        "ferjushaah@yahoo.com",
+        "tinglim9678@gmail.com",
+        "hamidimuradmidi81@gmail.com",
+        "mahathirjamil@gmail.com",
+        "mdsuhaili@gmail.com",
+        "peryeelaw@yahoo.com",
+        "imad@socar.my",
+        "ghazibootboy@yahoo.com",
+        "paigeyeap@gmail.com",
+        "amandalim06@gmail.com",
+        "solnishkotours@gmail.com",
+        "yvonnechan07@gmail.com",
+        "sparkwong5983@gmail.com",
+        "unaahmad@live.com",
+        "7284benny@gmail.com",
+        "ariftaqiuddin25@gmail.com",
+        "nurzarima@gmail.com",
+        "alaxlim28@gmail.com",
+        "kunordin@yahoo.com",
+        "thekeretasewaku@gmail.com",
+        "wendyw.toyotapg@gmail.com",
+        "nazuray@yahoo.com",
+        "c3llobass@hotmail.com",
+        "errisshahrol@gmail.com",
+        "phuiclee@gmail.com",
+        "nhayati82@gmail.com",
+        "tim0106tim@gmail.com",
+        "rq8239@gmail.com",
+        "kanoo_p@hotmail.com",
+        "ryanshakthi@gmail.com",
+        "chingwaikow@gmail.com",
+        "Rq8239@gmail.com",
+        "assa_sin@live.com",
+        "saraja1327@yahoo.com",
+        "cclim5207@gmail.com",
+        "ariffinramli87@gmail.com",
+        "annisa886@gmail.com",
+        "fairprice.my@gmail.com",
+        "eleenteh2728@gmail.com",
+        "ivankhoo@live.com.my",
+        "aprenqiang@yahoo.com",
+        "voonchun@gmail.com",
+        "arafjer@gmail.com",
+        "asrulafeef@gmail.com",
+        "cassahafiz@gmail.com",
+        "azman827070@gmail.com",
+        "cliffjunior@gmail.com",
+        "mohd.saza@gmail.com",
+        "stanley.chu@outlook.my",
+        "memeydjokam@gmail.com",
+        "zahirzain97@gmail.com",
+        "jesmondl@gmail.com",
+        "kuwakzai84@gmail.com",
+        "afdalmus_lc135@yahoo.com",
+        "davidchew8823@gmail.com",
+        "live.love.accessories@gmail.com",
+        "natashaazrah@hotmail.com",
+        "v.mak@vmakempire.com",
+        "casther.wai@hotmail.com",
+        "limkahhoon322@gmail.com",
+        "hossainmahamud3@gmail.com",
+        "ridzalhalik@gmail.com",
+        "siehou90@gmail.com",
+        "Mixson5252@gmail.com",
+        "telestarcom@hotmail.com",
+        "zaililayatim88@gmail.com",
+        "ishaqberu@gmail.com",
+        "hwaglow@gmail.com",
+        "syedhizam01@gmail.com",
+        "izzathazman96@gmail.com",
+        "umisalma74@gmail.com",
+        "holyfieldbennidict@gmail.com",
+        "wenchui1129@gmail.com",
+        "langkawi4all@gmail.com",
+        "yusnita2603@gmail.com",
+        "sadrieja@gmail.com",
+        "teresacheng82@gmail.com",
+        "laicheehiong@gmail.com",
+        "munirah.kamaruddin@gmail.com",
+        "azamlokmanal94@gmail.com",
+        "timothyngim@gmail.com",
+        "surenmenonsasitharan@gmail.com",
+        "philip8chan@gmail.com",
+        "kelvinchong_522@hotmail.com",
+        "jcempiresabah@gmail.com",
+        "yus_101282@yahooo.com",
+        "azmitelaga91@yahoo.com",
+        "meeqahlamka15@gmail.com",
+        "anuarpng8064@gmail.com",
+        "weien_hoong@rocketmail.com",
+        "tarhip0505@yahoo.co.uk",
+        "amirulisnan1991@gmail.com",
+        "brijesh.ratnani@gmail.com",
+        "mohdazriujang00@gmail.com",
+        "vivekananth.smi@gmail.com",
+        "limyonglin@hotmail.com",
+        "joachan79@gmail.com",
+        "aerotranz@yahoo.com",
+        "zulhaidi.sjr@gmail.com",
+        "ahmad.muzamil@gmail.com",
+        "erikssonchin@hotmail.com",
+        "rohaidaabdullah29@gmail.com",
+        "azniyahaya@gmail.com",
+        "azhanzabidi85@gmail.com",
+        "cyqapinky@gmail.com",
+        "johnonjong888@yahoo.com",
+        "suhaimiabubakar1986@gmail.com",
+        "hockheng.auto@outlook.com",
+        "nfaizah@yahoo.com",
+        "fazlina.hj.zainuddin@gmail.com",
+        "saiyalit@gmail.com",
+        "alhafizadamfitri@gmail.com",
+        "melvinanand77@gmail.com",
+        "eswindergill99@gmail.com",
+        "azwana1810@gmail.com",
+        "ket5523@yahoo.com.hk",
+        "mfakhzan@gmail.com",
+        "maizatilyaacob@gmail.com",
+        "kangkai616@gmail.com",
+        "qinqin91@icloud.com",
+        "halfpiece76@gmail.com",
+        "azizulazre@gmail.com",
+        "muhammadazimm94@gmail.com",
+        "sherlyn9893@live.cn",
+        "sayeedramadhan4800@yahoo.com",
+        "kunsheng98@gmail.com",
+        "whun_95@hotmail.com",
+        "chankimbeng@yahoo.com",
+        "shin9212@hotmail.com",
+        "chengyee1503@gmail.com",
+        "zakwanmillionaire@gmail.com",
+        "alvinlimyx@gmail.com",
+        "farhanawagiman15@gmail.com",
+        "rainbowsalon@gmail.com",
+        "aizat.idris90@gmail.com",
+        "joshualeong1510@gmail.com",
+        "misterafiqq@gmail.com",
+        "fnatic.edward@gmail.com",
+        "fitryhaniff@gmail.com",
+        "kooshibin@gmail.com",
+        "iddlex@gmail.com",
+        "fhempireventures@gmail.com",
+        "syed.arselan@gmail.com",
+        "tommyckt1003@gmail.com",
+        "exper.cars@yahoo.com",
+        "ilsw_0928@hotmail.com",
+        "fek922@gmail.com",
+        "luqmnhqim@gmail.com",
+        "pc9928u@yahoo.com",
+        "eddy.wenhui@gmail.com",
+        "hafizuddinmdz@gmail.com",
+        "mohdkhairilamin.official@gmail.com",
+        "kaiqian0819@gmail.com",
+        "ytan831113@gmail.com",
+        "ernijulius846@gmail.com",
+        "arifamali@yahoo.com",
+        "leesieuhui@gmail.com",
+        "ilmanhaikal.hi@gmail.com",
+        "skolin_84@yahoo.com",
+        "jeggadishvaaren1206@gmail.com",
+        "umaimahsuhaimi@gmail.com",
+        "prasenraj88@gmail.com",
+        "nurulhusna1407@gmail.com",
+        "ks_yan@hotmail.com",
+        "syafiq92zainol@gmail.com",
+        "ingfu820@yahoo.com",
+        "kbyap98@yahoo.com",
+        "mohdfarhanridzwan@ymail.com",
+        "rizqamni@gmail.com",
+        "syaqiqmatsihat@yahoo.com",
+        "nuritazarah@gmail.com",
+        "zhunzhun789@gmail.com",
+        "priyankaraj170896@gmail.com",
+        "amdean143@gmail.com",
+        "limshengming306@hotmail.com",
+        "alhazm300@gmail.com",
+        "kriticarani@rocketmail.com",
+        "endy.khalid@gmail.com",
+        "acup96@hotmail.com",
+        "mohdzharifmohammedhashim@gmail.com",
+        "dylanchee@live.com",
+        "awali19@gmail.com",
+        "nurfazahia@yahoo.com",
+        "reynoldchin93@gmail.com",
+        "hongwuenlee@gmail.com",
+        "gngobinathan@gmail.com",
+        "faqhazirulbasharey@gmail.com",
+        "ywchuan@live.com",
+        "szepei1998@gmail.com",
+        "mshaher84@gmail.com",
+        "boomdeyah@gmail.com",
+        "shark_nemo05@yahoo.com",
+        "chin.xm1130@gmail.com",
+        "jveluppilay@yahoo.com",
+        "syafa.scudai@gmail.com",
+        "rizuan.jumali@gmail.com",
+        "darrelchewwy@gmail.com",
+        "kevtan1014@gmail.com",
+        "myusofsaad@gmail.com",
+        "rayymondthomas@gmail.com",
+        "wuweiliang1113@gmail.com",
+        "hadesquxe@yahoo.com",
+        "aggie_ling@hotmail.com",
+        "abishree2002@gmail.com",
+        "farris.sakrani@gmail.com",
+        "thiban5580@gmail.com",
+        "faireezal@gmail.com",
+        "tingyusing@yahoo.com",
+        "saifullahkmldn@gmail.com",
+        "hafizah.abdulhamid@gmail.com",
+        "mhm21292@gmail.com",
+        "helmi77@gmail.com",
+        "jianvun92@gmail.com",
+        "meifenpe@gmail.com",
+        "nurhaziqahfatin0405@gmail.com",
+        "ungsiitung@gmail.com",
+        "zals5@icloud.com",
+        "hafiz20556@gmail.com",
+        "mdfzl89@gmail.com",
+        "kifshok@gmail.com",
+        "jyc_lee@hotmail.com",
+        "bkchee93@gmail.com",
+        "christine_wcy@hotmail.com",
+        "huishan0108@gmail.com",
+        "drian_tan@hotmail.my",
+        "asyraf317@gmail.com",
+        "sielim85@gmail.com",
+        "xiaowen0502@yahoo.com",
+        "achan79@hotmail.com",
+        "naj960825@yahoo.com",
+        "hanhannah1012@gmail.com",
+        "nadhirarahman@gmail.com",
+        "muhdhilmi1617@gmail.com",
+        "lelaiskandarphone@gmail.com",
+        "smallapple1807@gmail.com",
+        "kavi15212@gmail.com",
+        "otrajus@hotmail.com",
+        "muhdnizam5887@gmail.com",
+        "i_aku@hotmail.com",
+        "jomrental@gmail.com",
+        "iamhakimmm@gmail.com",
+        "gkhm21@gmail.com",
+        "anisamirarosidi@gmail.com",
+        "nohtecnomotobikenoh@gmail.com",
+        "abuubaidah1988@gmail.com",
+        "ibrahimsuzana6@gmail.com",
+        "hyljendaniel@gmail.com",
+        "aimanhafidz86@yahoo.com",
+        "edvinsi@gmail.com",
+        "delishakhisyam@gmail.com",
+        "asismus1990.ma@gmail.com",
+        "andyhoo88@icloud.com",
+        "aseplastfriends97@gmail.com",
+        "rifalsyaipulhamdani@gmail.com",
+        "aprianfajarsuluh@gmail.com",
+        "jowin88@gmail.com",
+        "faizuly_fai@yahoo.com",
+        "milliehamid@gmail.com",
+        "rickydwicahyo3@gmail.com",
+        "mohdeffandi868@gmail.com",
+        "mixson5252@gmail.com",
+        "c562754061@gmail.com",
+        "uswahmokhtar64@gmail.com",
+        "reenters2@gmail.com",
+        "nasruddinmohamed@gmail.com",
+        "sw_1124@yahoo.com",
+        "setevenkhoo93@gmail.com",
+        "saadah_razali@yahoo.com",
+        "ellapan0121@icloud.com",
+        "ano1919@gmail.com",
+        "leongchangfai@gmail.com",
+        "razin.com@gmail.com",
+        "brodainr@gmail.com",
+        "junhao.realty.invest@gmail.com",
+        "uddindaeng4@gmail.com",
+        "panedi806@gmail.com",
+        "sky6535@gmail.com",
+        "iahchang797@gmail.com",
+        "askyah@gmail.com",
+        "iliasismail_91@yahoo.com",
+        "kookaboora.bali@gmail.com",
+        "gheben@yahoo.com",
+        "huzaifah83@gmail.com",
+        "kudamotorplt@gmail.com",
+        "vanessafoh98@gmail.com",
+        "arifahhariz@gmail.com",
+        "afnanzafar@gmail.com",
+        "akuameer@gmail.com",
+        "joshuaraj.socar.my@gmail.com",
+        "razneil.socar.my@gmail.com",
+        "latifkhushafiy@gmail.com",
+        "teraslegasiresources@gmail.com",
+        "prakash.vijian@gmail.com",
+        "tongchinyee0906@gmail.com",
+        "yappjoseph@gmail.com",
+        "arcdman@gmail.com",
+        "hanisbobby@gmail.com",
+        "aideedvhoyz@gmail.com",
+        "kokchan7788@gmail.com",
+        "norsoffi5916@gmail.com",
+        "qizdah@gmail.com",
+        "mshawalludin@gmail.com",
+        "twinswer89@gmail.com",
+        "ahlieang@gmail.com",
+        "trebligtan@gmail.com",
+        "xiaoteo826@gmail.com",
+        "raghavendrarajk@gmail.com",
+        "sofianmatyusop@gmail.com",
+        "hasriekushairie@gmail.com",
+        "caliph.azzayyan@gmail.com",
+        "andinajmuddin@gmail.com",
+        "shann46@gmail.com",
+        "kamarkhamis76@gmail.com",
+        "imrankz@hotmail.my",
+        "sinar_puteri@yahoo.com",
+        "mohdasyraf1191@gmail.com",
+        "tbkeong445@gmail.com",
+        "mohdfarouk80@gmail.com",
+        "zaidy771121@yahoo.com.my",
+        "amirul.syafiq@socar.my",
+        "syamkushaini@gmail.com",
+        "luqman5629@gmail.com",
+        "ksyeoh88@gmail.com",
+        "yaalharasibaskaran@gmail.com",
+        "Adampann3265@gmail.com",
+        "chanwooilim@gmail.com",
+        "raffi.merusin@gmail.com",
+        "jawwad40734@gmail.com",
+        "timoyx@gmail.com",
+        "aborneotours@yahoo.com",
+        "regina@trevo.my",
+        "ruvaventerprise@gmail.com",
+        "Sha182329@gmail.com",
+        "snjvkumar2002@gmail.com",
+        "cyril.properties@gmail.com",
+        "dyneshdy0909@gmail.com",
+        "megatafiffarabi@gmail.com",
+        "zubairresources@gmail.com",
+        "noyeb46145@adroh.com",
+        "Sshar69@gmail.com",
+        "ric.lu@yahoo.co.id",
+        "Azierajalani@gmail.com",
+        "bobliem@gmail.com",
+        "shridaneshparathan@gmail.com",
+        "irmrb88@gmail.com",
+        "Caroptima.my@gmail.com",
+        "lalacotia@hotmail.com",
+        "bukitgambier@gmail.com",
+        "Kennyackk@gmail.com",
+        "yai79@yahoo.com",
+        "hendranojjen@gmail.com",
+        "pnimala22@yahoo.com",
+        "chinnliang@gmail.com",
+        "Sammychan860@gmail.com",
+        "saifulbahhari5045@gov.com",
+        "fieyza09@gmail.com",
+        "Heryputra90@gmail.com",
+        "Pinpinlee713@gmail.com",
+        "SYUKRI.SHAMSUDDIN@GMAIL.COM",
+        "mfaizmsalleh93@gmail.com",
+        "andy1314carie@gmail.com",
+        "jasbiante_87@yahoo.com",
+        "wan.co97@gmail.com",
+        "zamarsindustries@gmail.com",
+        "Michael-Ang@hotmail.com",
+        "cassahafiz95@gmail.com",
+        "kivi2298@gmail.com",
+        "fralyc77@gmail.com",
+        "adeqtandop.deqt.empire.dman@gmail.com",
+        "Shenglee1995@gmail.com",
+        "v.makempire@vmakempire.com",
+        "jaymohamad810@gmail.com",
+        "alexlim88@gmail.com",
+        "Moha40238@gmail.com",
+        "tcc1119@gmail.com",
+        "sammycky6008@yahoo.com",
+        "azmi2231@gmail.com",
+        "Roseshirley456@gmail.com",
+        "DSAGLOBALEMPIRE@gmail.com",
+        "AZZUANMUSTAPA@gmail.com",
+        "superlyk93@gmail.com",
+        "rukavagory@gmail.com",
+        "xcape.rental@gmail.com",
+        "annyss_velvet@yahoo.com",
+        "ALVIN5350@GMAIL.COM",
+        "Julianwong9191@gmail.com",
+        "Mingru1@hotmail.com",
+        "Syamienterboo@gmail.com",
+        "Tonylo3988@gmail.com",
+        "norlie_kamal@yahoo.com",
+        "Blavksysblackbox@gmail.com",
+        "Morganbhatt930524@yahoo.com",
+        "jamizan2@gmail.com",
+        "eunoiaofkefi@gmail.com",
+        "Js.unifi@gmail.com",
+        "narendran.balakrishnan@gmail.com",
+        "nuradriana247@gmail.com",
+        "rskauto@yahoo.com",
+        "Megarahju@live.com",
+        "ayulatfir88.coway@gmail.com",
+        "hazwanyassin91@gmail.com",
+        "shatteredsoul83@yahoo.com.sg",
+        "Jason7.francis@gmail.com",
+        "cheeyuet0802@gmail.com",
+        "mrusdi66@yahoo.co.uk",
+        "Hummingbird645@yahoo.com",
+        "darvelmybay@gmail.com",
+        "mcfarul@gmail.com",
+        "0166151094mega@gmail.com",
+        "LEEYONGQING123@GMAIL.COM",
+        "darrenchan2009@gmail.com",
+        "radzimpaj@gmail.com",
+        "swimmingcow@outlook.com",
+        "hanifmohamad.torts@gmail.com",
+        "kanaeson8@gmail.com",
+        "mahissac@gmail.com",
+        "desmond9986@gmail.com",
+        "Chaucps@hotmail.com",
+        "bhangra16@hotmail.com",
+        "sujitra.dawamani@socar.my",
+        "Hhtang92@gmail.com",
+        "sunita293verma@gmail.com",
+        "afiffahimi.kb@gmail.com",
+        "jxin714@hotmail.com",
+        "ddreleyy@gmail.com",
+        "Wailun9883@gmail.com",
+        "james257@gmail.com",
+        "limseokling@gmail.com",
+        "sjsadu@gmail.com",
+        "mohd.muzamil@outlook.com",
+        "ezwanaidris@gmail.com",
+        "Hans.budiharja@gmail.com",
+        "benjaminpragasam@gmail.com",
+        "Shahrizan.sutri821116@gmail.com",
+        "earezeki@gmail.com",
+        "uadlthiaga@gmail.com",
+        "yatrarahju@gmail.com",
+        "Riskyanto057@gma.com",
+        "aloysiuslee.lt@gmail.com",
+        "Wing_1207@hotmail.com",
+        "kims_data@yahoo.com",
+        "Muhamadas14@gmail.com",
+        "shahari837822@gmail.com",
+        "Putrafif316@gmail.com",
+        "leekingchang5@gmail.com",
+        "davidwhong212313@gmail.com",
+        "Theyourna@yahoo.com",
+        "test@calconic.com",
+        "testing@example.com",
+        "jilianwong9191@gmail.com",
+        "work.munwei@gmail.com",
+        "amirdahari69@gmail.com",
+        "rdmimi63@yahoo.com",
+        "izwanzuljb@gmail.com",
+        " kifshok@gmail.com",
+        "apiqapiq1876@gmail.com",
+        " firdausmddin@gmail.com",
+        " zals5@icloud.com",
+        "saudahhasan93@gmail.com",
+        " izwanzuljb@gmail.com",
+        "khlau_1012@hotmail.com",
+        "Shahrizan.sutri@yahoo.com",
+        "jaspermeou@gmail.com",
+        "binders_09hairnet@icloud.com",
+        "yack.aero92@gmail.com",
+        "jiunyewhiew@gmail.com",
+        "laywoei@hotmail.com",
+        "jeshan0596@gmail.com",
+        "fabiohung@gmail.com",
+        "mohdfauzi.abdulaziz@gmail.com",
+        "shazli_amir@yahoo.com",
+        "Desmondchan1811@gmail.com",
+        "akmalstams10@gmail.com",
+        "ahmadalhafis91@gmail.com",
+        "eshvaren511983@gmail.com",
+        "Sashikala_Garnaison@yahoo.com",
+        "tkhong118@gmail.com",
+        "nantha.punusamy@gmail.com",
+        "Wern5802@gmail.com",
+        " jyz683@gmail.com",
+        "azraihakim@gmail.com",
+        "yapelvis9@gmail.com",
+        "Kchiakh@gmail.com",
+        "kumarvinnesh@gmail.com",
+        "ivanhao@gmail.com",
+        "nuratikah13@gmail.com",
+        "scalingupfitri@gmail.com",
+        "dell.adnan@yahoo.com",
+        "mohdhusnanibrahim@gmail.com",
+        "Top.infinity33@gmail.com",
+        "powforchai@gmail.com",
+        "Mohdaizuddinelias@gmail.com",
+        "outback-heirs0e@icloud.com",
+        "sitifatimahhhameer@gmail.com",
+        "saffiyyahfarhana@gmail.com",
+        "sharizalmalek@gmail.com",
+        "tharma_remo@yahoo.com",
+        " kriticarani@rocketmail.com",
+        "linges39@gmail.com",
+        "cpebizs@gmail.com",
+        19217,
+        20190,
+        23254,
+        27519,
+        27551,
+        32133,
+        33151,
+        35444,
+        35561,
+        36079,
+        36365,
+        36521,
+        37333,
+        38267,
+        38439,
+        39151,
+        40735,
+        40921,
+        41127,
+        41608,
+        41724,
+        41749,
+        42137,
+        42399,
+        42707,
+        42849,
+        12899,
+        19353,
+        23956,
+        26261,
+        27750,
+        28472,
+        29017,
+        31146,
+        31379,
+        33164,
+        33615,
+        33926,
+        35551,
+        36174,
+        36585,
+        37073,
+        37713,
+        37728,
+        38029,
+        38260,
+        38434,
+        38473,
+        39563,
+        39641,
+        39660,
+        39933,
+        40012,
+        40057,
+        40116,
+        40220,
+        40301,
+        40892,
+        41136,
+        41268,
+        41270,
+        41407,
+        41682,
+        42300,
+        42343,
+        42438,
+        42662,
+        42690,
+        42743,
+        34796,
+        39374,
+        41105,
+        20054,
+        36923,
+        27043,
+        19995,
+        39889,
+        26974,
+        39701,
+        38092,
+        41642,
+        18799,
+        39734,
+        1740,
+        40531,
+        36804,
+        38580,
+        26805,
+        14675,
+        34334,
+        40629,
+        21248,
+        28915,
+        41586,
+        41148,
+        41139,
+        39738,
+        35016,
+        27715,
+        39435,
+        26309,
+        35073,
+        2038,
+        36791,
+        39062,
+        37948,
+        38875,
+        30729,
+        39692,
+        32406,
+        24942,
+        40221,
+        38458,
+        38202,
+        37568,
+        32750,
+        35103,
+        41550,
+        39269,
+        37792,
+        36274,
+        35383,
+        25601,
+        12864,
+        41012,
+        37433,
+        32621,
+        33630,
+        27474,
+        38553,
+        21778,
+        2497,
+        40593,
+        28185,
+        31155,
+        35009,
+        1167,
+        41172,
+        34700,
+        17005,
+        41974,
+        39461,
+        39439,
+        40705,
+        33820,
+        10983,
+        1266,
+        39774,
+        34695,
+        40850,
+        36282,
+        35342,
+        40760,
+        1166,
+        14683,
+        840,
+        37105,
+        38286,
+        40753,
+        28301,
+        32796,
+        33760,
+        40946,
+        39536,
+        39717,
+        40502,
+        36721,
+        36427,
+        36069,
+        32385,
+        40786,
+        37724,
+        37392,
+        6871,
+        41785,
+        37198,
+        31404,
+        39170,
+        37529,
+        39371,
+        39373,
+        36415,
+        36968,
+        39960,
+        19972,
+        40670,
+        17984,
+        39343,
+        40835,
+        39622,
+        30316,
+        41135,
+        31632,
+        34878,
+        38573,
+        33659,
+        41011,
+        35567,
+        38925,
+        34917,
+        40896,
+        37706,
+        39999,
+        39279,
+        9708,
+        38912,
+        33302,
+        6107,
+        29539,
+        39837,
+        38311,
+        38218,
+        28724,
+        35373,
+        9552,
+        27319,
+        848,
+        28436,
+        6,
+        1,
+        2,
+        3,
+        4,
+        5,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "oldListingIds_1": [
+        "nesh_ganesan@yahoo.com",
+        "saras.lachimana@trevo.my",
+        "smfirdaus18@gmail.com",
+        "wwlung.96@gmail.com",
+        "kay.rules@yahoo.com",
+        "sunnycschang20@gmail.com",
+        "vigi.lim@trevo.my",
+        "rashed.rauf89@gmail.com",
+        "jacklin@trevo.my",
+        "amirulsyafiqezanie@gmail.com",
+        "saras2408@ymail.com",
+        "nguianncia@gmail.com",
+        "chanwooilim@gmail.com",
+        "yingyingjas@gmail.com",
+        "r0kawa@gmail.com",
+        "edward_lajinga@yahoo.com",
+        "azian.mokhti@gmail.com",
+        "tasiko@hotmail.com",
+        "nazifget@gmail.com",
+        "haziq.asyaraf@gmail.com",
+        "radenanwar@gmail.com",
+        "tory_chan@hotmail.com",
+        "zicksi@gmail.com",
+        "kusa_2701@yahoo.com",
+        "jovin_ajo@yahoo.com",
+        "graceyong8@gmail.com",
+        "husainabdghani@gmail.com",
+        "rudin12.salleh@gmail.com",
+        "azriadi.arbai@gmail.com",
+        "risznafisaharris@gmail.com",
+        "yongjianjian71@gmail.com",
+        "shirley.teoh@hotmail.com",
+        "alifnizar4@gmail.com",
+        "ferjushaah@yahoo.com",
+        "tinglim9678@gmail.com",
+        "hamidimuradmidi81@gmail.com",
+        "mahathirjamil@gmail.com",
+        "mdsuhaili@gmail.com",
+        "peryeelaw@yahoo.com",
+        "imad@socar.my",
+        "ghazibootboy@yahoo.com",
+        "paigeyeap@gmail.com",
+        "amandalim06@gmail.com",
+        "solnishkotours@gmail.com",
+        "yvonnechan07@gmail.com",
+        "sparkwong5983@gmail.com",
+        "unaahmad@live.com",
+        "7284benny@gmail.com",
+        "ariftaqiuddin25@gmail.com",
+        "nurzarima@gmail.com",
+        "kunordin@yahoo.com",
+        "thekeretasewaku@gmail.com",
+        "wendyw.toyotapg@gmail.com",
+        "nazuray@yahoo.com",
+        "c3llobass@hotmail.com",
+        "errisshahrol@gmail.com",
+        "phuiclee@gmail.com",
+        "nhayati82@gmail.com",
+        "tim0106tim@gmail.com",
+        "rq8239@gmail.com",
+        "kanoo_p@hotmail.com",
+        "ryanshakthi@gmail.com",
+        "chingwaikow@gmail.com",
+        "Rq8239@gmail.com",
+        "assa_sin@live.com",
+        "saraja1327@yahoo.com",
+        "cclim5207@gmail.com",
+        "ariffinramli87@gmail.com",
+        "annisa886@gmail.com",
+        "fairprice.my@gmail.com",
+        "eleenteh2728@gmail.com",
+        "ivankhoo@live.com.my",
+        "aprenqiang@yahoo.com",
+        "voonchun@gmail.com",
+        "arafjer@gmail.com",
+        "asrulafeef@gmail.com",
+        "cassahafiz@gmail.com",
+        "azman827070@gmail.com",
+        "cliffjunior@gmail.com",
+        "mohd.saza@gmail.com",
+        "stanley.chu@outlook.my",
+        "memeydjokam@gmail.com",
+        "zahirzain97@gmail.com",
+        "jesmondl@gmail.com",
+        "kuwakzai84@gmail.com",
+        "afdalmus_lc135@yahoo.com",
+        "davidchew8823@gmail.com",
+        "live.love.accessories@gmail.com",
+        "natashaazrah@hotmail.com",
+        "v.mak@vmakempire.com",
+        "casther.wai@hotmail.com",
+        "limkahhoon322@gmail.com",
+        "hossainmahamud3@gmail.com",
+        "kivi2298@gmail.com",
+        "fralyc77@gmail.com",
+        "ridzalhalik@gmail.com",
+        "siehou90@gmail.com",
+        "Mixson5252@gmail.com",
+        "telestarcom@hotmail.com",
+        "zaililayatim88@gmail.com",
+        "hwaglow@gmail.com",
+        "syedhizam01@gmail.com",
+        "izzathazman96@gmail.com",
+        "umisalma74@gmail.com",
+        "holyfieldbennidict@gmail.com",
+        "wenchui1129@gmail.com",
+        "langkawi4all@gmail.com",
+        "yusnita2603@gmail.com",
+        "sadrieja@gmail.com",
+        "teresacheng82@gmail.com",
+        "laicheehiong@gmail.com",
+        "munirah.kamaruddin@gmail.com",
+        "azamlokmanal94@gmail.com",
+        "timothyngim@gmail.com",
+        "surenmenonsasitharan@gmail.com",
+        "philip8chan@gmail.com",
+        "kelvinchong_522@hotmail.com",
+        "jcempiresabah@gmail.com",
+        "yus_101282@yahooo.com",
+        "azmitelaga91@yahoo.com",
+        "meeqahlamka15@gmail.com",
+        "anuarpng8064@gmail.com",
+        "weien_hoong@rocketmail.com",
+        "tarhip0505@yahoo.co.uk",
+        "amirulisnan1991@gmail.com",
+        "brijesh.ratnani@gmail.com",
+        "mohdazriujang00@gmail.com",
+        "vivekananth.smi@gmail.com",
+        "limyonglin@hotmail.com",
+        "joachan79@gmail.com",
+        "aerotranz@yahoo.com",
+        "zulhaidi.sjr@gmail.com",
+        "ahmad.muzamil@gmail.com",
+        "erikssonchin@hotmail.com",
+        "rohaidaabdullah29@gmail.com",
+        "azniyahaya@gmail.com",
+        "azhanzabidi85@gmail.com",
+        "cyqapinky@gmail.com",
+        "johnonjong888@yahoo.com",
+        "suhaimiabubakar1986@gmail.com",
+        "hockheng.auto@outlook.com",
+        "nfaizah@yahoo.com",
+        "fazlina.hj.zainuddin@gmail.com",
+        "saiyalit@gmail.com",
+        "alhafizadamfitri@gmail.com",
+        "melvinanand77@gmail.com",
+        "eswindergill99@gmail.com",
+        "azwana1810@gmail.com",
+        "ket5523@yahoo.com.hk",
+        "mfakhzan@gmail.com",
+        "maizatilyaacob@gmail.com",
+        "kangkai616@gmail.com",
+        "qinqin91@icloud.com",
+        "halfpiece76@gmail.com",
+        "azizulazre@gmail.com",
+        "muhammadazimm94@gmail.com",
+        "sherlyn9893@live.cn",
+        "sayeedramadhan4800@yahoo.com",
+        "kunsheng98@gmail.com",
+        "whun_95@hotmail.com",
+        "chankimbeng@yahoo.com",
+        "shin9212@hotmail.com",
+        "chengyee1503@gmail.com",
+        "zakwanmillionaire@gmail.com",
+        "alvinlimyx@gmail.com",
+        "farhanawagiman15@gmail.com",
+        "rainbowsalon@gmail.com",
+        "aizat.idris90@gmail.com",
+        "joshualeong1510@gmail.com",
+        "misterafiqq@gmail.com",
+        "fitryhaniff@gmail.com",
+        "kooshibin@gmail.com",
+        "iddlex@gmail.com",
+        "fhempireventures@gmail.com",
+        "syed.arselan@gmail.com",
+        "tommyckt1003@gmail.com",
+        "exper.cars@yahoo.com",
+        "ilsw_0928@hotmail.com",
+        "fek922@gmail.com",
+        "luqmnhqim@gmail.com",
+        "pc9928u@yahoo.com",
+        "eddy.wenhui@gmail.com",
+        "hafizuddinmdz@gmail.com",
+        "mohdkhairilamin.official@gmail.com",
+        "kaiqian0819@gmail.com",
+        "ytan831113@gmail.com",
+        "ernijulius846@gmail.com",
+        "arifamali@yahoo.com",
+        "leesieuhui@gmail.com",
+        "ilmanhaikal.hi@gmail.com",
+        "skolin_84@yahoo.com",
+        "jeggadishvaaren1206@gmail.com",
+        "umaimahsuhaimi@gmail.com",
+        "prasenraj88@gmail.com",
+        "nurulhusna1407@gmail.com",
+        "ks_yan@hotmail.com",
+        "syafiq92zainol@gmail.com",
+        "ingfu820@yahoo.com",
+        "kbyap98@yahoo.com",
+        "mohdfarhanridzwan@ymail.com",
+        "rizqamni@gmail.com",
+        "syaqiqmatsihat@yahoo.com",
+        "nuritazarah@gmail.com",
+        "zhunzhun789@gmail.com",
+        "priyankaraj170896@gmail.com",
+        "amdean143@gmail.com",
+        "sharizalmalek@gmail.com",
+        "limshengming306@hotmail.com",
+        "alhazm300@gmail.com",
+        "kriticarani@rocketmail.com",
+        "endy.khalid@gmail.com",
+        "acup96@hotmail.com",
+        "mohdzharifmohammedhashim@gmail.com",
+        "sitifatimahhhameer@gmail.com",
+        "dylanchee@live.com",
+        "awali19@gmail.com",
+        "mohdhusnanibrahim@gmail.com",
+        "nurfazahia@yahoo.com",
+        "reynoldchin93@gmail.com",
+        "hongwuenlee@gmail.com",
+        "gngobinathan@gmail.com",
+        "faqhazirulbasharey@gmail.com",
+        "ywchuan@live.com",
+        "szepei1998@gmail.com",
+        "mshaher84@gmail.com",
+        "boomdeyah@gmail.com",
+        "shark_nemo05@yahoo.com",
+        "chin.xm1130@gmail.com",
+        "jveluppilay@yahoo.com",
+        "syafa.scudai@gmail.com",
+        "rizuan.jumali@gmail.com",
+        "darrelchewwy@gmail.com",
+        "kevtan1014@gmail.com",
+        "myusofsaad@gmail.com",
+        "rayymondthomas@gmail.com",
+        "wuweiliang1113@gmail.com",
+        "hadesquxe@yahoo.com",
+        "aggie_ling@hotmail.com",
+        "abishree2002@gmail.com",
+        "farris.sakrani@gmail.com",
+        "thiban5580@gmail.com",
+        "faireezal@gmail.com",
+        "tingyusing@yahoo.com",
+        "saifullahkmldn@gmail.com",
+        "hafizah.abdulhamid@gmail.com",
+        "mhm21292@gmail.com",
+        "helmi77@gmail.com",
+        "mohdfauzi.abdulaziz@gmail.com",
+        "jianvun92@gmail.com",
+        "meifenpe@gmail.com",
+        "nurhaziqahfatin0405@gmail.com",
+        "ungsiitung@gmail.com",
+        "jaspermeou@gmail.com",
+        "khlau_1012@hotmail.com",
+        "zals5@icloud.com",
+        "hafiz20556@gmail.com",
+        "mdfzl89@gmail.com",
+        "kifshok@gmail.com",
+        "jyc_lee@hotmail.com",
+        "bkchee93@gmail.com",
+        "christine_wcy@hotmail.com",
+        "huishan0108@gmail.com",
+        "drian_tan@hotmail.my",
+        "asyraf317@gmail.com",
+        "sielim85@gmail.com",
+        "xiaowen0502@yahoo.com",
+        "achan79@hotmail.com",
+        "naj960825@yahoo.com",
+        "hanhannah1012@gmail.com",
+        "nadhirarahman@gmail.com",
+        "muhdhilmi1617@gmail.com",
+        "lelaiskandarphone@gmail.com",
+        "smallapple1807@gmail.com",
+        "kavi15212@gmail.com",
+        "otrajus@hotmail.com",
+        "muhdnizam5887@gmail.com",
+        "i_aku@hotmail.com",
+        "jomrental@gmail.com",
+        "iamhakimmm@gmail.com",
+        "gkhm21@gmail.com",
+        "anisamirarosidi@gmail.com",
+        "nohtecnomotobikenoh@gmail.com",
+        "abuubaidah1988@gmail.com",
+        "ibrahimsuzana6@gmail.com",
+        "hyljendaniel@gmail.com",
+        "shahari837822@gmail.com",
+        "aimanhafidz86@yahoo.com",
+        "edvinsi@gmail.com",
+        "delishakhisyam@gmail.com",
+        "asismus1990.ma@gmail.com",
+        "andyhoo88@icloud.com",
+        "aseplastfriends97@gmail.com",
+        "rifalsyaipulhamdani@gmail.com",
+        "aprianfajarsuluh@gmail.com",
+        "jowin88@gmail.com",
+        "faizuly_fai@yahoo.com",
+        "milliehamid@gmail.com",
+        "rickydwicahyo3@gmail.com",
+        "mohdeffandi868@gmail.com",
+        "mixson5252@gmail.com",
+        "c562754061@gmail.com",
+        "uswahmokhtar64@gmail.com",
+        "reenters2@gmail.com",
+        "nasruddinmohamed@gmail.com",
+        "sw_1124@yahoo.com",
+        "setevenkhoo93@gmail.com",
+        "saadah_razali@yahoo.com",
+        "ellapan0121@icloud.com",
+        "ano1919@gmail.com",
+        "leongchangfai@gmail.com",
+        "razin.com@gmail.com",
+        "brodainr@gmail.com",
+        "junhao.realty.invest@gmail.com",
+        "uddindaeng4@gmail.com",
+        "panedi806@gmail.com",
+        "sky6535@gmail.com",
+        "iahchang797@gmail.com",
+        "askyah@gmail.com",
+        "iliasismail_91@yahoo.com",
+        "kookaboora.bali@gmail.com",
+        "gheben@yahoo.com",
+        "huzaifah83@gmail.com",
+        "kudamotorplt@gmail.com",
+        "vanessafoh98@gmail.com",
+        "sujitra.dawamani@socar.my",
+        "arifahhariz@gmail.com",
+        "afnanzafar@gmail.com",
+        "akuameer@gmail.com",
+        "joshuaraj.socar.my@gmail.com",
+        "razneil.socar.my@gmail.com",
+        "latifkhushafiy@gmail.com",
+        "teraslegasiresources@gmail.com",
+        "prakash.vijian@gmail.com",
+        "tongchinyee0906@gmail.com",
+        "yappjoseph@gmail.com",
+        "arcdman@gmail.com",
+        "hanisbobby@gmail.com",
+        "aideedvhoyz@gmail.com",
+        "kokchan7788@gmail.com",
+        "norsoffi5916@gmail.com",
+        "qizdah@gmail.com",
+        "mshawalludin@gmail.com",
+        "twinswer89@gmail.com",
+        "ahlieang@gmail.com",
+        "trebligtan@gmail.com",
+        "xiaoteo826@gmail.com",
+        "raghavendrarajk@gmail.com",
+        "sofianmatyusop@gmail.com",
+        "hasriekushairie@gmail.com",
+        "caliph.azzayyan@gmail.com",
+        "andinajmuddin@gmail.com",
+        "shann46@gmail.com",
+        "kamarkhamis76@gmail.com",
+        "imrankz@hotmail.my",
+        "sinar_puteri@yahoo.com",
+        "mohdasyraf1191@gmail.com",
+        "tbkeong445@gmail.com",
+        "mohdfarouk80@gmail.com",
+        "zaidy771121@yahoo.com.my",
+        "mohdkhairulnizam5567@gmail.com",
+        "mfasynergy@gmail.com",
+        "amcarlink@gmail.com",
+        "alinaong8687@gmail.com",
+        "lengsan0999@hotmail.com",
+        "faridaiman6@yahoo.com",
+        "f015_farah@yahoo.com",
+        "mohdakmaldr@gmail.com",
+        "44carrental.transportation@gmail.com",
+        "yslan88@hotmail.com",
+        "chailfung@gmail.com",
+        "theven.dev03@gmail.com",
+        "juliuslyk@gmail.com",
+        "kimkimdata@gmail.com",
+        "shaukah89@gmail.com",
+        "tommythamsweelin@gmail.com",
+        "arvinthiran21@gmail.com",
+        "faizsaid2710@gmail.com",
+        "shahzanamri@yahoo.com",
+        "aeronyeoh.813@gmail.com",
+        "garygladwin@yahoo.co.uk",
+        "ivanyeo0203@gmail.com",
+        "jasonang87hc@gmail.com",
+        "blueorion.co@gmail.com",
+        "adah_hana@yahoo.com",
+        "hlwong_1226@hotmail.com",
+        "aizuddin.rahman91@gmail.com",
+        "tiffany_wongyi@hotmail.com",
+        "cfwong9@gmail.com",
+        "ridzuannordin871@gmail.com",
+        "tan.keith95@gmail.com",
+        "alfieiznan@heig.my",
+        "abdulafiqhisbullah@gmail.com",
+        "shen1215@hotmail.com",
+        "alvinkoo_87@yahoo.com",
+        "chiajiaxuan2014@gmail.com",
+        "rachel.jerk95@gmail.com",
+        "zaumjasma@gmail.com",
+        "azman2602@gmail.com",
+        "junichiming@hotmail.com",
+        "wanasikin1981@gmail.com",
+        "azraeishah23@gmail.com",
+        "albertchoong@gmail.com",
+        "amukampunf@gmail.com",
+        "jothytharma@gmail.com",
+        "durianjulin030111@gmail.com",
+        "faizaljaid@gmail.com",
+        "yeeming08@live.com.my",
+        "mnoralif@outlook.com",
+        "amirul.syafiq@socar.my",
+        "syamkushaini@gmail.com",
+        "luqman5629@gmail.com",
+        "ksyeoh88@gmail.com",
+        "darvelmybay@gmail.com",
+        "megatafiffarabi@gmail.com",
+        "zubairresources@gmail.com",
+        "noyeb46145@adroh.com",
+        "Sshar69@gmail.com",
+        "ric.lu@yahoo.co.id",
+        "Azierajalani@gmail.com",
+        "bobliem@gmail.com",
+        "shridaneshparathan@gmail.com",
+        "irmrb88@gmail.com",
+        "Caroptima.my@gmail.com",
+        "lalacotia@hotmail.com",
+        "bukitgambier@gmail.com",
+        "Kennyackk@gmail.com",
+        "yai79@yahoo.com",
+        "hendranojjen@gmail.com",
+        "pnimala22@yahoo.com",
+        "chinnliang@gmail.com",
+        "Sammychan860@gmail.com",
+        "alaxlim28@gmail.com",
+        "saifulbahhari5045@gov.com",
+        "fieyza09@gmail.com",
+        "Heryputra90@gmail.com",
+        "timoyx@gmail.com",
+        "Pinpinlee713@gmail.com",
+        "SYUKRI.SHAMSUDDIN@GMAIL.COM",
+        "mfaizmsalleh93@gmail.com",
+        "andy1314carie@gmail.com",
+        "jasbiante_87@yahoo.com",
+        "wan.co97@gmail.com",
+        "zamarsindustries@gmail.com",
+        "Michael-Ang@hotmail.com",
+        "cassahafiz95@gmail.com",
+        "adeqtandop.deqt.empire.dman@gmail.com",
+        "Shenglee1995@gmail.com",
+        "v.makempire@vmakempire.com",
+        "jaymohamad810@gmail.com",
+        "alexlim88@gmail.com",
+        "Moha40238@gmail.com",
+        "tcc1119@gmail.com",
+        "sammycky6008@yahoo.com",
+        "azmi2231@gmail.com",
+        "Roseshirley456@gmail.com",
+        "DSAGLOBALEMPIRE@gmail.com",
+        "AZZUANMUSTAPA@gmail.com",
+        "superlyk93@gmail.com",
+        "rukavagory@gmail.com",
+        "xcape.rental@gmail.com",
+        "annyss_velvet@yahoo.com",
+        "ALVIN5350@GMAIL.COM",
+        "Julianwong9191@gmail.com",
+        "Mingru1@hotmail.com",
+        "Syamienterboo@gmail.com",
+        "Tonylo3988@gmail.com",
+        "norlie_kamal@yahoo.com",
+        "Blavksysblackbox@gmail.com",
+        "Morganbhatt930524@yahoo.com",
+        "jamizan2@gmail.com",
+        "eunoiaofkefi@gmail.com",
+        "Js.unifi@gmail.com",
+        "narendran.balakrishnan@gmail.com",
+        "nuradriana247@gmail.com",
+        "rskauto@yahoo.com",
+        "Megarahju@live.com",
+        "ayulatfir88.coway@gmail.com",
+        "hazwanyassin91@gmail.com",
+        "shatteredsoul83@yahoo.com.sg",
+        "Jason7.francis@gmail.com",
+        "cheeyuet0802@gmail.com",
+        "tharma_remo@yahoo.com",
+        "mrusdi66@yahoo.co.uk",
+        "Hummingbird645@yahoo.com",
+        "linges39@gmail.com",
+        "cpebizs@gmail.com",
+        "powforchai@gmail.com",
+        "Mohdaizuddinelias@gmail.com",
+        "outback-heirs0e@icloud.com",
+        "saffiyyahfarhana@gmail.com",
+        "Top.infinity33@gmail.com",
+        "dell.adnan@yahoo.com",
+        "scalingupfitri@gmail.com",
+        "nuratikah13@gmail.com",
+        "yapelvis9@gmail.com",
+        "azraihakim@gmail.com",
+        "Wern5802@gmail.com",
+        "nantha.punusamy@gmail.com",
+        "tkhong118@gmail.com",
+        "Sashikala_Garnaison@yahoo.com",
+        "eshvaren511983@gmail.com",
+        "akmalstams10@gmail.com",
+        "ahmadalhafis91@gmail.com",
+        "Desmondchan1811@gmail.com",
+        "shazli_amir@yahoo.com",
+        "fabiohung@gmail.com",
+        "jeshan0596@gmail.com",
+        "laywoei@hotmail.com",
+        "saudahhasan93@gmail.com",
+        "izwanzuljb@gmail.com",
+        "apiqapiq1876@gmail.com",
+        "rdmimi63@yahoo.com",
+        "testing@example.com",
+        "jilianwong9191@gmail.com",
+        "work.munwei@gmail.com",
+        "amirdahari69@gmail.com",
+        "davidwhong212313@gmail.com",
+        "leekingchang5@gmail.com",
+        "Theyourna@yahoo.com",
+        "Muhamadas14@gmail.com",
+        "kims_data@yahoo.com",
+        "Putrafif316@gmail.com",
+        "Riskyanto057@gma.com",
+        "yatrarahju@gmail.com",
+        "earezeki@gmail.com",
+        "Shahrizan.sutri821116@gmail.com",
+        "Hans.budiharja@gmail.com",
+        "aborneotours@yahoo.com",
+        "ezwanaidris@gmail.com",
+        "Wailun9883@gmail.com",
+        "ddreleyy@gmail.com",
+        "afiffahimi.kb@gmail.com",
+        "sunita293verma@gmail.com",
+        "Hhtang92@gmail.com",
+        "swimmingcow@outlook.com",
+        "hanifmohamad.torts@gmail.com",
+        "radzimpaj@gmail.com",
+        "darrenchan2009@gmail.com",
+        "LEEYONGQING123@GMAIL.COM",
+        "snjvkumar2002@gmail.com",
+        "ruvaventerprise@gmail.com",
+        "regina@trevo.my",
+        "jawwad40734@gmail.com",
+        "raffi.merusin@gmail.com",
+        "Adampann3265@gmail.com",
+        "yaalharasibaskaran@gmail.com",
+        "bruunney@gmail.com",
+        "m.asyrafafifi@gmail.com",
+        "smartrent.carrental@gmail.com",
+        "weechiuntan@gmai.com",
+        "omarshehroz14@gmail.com",
+        "anderson890713@gmail.com",
+        "ajimboy10a@gmail.com",
+        "muhdadibmr@gmail.com",
+        "qtransporthuat@gmail.com",
+        "zaki4590@gmail.com",
+        "sitinurella89@gmail.com",
+        "yanimusanif@gmail.com",
+        "ridwan.protonedar@gmail.com",
+        "liaugouhao@gmail.com",
+        "adrienteoh3@gmail.com",
+        "ann_scadoll@yahoo.com",
+        "arifhaiqal.mz@gmail.com",
+        "amelya1@yahoo.co.uk",
+        "blake.gg.93@gmail.com",
+        "saypoiate@gmail.com",
+        "anas.atarek@gmail.com",
+        "maolamka@gmail.com",
+        "ceomell2196@gmail.com",
+        "Wing_1207@hotmail.com",
+        "aloysiuslee.lt@gmail.com",
+        "uadlthiaga@gmail.com",
+        "limseokling@gmail.com",
+        "sjsadu@gmail.com",
+        "mohd.muzamil@outlook.com",
+        "james257@gmail.com",
+        "jxin714@hotmail.com",
+        "bhangra16@hotmail.com",
+        "Chaucps@hotmail.com",
+        "desmond9986@gmail.com",
+        "mahissac@gmail.com",
+        "kanaeson8@gmail.com",
+        "0166151094mega@gmail.com",
+        "Sha182329@gmail.com"
+      ],
+      "oldListingIds_2": [
+        "binders_09hairnet@icloud.com",
+        "yack.aero92@gmail.com",
+        "jiunyewhiew@gmail.com"
+      ]
+    },
+    "node:Schedule Trigger1": {
+      "recurrencyRules": [
+        96
+      ]
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2022-12-15T07:35:21.640Z",
+      "updatedAt": "2022-12-15T07:35:21.640Z",
+      "id": "2",
+      "name": "MY"
+    },
+    {
+      "createdAt": "2023-05-12T02:58:32.100Z",
+      "updatedAt": "2023-05-12T02:58:32.100Z",
+      "id": "7",
+      "name": "Host CRM"
+    },
+    {
+      "createdAt": "2023-05-12T02:58:38.207Z",
+      "updatedAt": "2023-05-12T02:58:38.207Z",
+      "id": "8",
+      "name": "Host Community"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-04-29T05:52:06.375Z",
+  "versionId": "89ca611f-48a7-4fa3-abf9-d46afbdbf78e"
+}
