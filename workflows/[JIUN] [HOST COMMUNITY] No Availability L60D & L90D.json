@@ -1,0 +1,674 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres3": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Function",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function": {
+      "main": [
+        [
+          {
+            "node": "[CT] - Host_Availability1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Postgres3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function1": {
+      "main": [
+        [
+          {
+            "node": "[CT] - Host_Availability2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres4": {
+      "main": [
+        [
+          {
+            "node": "Function1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-07-11T08:05:14.002Z",
+  "id": "lgLOZJppj3HBYWYB",
+  "name": "[JIUN] [HOST COMMUNITY] No Availability L60D & L90D",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 6
+            }
+          ]
+        }
+      },
+      "id": "6c65c50b-d736-47f4-9f22-1afdd2a722cf",
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        720,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## No Availability L60D SC Call + Survey\n",
+        "height": 126.25147162703084,
+        "width": 217.6701200847657
+      },
+      "id": "ebabd3bb-63bd-4037-8c0d-2b201559a251",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        440,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nwith list_avai as\n(select distinct l.id, \nl.user_id,\nmax(la.end_date) as max_avai\nfrom listings l\nleft join listing_availability la on la.listing_id = l.id\nleft join listing_location ll on ll.listing_id = l.id\nwhere 1=1\nand l.status = 'approved'\nand l.deleted_at is null\nand ll.country = 'Malaysia'\ngroup by 1,2\nhaving max(la.end_date) < NOW() - interval '60 days'),\n--\nhosts as\n(select distinct u.id, \nconcat(u.first_name,' ',u.last_name)as host_name, \nu.email, \nu.phone_number,\nu.uuid\nfrom users u),\n--\nbad_host as\n(select distinct l.id, t.name as tag\nfrom listings l \nleft join tag_taggables tt on tt.taggable_id = l.id\nleft join tags t on t.id = tt.tag_id \nwhere t.name = 'Bad Host'),\n--\nclt as\n(select distinct b.listing_id,\nmax(b.request_end_at)as CLT\nfrom bookings b \nwhere b.status = 'completed'\ngroup by 1)\n--\nselect distinct la.user_id as host_id, \nh.*\nfrom list_avai la\nleft join hosts h on h.id  = la.user_id\nleft join bad_host bh on bh.id = la.id\nleft join clt clt on clt.listing_id = la.id\nwhere 1=1\nand bh.tag is null\nand clt.clt >= NOW() - interval '180 days'\n--and la.user_id = '5162'\n",
+        "additionalFields": {}
+      },
+      "id": "a2a37b48-78e5-4b18-966e-410af765444b",
+      "name": "Postgres3",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        720
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"uuid\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Noavai_survey\",\n            \"evtData\": {\n                \"NA_com_id\": \"last90days\"\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "8fbf1833-9c59-440d-8222-70840bf12027",
+      "name": "[CT] - Host_Availability1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1320,
+        920
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nwith list_avai as\n(select distinct l.id, l.registration_no,\nl.user_id,\nmax(la.end_date) as max_avai,\ncurrent_date - max(la.end_date::date) as days\nfrom listings l\nleft join listing_availability la on la.listing_id = l.id\nleft join listing_location ll on ll.listing_id = l.id\nwhere 1=1\nand l.status = 'approved'\nand l.deleted_at is null\nand ll.country = 'Malaysia'\ngroup by 1,2\nhaving current_date - max(la.end_date::date) = 90),\n--\nhosts as\n(select distinct u.id, \nconcat(u.first_name,' ',u.last_name)as host_name, \nu.email, \nu.phone_number,\nu.uuid\nfrom users u),\n--\nbad_host as\n(select distinct l.id, t.name as tag\nfrom listings l \nleft join tag_taggables tt on tt.taggable_id = l.id\nleft join tags t on t.id = tt.tag_id \nwhere t.name = 'Bad Host'),\n--\nclt as\n(select distinct b.listing_id,\nmax(b.request_end_at)as CLT\nfrom bookings b \nwhere b.status = 'completed'\ngroup by 1)\n--\nselect distinct la.user_id as host_id, \nh.*,\nla.days\nfrom list_avai la\nleft join hosts h on h.id  = la.user_id\nleft join bad_host bh on bh.id = la.id\nleft join clt clt on clt.listing_id = la.id\nwhere 1=1\nand bh.tag is null\nand clt.clt >= NOW() - interval '180 days'\n--and la.user_id = '5162'",
+        "additionalFields": {}
+      },
+      "id": "a9f900e0-bdd4-4d95-a32e-130d24322786",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        920,
+        920
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"host_id\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['host_id']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        920
+      ],
+      "id": "6b529e80-4929-439d-a5e7-6812ee6c52e7"
+    },
+    {
+      "parameters": {
+        "content": "## No Availability L90D Survey\n",
+        "height": 123.90106731436254,
+        "width": 217.6701200847657
+      },
+      "id": "e1539981-43f6-4881-8b1b-9f90c56b0283",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        440,
+        900
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1lmLk8_5vyxi4MYGEXVSsrJFS5OKkvdBc6wYWBbmLUFI",
+          "mode": "list",
+          "cachedResultName": "Churning Listings - L60D No Availability",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lmLk8_5vyxi4MYGEXVSsrJFS5OKkvdBc6wYWBbmLUFI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "N8N Import - L60D No Avai",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lmLk8_5vyxi4MYGEXVSsrJFS5OKkvdBc6wYWBbmLUFI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "host_id"
+          ],
+          "schema": [
+            {
+              "id": "host_id",
+              "displayName": "host_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "host_name",
+              "displayName": "host_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone_number",
+              "displayName": "phone_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "uuid",
+              "displayName": "uuid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "13842ae1-1e13-4e9c-83d1-a1b5a7a8cb13",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1320,
+        720
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1lmLk8_5vyxi4MYGEXVSsrJFS5OKkvdBc6wYWBbmLUFI",
+          "mode": "list",
+          "cachedResultName": "Churning Listings - L60D No Availability",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lmLk8_5vyxi4MYGEXVSsrJFS5OKkvdBc6wYWBbmLUFI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "N8N Import - L60D No Avai",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lmLk8_5vyxi4MYGEXVSsrJFS5OKkvdBc6wYWBbmLUFI/edit#gid=0"
+        },
+        "clear": "specificRange",
+        "range": "A2:Z"
+      },
+      "id": "49084625-83fd-4fc2-b7e7-990a875dd898",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        920,
+        720
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"uuid\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Noavai_survey\",\n            \"evtData\": {\n                \"NA_com_id\": \"last60days\"\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "d461127d-1c0f-4db0-8dfd-309e90485ca3",
+      "name": "[CT] - Host_Availability2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1320,
+        540
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"host_id\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['host_id']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        540
+      ],
+      "id": "26fc2b5c-5cfc-491f-8cb2-a75bc7011176"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nwith list_avai as\n(select distinct l.id, l.registration_no,\nl.user_id,\nmax(la.end_date) as max_avai,\ncurrent_date - max(la.end_date::date) as days\nfrom listings l\nleft join listing_availability la on la.listing_id = l.id\nleft join listing_location ll on ll.listing_id = l.id\nwhere 1=1\nand l.status = 'approved'\nand l.deleted_at is null\nand ll.country = 'Malaysia'\ngroup by 1,2\nhaving current_date - max(la.end_date::date) = 60),\n--\nhosts as\n(select distinct u.id, \nconcat(u.first_name,' ',u.last_name)as host_name, \nu.email, \nu.phone_number,\nu.uuid\nfrom users u),\n--\nbad_host as\n(select distinct l.id, t.name as tag\nfrom listings l \nleft join tag_taggables tt on tt.taggable_id = l.id\nleft join tags t on t.id = tt.tag_id \nwhere t.name = 'Bad Host'),\n--\nclt as\n(select distinct b.listing_id,\nmax(b.request_end_at)as CLT\nfrom bookings b \nwhere b.status = 'completed'\ngroup by 1)\n--\nselect distinct la.user_id as host_id, \nh.*,\nla.days\nfrom list_avai la\nleft join hosts h on h.id  = la.user_id\nleft join bad_host bh on bh.id = la.id\nleft join clt clt on clt.listing_id = la.id\nwhere 1=1\nand bh.tag is null\nand clt.clt >= NOW() - interval '180 days'\n--and la.user_id = '5162'",
+        "additionalFields": {}
+      },
+      "id": "419f0727-4e7b-4c5e-a3e2-474487361e4b",
+      "name": "Postgres4",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        920,
+        540
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11",
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "all"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "node:Schedule Trigger1": {
+      "recurrencyRules": [
+        9
+      ]
+    },
+    "global": {
+      "oldListingIds": [
+        411303,
+        2253304,
+        163,
+        526,
+        3416,
+        5162,
+        6669,
+        11722,
+        14452,
+        15132,
+        25989,
+        30739,
+        32215,
+        34587,
+        35295,
+        37340,
+        38311,
+        42740,
+        43269,
+        53433,
+        55905,
+        56838,
+        60835,
+        70736,
+        71001,
+        79696,
+        82570,
+        82596,
+        87257,
+        87725,
+        87854,
+        89213,
+        92561,
+        92802,
+        100597,
+        106417,
+        110928,
+        112289,
+        115693,
+        124086,
+        125088,
+        135689,
+        136775,
+        150949,
+        151289,
+        159576,
+        177014,
+        179117,
+        188643,
+        213428,
+        228687,
+        241544,
+        259332,
+        266201,
+        285735,
+        299369,
+        309978,
+        325533,
+        343310,
+        357352,
+        399266,
+        403623,
+        416381,
+        430743,
+        444292,
+        483725,
+        509913,
+        543935,
+        548329,
+        570444,
+        573179,
+        573320,
+        579140,
+        587014,
+        605762,
+        613542,
+        619343,
+        621286,
+        631481,
+        635203,
+        655617,
+        680149,
+        684922,
+        687176,
+        706220,
+        726959,
+        728737,
+        748414,
+        754661,
+        759376,
+        767156,
+        771843,
+        784221,
+        791078,
+        805290,
+        822407,
+        848031,
+        849983,
+        853452,
+        866940,
+        869069,
+        906114,
+        916851,
+        923006,
+        936580,
+        941716,
+        945695,
+        975931,
+        990613,
+        999933,
+        1008093,
+        1080764,
+        1086194,
+        1108038,
+        1125352,
+        1161065,
+        1168674,
+        1181326,
+        1191990,
+        1199551,
+        1211952,
+        1214473,
+        1219047,
+        1223817,
+        1226421,
+        1291001,
+        1291430,
+        1294671,
+        1314368,
+        1348464,
+        1406017,
+        1417187,
+        1446394,
+        1492604,
+        1504223,
+        1537493,
+        1585283,
+        1586991,
+        1599109,
+        1626926,
+        1646364,
+        1649137,
+        1656931,
+        1671548,
+        1681081,
+        1686493,
+        1718427,
+        1751833,
+        1752676,
+        1770081,
+        1776866,
+        1789203,
+        1792210,
+        1804263,
+        1807704,
+        1809313,
+        1821121,
+        1828080,
+        1829226,
+        1849058,
+        1870067,
+        1899997,
+        1933097,
+        1937538,
+        1950318,
+        1974368,
+        2013855,
+        2016959,
+        2019486,
+        2118028,
+        2145749,
+        2169227,
+        2169573,
+        2171674,
+        2172003,
+        2177198,
+        2212647,
+        2222932,
+        2311739,
+        2354710,
+        2363178,
+        2366997,
+        2378818,
+        2396704,
+        2424570,
+        2441518,
+        2449413,
+        2450828,
+        2456384,
+        2467060,
+        2468170,
+        2476061,
+        2480919,
+        2488648,
+        2493700,
+        2542545,
+        2552051,
+        2560545,
+        2566589,
+        2603535,
+        2617643,
+        2627641,
+        2627921,
+        2628225,
+        2635797,
+        2672967,
+        2728413,
+        2738089,
+        2748575,
+        2754230,
+        2756036,
+        2763627,
+        2856604,
+        2861249,
+        2887220,
+        2890250,
+        2892275,
+        2898919,
+        2922283,
+        2929234,
+        2950923,
+        2959826,
+        2969173,
+        2973980,
+        2975757,
+        2997425,
+        3017790,
+        3044068,
+        3060108,
+        3060781,
+        3066738,
+        3090819,
+        3093008,
+        3096346
+      ]
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-08-08T01:00:00.180Z",
+  "versionId": "7f7cfd6f-04d8-4b01-99b6-7048b2d9426c"
+}
