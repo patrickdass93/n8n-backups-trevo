@@ -1,0 +1,527 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets6",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets2": {
+      "main": [
+        [
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets4": {
+      "main": [
+        [
+          {
+            "node": "Postgres2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets6": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-08-08T06:31:02.138Z",
+  "id": "WkCnRZ3IjQAODE9R",
+  "name": "[JIUN][FINANCE] - HEP Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "f7648a56-81e4-4c8c-a1b7-d0604ae0018a",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        620,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "13eCxviuix-ra_GYreeNGuEK0rA9lCk1YzsSOPlzUtU0",
+          "mode": "list",
+          "cachedResultName": "TREVO HEP - Automated as of 8th Aug 2023",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13eCxviuix-ra_GYreeNGuEK0rA9lCk1YzsSOPlzUtU0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "N8N Import - Raw Bookings",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13eCxviuix-ra_GYreeNGuEK0rA9lCk1YzsSOPlzUtU0/edit#gid=0"
+        },
+        "clear": "specificRange",
+        "range": "A2:AZ"
+      },
+      "id": "8b46a7a3-2684-493d-a556-20800cf3b5b9",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        800,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "13eCxviuix-ra_GYreeNGuEK0rA9lCk1YzsSOPlzUtU0",
+          "mode": "list",
+          "cachedResultName": "TREVO HEP - Automated as of 8th Aug 2023",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13eCxviuix-ra_GYreeNGuEK0rA9lCk1YzsSOPlzUtU0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "N8N Import - Raw Bookings",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13eCxviuix-ra_GYreeNGuEK0rA9lCk1YzsSOPlzUtU0/edit#gid=0"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "ref_no",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "7b3b56b2-03d4-4d3a-8144-9dc780a3e3fa",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1160,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect distinct b.ref_no, \nto_char(b.created_at::timestamp, 'YYYY-MM-DD HH24:MI')as created_at,\nto_char(b.request_start_at::timestamp, 'YYYY-MM-DD HH24:MI')as start_at,\nto_char(b.request_end_at::timestamp, 'YYYY-MM-DD HH24:MI')as end_at,\nto_char(b.request_end_at::timestamp, 'IYYY-IW')as end_week,\ncase when bl.pricing_id = '3' then 0.5\nelse ceil((EXTRACT(EPOCH FROM b.request_end_at) - EXTRACT(EPOCH FROM b.request_start_at))/86400) end as duration,\nl.registration_no, \npc.p_created_at,\nb.gross_amount, \nd5.rental as rental_amount,\ndl.delivery_start,\ndl.pickup_return, \ndl.scdw,\nb.gross_amount - d5.rental as scdw_delivery, \nround((coalesce(d5.rental,0) + coalesce(ext.rental,0) - p.amount - coalesce(bh.total_handover_fee,0) + (coalesce(mp.mileage_payout_amount,0) + coalesce(mp.mileage_payout_sst,0)) - p.sst_amount)/(coalesce(d5.rental,0) + coalesce(ext.rental,0)),2)*100 as comm_percent, \next.created_at as ext_created_at,\npc.p_created_at_extended,\next.gross_amount as ext_gross_amount, \next.rental as ext_rental, \next.scdw as ext_scdw,\n--m.multipliercontr,\np.sst_amount as overall_sst,\nbh.total_handover_fee,\nmp.mileage_package,\nmp.mileage_pack_amount,\nmp.mileage_payout_sst,\nmp.mileage_payout_amount,\np.amount as payout_amount, \nl.user_id as host_id, \ncase when ht.host_type is null then 'Organic' else ht.host_type end as host_type,\nconcat(u.first_name,' ',u.last_name) as host_name, \nu.email as host_email,\ncase when pa.name is not null then pa.name else concat(u.first_name,' ',u.last_name) end beneficiary_name, \nCONCAT('''', account_number)::TEXT as \"Payout Account Number\",\npa.bank,\ncase when ll.city_id in (1) then 'KV'   \nwhen ll.city_id in (2,12) then 'PGM' when ll.city_id in (48) then 'PGI'\nwhen ll.city_id in (3,19,20,21) then 'KK'   when ll.city_id in (4) then 'JB' \nwhen ll.city_id in (5) then 'IP'   when ll.city_id in (47) then 'NS'\nwhen ll.city_id in (13) then 'LGK' \nwhen ll.city_id in (14) then 'PRLS'\nwhen ll.city_id in (15) then 'MLK'\nwhen ll.city_id in (16) then 'PHG'\nwhen ll.city_id in (17) then 'TRGN'\nwhen ll.city_id in (18) then 'KLT'\nwhen ll.city_id in (22,23) then 'KCH'\nelse 'Others' end as City\nfrom bookings b \nleft join listings l on l.id = b.listing_id \nleft join users u on u.id = l.user_id\nleft join listing_location ll on ll.listing_id = l.id\nleft join listing_commission_class lcc on lcc.listing_id = l.id\nleft join commission_class cc on cc.id = lcc.commission_id \nleft join payouts p on p.booking_id = b.id \nLEFT JOIN payout_accounts pa ON pa.user_id = l.user_id and pa.deleted_at is null\nleft join booking_lines bl on bl.booking_id = b.id and bl.slug = 'rental-fee' \nleft join\n(select bl.booking_id, bl.amount as rental from booking_lines bl where bl.slug = 'rental-fee') d5\non b.id = d5.booking_id\n--\nleft join\n    (select distinct l.user_id, l.id, t.name as host_type\n    from listings l\n    left join tag_taggables tt on tt.taggable_id = l.user_id \n    left join tags t on t.id = tt.tag_id\n    where t.name ~* '(entrepreneur|commercial)')ht\n    on ht.user_id = l.user_id\n--\nleft join\n\t(select distinct b.ref_no, \n\tto_char(be.created_at::timestamp, 'YYYY-MM-DD HH24:MI')as created_at,\n\tbe.gross_amount, \n\td6.rental, \n\tbe.gross_amount - d6.rental as scdw\n\tfrom booking_extension be \n\tleft join bookings b on b.id = be.booking_id\n\tleft join\n\t(select bl.booking_id, be.status, bl.amount as rental\nfrom booking_lines bl \nleft join booking_extension be on be.booking_id = bl.booking_id and bl.entity_id = be.id\nwhere bl.slug = 'extension'\nand be.status = 'accepted') d6\n\ton be.booking_id = d6.booking_id\n\tleft join listing_commission_class lcc on lcc.listing_id = b.listing_id\n\tleft join commission_class cc on cc.id = lcc.commission_id \n\twhere be.status = 'accepted')ext\n\ton ext.ref_no = b.ref_no\n--\nleft join\n\t(select distinct b.ref_no, \n\tbl.amount as delivery_start,\n\tbl2.amount as pickup_return, \n\tbl3.amount as scdw\n\tfrom bookings b\n\tleft join booking_lines bl on b.id = bl.booking_id and bl.name = 'car-drop-off fee'\n\tleft join booking_lines bl2 on b.id = bl2.booking_id and bl2.name = 'car-pick-up fee'\n\tleft join booking_lines bl3 on b.id = bl3.booking_id and bl3.name in ('Premium', 'Standard','Lite'))dl\n\ton dl.ref_no = b.ref_no\n--\nleft join\n\t(select distinct b.id, \n\tb.ref_no, \n\tsum(bh.handover_fee)as total_handover_fee\n\tfrom bookings b \n\tleft join booking_handover bh on bh.booking_id = b.id\n\twhere 1=1\n\t--and b.ref_no = 'YHLUKSAS'\n\tgroup by 1,2)bh\n\ton bh.id = b.id\n--\nleft join\n\t(with booking as\n\t\t(select distinct b.ref_no,\n\t\tb.id,\n\t\tto_char(pi.created_at::timestamp, 'YYYY-MM-DD HH24:MI')as p_created_at\n\t\tfrom bookings b  \n\t\tleft join payment_intents pi on pi.booking_id = b.id and pi.status = 'succeeded'\n\t\twhere 1=1 \n\t\tand b.status = 'completed'\n\t\t--and b.ref_no = '0603GC6D'\n\t\tand pi.entity_type is null),\n\t\t--\n\t\tbooking_extension as \n\t\t(select distinct b.ref_no,\n\t\tb.id,\n\t\tto_char(pi.created_at::timestamp, 'YYYY-MM-DD HH24:MI')as p_created_at_extended\n\t\tfrom bookings b  \n\t\tleft join payment_intents pi on pi.booking_id = b.id and pi.status = 'succeeded' \n\t\tleft join booking_extension be on be.booking_id = b.id and be.id = pi.entity_id\n\t\twhere 1=1 \n\t\tand be.status = 'accepted'\n\t\tand b.status = 'completed'\n\t\t--and b.ref_no = '0603GC6D'\n\t\tand pi.entity_type = 'booking-extension')\n\t\t--\n\tselect distinct b.ref_no, \n\tb.p_created_at, \n\tbe.p_created_at_extended\n\tfrom booking b \n\tleft join booking_extension be on be.ref_no = b.ref_no)pc\n\ton pc.ref_no = b.ref_no\n--\nleft join\n\t(select distinct b.ref_no, \n\tbl.name as mileage_package,\n\tbl.amount as mileage_pack_amount,  \n\tcase when b.created_at >= '2024-03-01 00:00' then ((bl.amount * 0.15) * 0.08)\n\telse ((bl.amount * 0.15) * 0.06) end as mileage_payout_sst,\n\tcase when b.created_at >= '2024-03-01 00:00' then bl.amount - (bl.amount * 0.15) - ((bl.amount * 0.15) * 0.08)\n\telse bl.amount - (bl.amount * 0.15) - ((bl.amount * 0.15) * 0.06) end as mileage_payout_amount\n\tfrom booking_lines bl \n\tleft join bookings b on b.id = bl.booking_id \n\twhere bl.name ~* '(Mileage)'\n\tand bl.currency = 'myr')mp\n\ton mp.ref_no = b.ref_no\nwhere 1=1 \nand ll.country = 'Malaysia'\nand b.status in ('completed')\nand b.request_end_at >= '2023-10-01 00:00'\n--and b.ref_no in ('WGSDIFY4')\n--and b.id = '482293'",
+        "options": {}
+      },
+      "id": "82ab0441-9713-4cde-a25b-76fcd5270c99",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        980,
+        400
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "13eCxviuix-ra_GYreeNGuEK0rA9lCk1YzsSOPlzUtU0",
+          "mode": "list",
+          "cachedResultName": "TREVO HEP - Automated as of 8th Aug 2023",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13eCxviuix-ra_GYreeNGuEK0rA9lCk1YzsSOPlzUtU0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 501520108,
+          "mode": "list",
+          "cachedResultName": "Promo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13eCxviuix-ra_GYreeNGuEK0rA9lCk1YzsSOPlzUtU0/edit#gid=501520108"
+        },
+        "clear": "specificRange",
+        "range": "A2:AZ"
+      },
+      "id": "622a2166-873c-468d-8c0c-231e33e2731e",
+      "name": "Google Sheets2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        800,
+        580
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "13eCxviuix-ra_GYreeNGuEK0rA9lCk1YzsSOPlzUtU0",
+          "mode": "list",
+          "cachedResultName": "TREVO HEP - Automated as of 8th Aug 2023",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13eCxviuix-ra_GYreeNGuEK0rA9lCk1YzsSOPlzUtU0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 501520108,
+          "mode": "list",
+          "cachedResultName": "Promo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13eCxviuix-ra_GYreeNGuEK0rA9lCk1YzsSOPlzUtU0/edit#gid=501520108"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "city",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "4efa185b-2e2b-4f94-9407-09d6dda3e7ee",
+      "name": "Google Sheets3",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1160,
+        580
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nselect distinct case when ll.city_id in (1) then 'KV'   \nwhen ll.city_id in (2,12) then 'PGM' when ll.city_id in (48) then 'PGI'\nwhen ll.city_id in (3,19,20,21) then 'KK'   when ll.city_id in (4) then 'JB' \nwhen ll.city_id in (5) then 'IP'   when ll.city_id in (47) then 'NS'\nwhen ll.city_id in (13) then 'LGK' \nwhen ll.city_id in (14) then 'PRLS'\nwhen ll.city_id in (15) then 'MLK'\nwhen ll.city_id in (16) then 'PHG'\nwhen ll.city_id in (17) then 'TRGN'\nwhen ll.city_id in (18) then 'KLT'\nwhen ll.city_id in (22,23) then 'KCH'\nelse 'Others' end as City,\n--\nb.id as \"Booking ID\", b.ref_no as \"Booking Ref No\", l.registration_no as \"Car Registration No\", b.status as \"Booking Status\", \nb.created_at::timestamp as \"Created At\", b.request_start_at::timestamp as \"Request Start At\", \nb.request_end_at::timestamp \"Request End At\", case when bl.pricing_id = '3' then 0.5\nelse ceil((EXTRACT(EPOCH FROM b.request_end_at) - EXTRACT(EPOCH FROM b.request_start_at))/86400) end as \"Duration (days)\",\n--\nb.user_id as \"Guest ID\",\ncase when u.display_name is not null then u.display_name else concat(u.first_name,' ',u.last_name) end as \"Guest\",\np.code as \"Old Promo Code\", pm.card_type as \"Card Type\", pm.brand as \"Card Brand\", pm.issuer as \"Issuing Bank\",\npm.bin as \"Bin\", pm.last4 as \"Last 4\", pm.customer_ref \"Payment Guest Ref\", \npy.ref_no \"Payment Ref\", py.channel as \"Payment Channel\", py.created_at as \"Payment Time\",\n--\nl.user_id as \"Host ID\",\ncase when u2.display_name is not null then u2.display_name else concat(u2.first_name,' ',u2.last_name) end as \"Host\",\ncase when cu.id is not null then 'PFP' else 'Organic' end \"Host Category\", pa.bank as \"Host Bank\", \npa.account_number as \"Host Account No\", l.id as \"Listing ID\", concat(br.name, ' ', m.name) as \"Car Make Model\", \n--\nbl.amount as \"Actual Rental\", \ncase when d3.del_pickup_disc is null and d4.del_dropoff_disc is null then \nb.gross_amount - coalesce(d1.del_pickup, 0) - coalesce(d2.del_dropoff, 0) - bl.amount\nelse b.gross_amount - coalesce(d3.del_pickup_disc, 0) - coalesce(d4.del_dropoff_disc, 0) - bl.amount end as \"SCDW\",\n--\n((case when d3.del_pickup_disc is null and d4.del_dropoff_disc is null then \nb.gross_amount - coalesce(d1.del_pickup, 0) - coalesce(d2.del_dropoff, 0) - bl.amount\nelse b.gross_amount - coalesce(d3.del_pickup_disc, 0) - coalesce(d4.del_dropoff_disc, 0) - bl.amount end)/b.gross_amount) * 100 \nas \"SCDW Contribution (%)\",\n--\ncase when d3.del_pickup_disc is null and d4.del_dropoff_disc is null then b.gross_amount \nelse b.gross_amount + coalesce(d1.del_pickup, 0) + coalesce(d2.del_dropoff, 0)\n- coalesce(d3.del_pickup_disc, 0) - coalesce(d4.del_dropoff_disc, 0) end as \"GMV\",\ncase when d3.del_pickup_disc is null and d4.del_dropoff_disc is null then b.net_amount\nelse b.net_amount + coalesce(d1.del_pickup, 0) + coalesce(d2.del_dropoff, 0) \n- coalesce(d3.del_pickup_disc, 0) - coalesce(d4.del_dropoff_disc, 0) end as \"NMV\",\nb.gross_amount - b.net_amount as \"Coupon\",\n--\ncoalesce(d1.del_pickup, 0) + coalesce(d2.del_dropoff, 0) as \"Delivery Fee\",\ncase when d3.del_pickup_disc is null and d4.del_dropoff_disc is null then 0 \nelse coalesce(d1.del_pickup, 0) + coalesce(d2.del_dropoff, 0) \n- coalesce(d3.del_pickup_disc, 0) - coalesce(d4.del_dropoff_disc, 0) end as \"Discounted Delivery Fee\",\n--\ncase when d3.del_pickup_disc is null and d4.del_dropoff_disc is null then \ncoalesce(d1.del_pickup, 0) + coalesce(d2.del_dropoff, 0) else\ncoalesce(d3.del_pickup_disc, 0) + coalesce(d4.del_dropoff_disc, 0) end as \"Delivery Fee [After discount]\",\n--\nb.gross_amount as \"GMV [With delivery disc]\", b.net_amount  as \"NMV [With delivery disc]\",\npo.amount as \"Host Payout\", \n((bl.amount - po.amount) / bl.amount) * 100 as \"Trevo Rental Commission (%)\"\n----\nfrom bookings b\nleft join listings l on b.listing_id = l.id\nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = b.listing_id\nleft join company_users cu ON cu.user_id = l.user_id\nleft join users u on u.id = b.user_id\nleft join users u2 on u2.id = l.user_id\n--\nleft join models m on l.model_id = m.id\nleft join brands br on br.id = m.brand_id\nleft join booking_promos bp on bp.booking_id = b.id\nleft join promos p on p.id = bp.promo_id \nleft join booking_lines bl on bl.booking_id = b.id and bl.slug = 'rental-fee' \n--\nleft join payouts po on po.booking_id = b.id\nleft join payout_accounts pa on pa.id = po.payout_account_id\nleft join booking_payments bpy on bpy.booking_id = b.id \nleft join payments py on py.id = bpy.payment_id and py.status ='succeeded' and py.amount_refunded is null\nleft join payment_methods pm on py.payment_method_id = pm.id \n--\nleft join\n(select bl.booking_id, bl.amount as del_pickup from booking_lines bl where bl.slug = 'car-pick-up-fee') d1\non b.id = d1.booking_id\nleft join\n(select bl.booking_id, bl.amount as del_dropoff from booking_lines bl where bl.slug = 'car-drop-off-fee') d2\non b.id = d2.booking_id\n--\nleft join\n(select bl.booking_id, bl.amount as del_pickup_disc from booking_lines bl where bl.slug = 'car-pick-up-discount-fee') d3\non b.id = d3.booking_id\nleft join\n(select bl.booking_id, bl.amount as del_dropoff_disc from booking_lines bl where bl.slug = 'car-drop-off-discount-fee') d4\non b.id = d4.booking_id\n----\nwhere 1=1\nand ll.country = 'Malaysia'\n--and b.status in ('accepted', 'waiting_for_inspection', 'start_driving', 'return_car', 'completed')\nand b.status = 'completed'\nand b.request_end_at >= '2023-09-01 00:00'\n--\norder by 2 desc\n",
+        "options": {}
+      },
+      "id": "4b3e2dbb-6922-4065-9b97-6c533863bb4f",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        980,
+        580
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Promo",
+        "height": 80,
+        "width": 150
+      },
+      "id": "5c638bfd-c793-47f1-a1ef-8c12b87f7189",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        400,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Raw Data",
+        "height": 80,
+        "width": 150
+      },
+      "id": "590b498c-b228-439f-88c3-44d9c0ce45de",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        400,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "13eCxviuix-ra_GYreeNGuEK0rA9lCk1YzsSOPlzUtU0",
+          "mode": "list",
+          "cachedResultName": "TREVO HEP - Automated as of 8th Aug 2023",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13eCxviuix-ra_GYreeNGuEK0rA9lCk1YzsSOPlzUtU0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 469604089,
+          "mode": "list",
+          "cachedResultName": "Host LCM Penalty (Partiban's sheet)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13eCxviuix-ra_GYreeNGuEK0rA9lCk1YzsSOPlzUtU0/edit#gid=469604089"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRangeA1",
+              "range": "AK:AK"
+            }
+          }
+        }
+      },
+      "id": "b5f6e9f8-8044-4e8d-892d-e0714fa48e79",
+      "name": "Google Sheets4",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        980,
+        760
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "13eCxviuix-ra_GYreeNGuEK0rA9lCk1YzsSOPlzUtU0",
+          "mode": "list",
+          "cachedResultName": "TREVO HEP - Automated as of 8th Aug 2023",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13eCxviuix-ra_GYreeNGuEK0rA9lCk1YzsSOPlzUtU0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 820816499,
+          "mode": "list",
+          "cachedResultName": "N8N Import - Host LCM Penalty",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13eCxviuix-ra_GYreeNGuEK0rA9lCk1YzsSOPlzUtU0/edit#gid=820816499"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "ref_no",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "85a1312c-582c-43d9-b385-e05219e52225",
+      "name": "Google Sheets5",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1340,
+        760
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nWITH multiplier AS (\n    SELECT DISTINCT\n        TO_DATE(REGEXP_REPLACE(SUBSTRING(json_extract_path(json_array_elements(bm.meta->'multiplierPricing'),'date')::text,1,11), '[^0-9-]', ''),'YYYY-MM-DD') AS multiplierdate,\n        bm.booking_id,\n        json_extract_path(json_array_elements(bm.meta->'multiplierPricing'),'price')::text AS multiplierprice\n    FROM booking_multipliers bm\n    JOIN bookings b ON b.id = bm.booking_id\n    LEFT JOIN listing_location ll ON b.listing_id = ll.listing_id\n    WHERE ll.country = 'Malaysia'\n),\nbooking AS (\n    SELECT DISTINCT\n        b.ref_no,\n        b.created_at, \n        b.updated_at,\n        b.request_start_at,\n        (EXTRACT(EPOCH FROM b.request_start_at) - EXTRACT(EPOCH FROM b.updated_at))/3600 as lag_hours,\n        FIRST_VALUE(m.multiplierprice) OVER (PARTITION BY b.ref_no ORDER BY b.request_start_at::date) AS multiplierprice,\n        l.registration_no, \n        l.user_id as host_id, \n        concat(u.first_name, ' ',u.last_name)as host_name\n    FROM bookings b \n    LEFT JOIN multiplier m ON m.booking_id = b.id AND m.multiplierdate = b.request_start_at::date\n    LEFT JOIN listing_location ll ON b.listing_id = ll.listing_id\n    left join listings l on l.id = b.listing_id\n   \tleft join users u on u.id = l.user_id\n    WHERE ll.country = 'Malaysia'\n    AND b.request_end_at BETWEEN '2023-01-01 00:00' AND NOW()\n)\nSELECT DISTINCT ref_no, \nto_char(created_at, 'YYYY-MM-DD HH24:MI') as created_at,\nto_char(updated_at, 'YYYY-MM-DD HH24:MI') as updated_at,\nto_char(request_start_at, 'YYYY-MM-DD HH24:MI') as request_start_at,\nlag_hours,\nmultiplierprice as first_daily_rate, \nregistration_no, \nhost_id, \nhost_name\nFROM booking \nwhere ref_no in ({{ $json['Bookings for Query'] }})\nand updated_at >= '2024-04-01 00:00'\nORDER BY created_at",
+        "options": {
+          "queryReplacement": "={{ $json['Bookings for Query'] }}"
+        }
+      },
+      "id": "a32febf6-b863-4f95-93c1-906c9cb23051",
+      "name": "Postgres2",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        1160,
+        760
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "13eCxviuix-ra_GYreeNGuEK0rA9lCk1YzsSOPlzUtU0",
+          "mode": "list",
+          "cachedResultName": "TREVO HEP - Automated as of 8th Aug 2023",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13eCxviuix-ra_GYreeNGuEK0rA9lCk1YzsSOPlzUtU0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 820816499,
+          "mode": "list",
+          "cachedResultName": "N8N Import - Host LCM Penalty",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13eCxviuix-ra_GYreeNGuEK0rA9lCk1YzsSOPlzUtU0/edit#gid=820816499"
+        },
+        "clear": "specificRange",
+        "range": "A2:Z"
+      },
+      "id": "fc7f0243-476a-43a5-aa63-a98b584f1402",
+      "name": "Google Sheets6",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        800,
+        760
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Host LCM",
+        "height": 80,
+        "width": 150
+      },
+      "id": "111f6e7c-1eef-45b1-99d4-d72a18b02ac2",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        400,
+        760
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 300,
+    "errorWorkflow": "11"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": [
+        12
+      ]
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2022-12-15T07:35:21.640Z",
+      "updatedAt": "2022-12-15T07:35:21.640Z",
+      "id": "2",
+      "name": "MY"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-08-05T02:41:07.512Z",
+  "versionId": "ea73e6ab-71bf-46b8-9c82-e5c5a9014e3d"
+}
