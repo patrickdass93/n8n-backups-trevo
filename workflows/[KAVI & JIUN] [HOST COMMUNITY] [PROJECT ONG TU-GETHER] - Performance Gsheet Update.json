@@ -1,0 +1,538 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets3": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-01-10T02:58:16.427Z",
+  "id": "22",
+  "name": "[KAVI & JIUN] [HOST COMMUNITY] [PROJECT ONG TU-GETHER] - Performance Gsheet Update",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "e4476b98-10ad-4a21-9dde-c8c78131f588",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        300,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=select distinct l.id, \nl.registration_no, \nm.name as model,\ncase when ll.city_id in (1) then '1. KV'   \nwhen ll.city_id in (2,12) then '2. PG'\nwhen ll.city_id in (3,19,20,21) then '3. KK'  \nwhen ll.city_id in (4,15) then '4. JB' \nwhen ll.city_id in (5) then '5. IP' \nwhen ll.city_id in (47) then '6. NS'\nwhen ll.city_id in (13) then '7. LGK'\nelse '8. Others' end as city,\nl.user_id, \nconcat(u.first_name, ' ',u.last_name)as host_name, \nu.email, \nu.uuid,\nu.phone_number,\nla.avai_days,\ncase when obj.rej_booking is null then '0' else obj.rej_booking end as overall_rej_booking,\ncase when wbj.rej_booking is null then '0' else wbj.rej_booking end as weekend_rej_booking,\ncase when bf.fuld_booking is null then '0' else bf.fuld_booking end as fuld_booking\nfrom listings l \nleft join users u on u.id = l.user_id\nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = l.id\nleft join models m on m.id = l.model_id\nleft join companies c on c.owner_id = l.user_id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) or (b.status in ('withdrawn', 'cancelled') and b.reason ~* '(host|owner|avai|car)') then b.ref_no end) as rej_booking\n        from bookings b \n        where b.request_end_at >= '2023-01-18 00:00' and b.request_start_at <= '2023-01-31 23:59'\n        group by 1)obj\n        on obj.listing_id = l.id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when (b.status = 'rejected' and (b.reason !~* '(guest)' or b.reason is null)) or (b.status in ('withdrawn', 'cancelled') and b.reason ~* '(host|owner|avai|car)') then b.ref_no end) as rej_booking\n        from bookings b \n        where (b.request_start_at between '2023-01-20 00:00' and '2023-01-23 23:59') or (b.request_start_at between '2023-01-27 00:00' and '2023-01-29 23:59')\n        group by 1)wbj\n        on wbj.listing_id = l.id\n--\nleft join \n        (select distinct b.listing_id, \n        count(distinct case when b.status in ('completed','start_driving','waiting_for_inspection', 'return_car','accepted') then b.id end) as fuld_booking\n        from bookings b \n        where b.request_end_at >= '2023-01-18 00:00' and b.request_start_at <= '2023-01-31 23:59'\n        group by 1)bf\n        on bf.listing_id = l.id\n--\nleft join \n        (select l.id,\n        count(dates.ymd) as avai_days\n        from listings l\n        left join listing_availability la on la.listing_id=l.id\n        left join (SELECT generate_series(timestamp '2023-01-18', timestamp '2023-01-31', interval '1 day')::date ymd) dates on \n        dates.ymd between la.start_date::date and la.end_date::date\n        where l.status='approved' and l.deleted_at is null \n        GROUP BY 1)la\n        on la.id = l.id\nwhere l.status = 'approved'\nand l.deleted_at is null\nand ((c.owner_id is null) or (l.user_id in (942862,344308,756223,31534,176936,551568,59693,120252,113801,483725,839440,760777,59551,58937,725875,797829,810417,1415199,1594773,50832,684922,1387955,548329,259352,81472,399266,79964,92561,93080,177014,89213,925742,758921,46071,1072616,1751078,82304)))\nand l.registration_no in ({{ $json[\"String\"] }})\norder by 10 desc",
+        "additionalFields": {}
+      },
+      "id": "bf8b5553-7871-46ee-a048-a5b545c968fc",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        900,
+        360
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "trevodb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1j07W-fwHDU5-2Ta8cYq9kvdOu0Uiqnu0D16zq2vab1U",
+          "mode": "list",
+          "cachedResultName": "Ong Tù-Gether Opt In (Responses)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1j07W-fwHDU5-2Ta8cYq9kvdOu0Uiqnu0D16zq2vab1U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1908020212,
+          "mode": "list",
+          "cachedResultName": "N8N Import (Performance)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1j07W-fwHDU5-2Ta8cYq9kvdOu0Uiqnu0D16zq2vab1U/edit#gid=1908020212"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "registration_no",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "70d9e0bf-5c13-4ab3-9645-ed57f72c916c",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1100,
+        360
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1j07W-fwHDU5-2Ta8cYq9kvdOu0Uiqnu0D16zq2vab1U",
+          "mode": "list",
+          "cachedResultName": "Ong Tù-Gether Opt In (Responses)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1j07W-fwHDU5-2Ta8cYq9kvdOu0Uiqnu0D16zq2vab1U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1908020212,
+          "mode": "list",
+          "cachedResultName": "N8N Import (Performance)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1j07W-fwHDU5-2Ta8cYq9kvdOu0Uiqnu0D16zq2vab1U/edit#gid=1908020212"
+        },
+        "clear": "specificRange",
+        "range": "A2:M"
+      },
+      "id": "f6e3ebcd-d06a-4a10-8cd1-79be461b9db2",
+      "name": "Google Sheets2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        500,
+        360
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1j07W-fwHDU5-2Ta8cYq9kvdOu0Uiqnu0D16zq2vab1U",
+          "mode": "list",
+          "cachedResultName": "Ong Tù-Gether Opt In (Responses)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1j07W-fwHDU5-2Ta8cYq9kvdOu0Uiqnu0D16zq2vab1U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 782357221,
+          "mode": "list",
+          "cachedResultName": "Registration No",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1j07W-fwHDU5-2Ta8cYq9kvdOu0Uiqnu0D16zq2vab1U/edit#gid=782357221"
+        },
+        "options": {}
+      },
+      "id": "07b2a67f-fdec-41d4-b6f8-4be6f51a4072",
+      "name": "Google Sheets3",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        700,
+        360
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11",
+    "saveExecutionProgress": "DEFAULT"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds": [
+        "'natashaazrah@hotmail.com',",
+        "'izlan190199@icloud.com',",
+        "'fungtingli315218@gmail.com',",
+        "'righazrhent@gmail.com',",
+        "'aisyjalal@gmail.com',",
+        "'jenjenliew@gmail.com',",
+        "'nicholasting39@gmail.com',",
+        "'annarshd@gmail.com',",
+        "'kyairunnidzam@yahoo.com.my',",
+        "'ssy070306@gmail.com',",
+        "'yeoyi_2@hotmail.com',",
+        "' live.love.accessories@gmail.com',",
+        "'helmi77@gmail.com',",
+        "'errisshahrol@gmail.com',",
+        "'yks7268@gmail.com ',",
+        "'azzuddinazmi@gmail.com',",
+        "'kennykrichard@hotmail.com',",
+        "'Jusaidashaidin@icloud.com',",
+        "'cassahafiz95@gmail.com',",
+        "'takeuchitoshiyasu@gmail.com',",
+        "'alephazardr@gmail.com',",
+        "'chrisy_c_l@hotmail.com',",
+        "'jsalimeu@gmail.com',",
+        "'nafeesaamira@gmail.com',",
+        "'peterwkl1984@gmail.com',",
+        "'tch0106@hotmail.com',",
+        "'muhdazzuan@icloud.com',",
+        "'ainnossro@gmail.com',",
+        "'mjadri57@gmail.com',",
+        "'kbx8694@gmail.com',",
+        "'aaronleong1510@gmail.com',",
+        "'tehpeiwen92@gmail.com',",
+        "'engku.azhari@yahoo.com',",
+        "'alvinlimyx@gmail.com',",
+        "'apismaf77@gmail.com',",
+        "'atikah.4811@gmail.com',",
+        "'kenny.yapas@outlook.com',",
+        "'gunallan@gmail.com',",
+        "'mohd.saza@gmail.com',",
+        "'farisamir@gmail.com',",
+        "'jlairbus@gmail.com',",
+        "'yvonnechan07@gmail.com',",
+        "'driver2tad@gmail.com',",
+        "'fridabeautycartel@gmail.com',",
+        "'merckx21@gmail.com',",
+        "'manja85darwish@gmail.com',",
+        "'aie.amir@gmail.com',",
+        "'ramdan34103@gmail.com',",
+        "'mohdazriujang00@gmail.com',",
+        "'atina.ptt@gmail.com',",
+        "'laicheehiong@gmail.com',",
+        "'halfpiece76@gmail.com',",
+        "'arinais_96@yahoo.com',",
+        "'hadie9203@gmail.com',",
+        "'azwana1810@gmail.com',",
+        "'myrul_95@yahoo.com',",
+        "'amelyalee@ymail.com',",
+        "'mfakhzan@gmail.com',",
+        "'nuzulmahdi@gmail.com',",
+        "'faridaiman6@yahoo.com',",
+        "'afiqah.aziz88@gmail.com',",
+        "'Gtlee9999@gmail.com',",
+        "'msarorashdan@hotmail.com',",
+        "'joshuajaecyprinus@gmail.com',",
+        "'nhayati82@gmail.com',",
+        "'Nathan.Menon@Yahoo.Com',",
+        "'rezwan_wnzz@yahoo.com',",
+        "'azmanmuda@gmail.com',",
+        "'billadon244@gmail.com',",
+        "'azrimohammad60@gmail.com',",
+        "'zarrinfakhriazizan@gmail.com',",
+        "'azlanazman91@gmail.com',",
+        "'ricson6219@gmail.com',",
+        "'mdazwan09@gmail.com',",
+        "'brain333444@hotmail.com',",
+        "'yusnita2603@gmail.com',",
+        "'ridhwanolaff@gmail.com',",
+        "'sammychan860@gmail.com',",
+        "'sonnykazu@gmail.com',",
+        "'dassl_ali@yahoo.com',",
+        "'masaki5335@gmail.com',",
+        "'yongjianjian71@gmail.com',",
+        "'azriproton@yahoo.com',",
+        "'aidenlow88@gmail.com',",
+        "'afkariaziz1989@gmail.com',",
+        "'i_lan89@yahoo.com',",
+        "'aidenlow88@gmail.com',",
+        "'bb_farydah@yahoo.com',",
+        "'aidenlow88@gmail.com',",
+        "'aidenlow88@gmail.com',",
+        "'farihann@gmail.com',",
+        "'c3llobass@hotmail.com',",
+        "'bmw0175803316@gmail.com',",
+        "'lilycmk2007@yahoo.com',",
+        "'asyrafhafizi.id@gmail.com',",
+        "'tmohan069@yahoo.com',",
+        "'beegze@yahoo.com',",
+        "'wongpowlongtrevo@gmail.com',",
+        "'Zurahzie94@gmail.com',",
+        "'Zurahzie94@gmail.com',",
+        "'ishaqberu@gmail.com',",
+        "'sarahteh@gmail.com',",
+        "'kenneyhoo@hotmail.com',",
+        "'sittizubaidah87@gmail.com',",
+        "'idayu.ali@gmail.com',",
+        "'umaimahsuhaimi@gmail.com',",
+        "'zikril.azan1@yahoo.com',",
+        "'vuiliong6715@hotmail.com',",
+        "'hockheng.auto@outlook.com ',",
+        "'Toi_let8@hotmail.com',",
+        "'cheeonn9198@gmail.com',",
+        "'Farisbu@gmail.com',",
+        "'ytan831113@gmail.com',",
+        "'gobinatravichandran@gmail.com',",
+        "'johorgrab@gmail.com',",
+        "'reventon.lee@gmail.com',",
+        "'shunsankong@gmail.com',",
+        "'julianjuanis90@gmail.com',",
+        "'vijaycold19283166@gmail.com',",
+        "'kanoo_p@hotmail.com ',",
+        "'arsuhaida@gmail.com',",
+        "'tasiko@hotmail.com',",
+        "'Zaime.kz@gmail.com',",
+        "'izharbahriemib@gmail.com',",
+        "'saiponz.ppdl@gmail.com',",
+        "'zulkifliahmad117@gmail.com',",
+        "'rzwoo@yahoo.com',",
+        "'razin.com@gmail.com',",
+        "'thiban5580@gmail.com',",
+        "'faizaljaid@gmail.com',",
+        "'syafiqalkaff17@gmail.com',",
+        "'faezah_johar@yahoo.com',",
+        "'kangkai616@gmail.com',",
+        "'cws45@yahoo.com.sg',",
+        "'rubatharan@gmail.com',",
+        "'zaphkiel1508@gmail.com',",
+        "'khaty7170@gmail.com',",
+        "'mohdfaisaladam86@gmail.com',",
+        "'wwlung.96@gmail.com',",
+        "'johnsonhje@gmail.com',",
+        "'anmkumaran@gmail.com',",
+        "'islahzasd@gmail.com',",
+        "'azuwan.pkc@gmail.com',",
+        "'sab_abm@yahoo.com ',",
+        "'azril.azhari@gmail.com',",
+        "'wenchui1129@gmail.com ',",
+        "'faisal_pkm@rocketmail.com',",
+        "'magameaku@gmail.com',",
+        "'erina.cuckoo@gmail.com',",
+        "'parthiban_mc@ymail.com',",
+        "'jansideincome@gmail.com',",
+        "'mka89ayie@gmail.com',",
+        "'sunartumiran@gmail.com',",
+        "'amirfaiq5047@gmail.com',",
+        "'jiunyew98@gmail.com',",
+        "'butterlee27@gmail.com',",
+        "'test@gmail.com',",
+        "'christykoh13@yahoo.com',",
+        "'yusufjr95@gmail.com',",
+        "'afdalmus_lc135@yahoo.com',",
+        "'ahmadkamilrosli@yahoo.com',",
+        "'amosthien89@gmail.com',",
+        "'ghazali53@yahoo.com.sg',",
+        "'amritnebraj@gmail.com',",
+        "'alhafishamid@gmail.com',",
+        "'nursabirah93@gmail.com ',",
+        "'meshantini@gmail.com',",
+        "'sam828089@yahoo.com',",
+        "'arafjer@gmail.com',",
+        "'Kennyackk@gmail.com',",
+        "'Shenglee1995@gmail.com',",
+        "'siticircle90@gmail.com',",
+        "'jychew1982@gmail.com',",
+        "'annisa886@gmail.com',",
+        "'amierul_edu@yahoo.com',",
+        "'peryeelaw@yahoo.com',",
+        "'kavindra.herat@trevo.my',",
+        "'haziq.asyaraf@gmail.com',",
+        "'razzaramli84@gmail.com',",
+        "'smiley85_cute@yahoo.com',",
+        "'narendran_05@yahoo.com',",
+        "'haziq.asyaraf@gmail.com',",
+        "'muyassarahnur@gmail.com',",
+        "'mohamadhaizuddin@gmail.com',",
+        "'mrbija@gmail.com',",
+        "'jeevanrajmaniam@yahoo.com',",
+        "'vinodhanvennoo@gmail.com',",
+        "'pcchua4488@gmail.com',",
+        "'muhdnizam5887@gmail.com',",
+        "'muhdnizam5887@gmail.com',",
+        "'muhdnizam5887@gmail.com',",
+        "'shatar.enquiry@gmail.com',",
+        "'jeffreyignacio1982@yahoo.com',",
+        "'Christine_wcy@hotmail.com',",
+        "'fadzli165@gmail.com',",
+        "'suhaimumim@gmail.com',",
+        "'sadrieja@gmail.com',",
+        "'spanneer10@yahoo.com',",
+        "'yantzco@yahoo.com',",
+        "'annusairy@gmail.com',",
+        "'muhdariff96@gmail.com',",
+        "'payungcap2@gmail.com',",
+        "'karthikrajaseheran@gmail.com',",
+        "'preveena45@gmail.com',",
+        "'hasrizanajai4@gmail.com',",
+        "'rfiedah@gmail.com',",
+        "'fatehazainudin.kl@gmail.com',",
+        "'nurfahtenadia@gmail.com',",
+        "'ferjushaah@yahoo.com',",
+        "'sweekimleong11@gmail.com',",
+        "'farsuan@gmail.com',",
+        "'HOUWEI86Y@HOTMAIL.COM',",
+        "'akmalamin862@gmail.com',",
+        "'Tommy_2068@hotmail.com',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "'',",
+        "kavindra.herat@trevo.my",
+        "kavindra.herat@gmail.com",
+        "jiunyew98@gmail.com",
+        ""
+      ]
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2023-01-10T08:09:52.464Z",
+  "versionId": "adaae583-be8f-4fd8-b002-7518c2756c10"
+}
