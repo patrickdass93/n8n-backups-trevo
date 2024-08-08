@@ -1,0 +1,1155 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SIB API - Avai Reminder3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SIB API - Avai Reminder": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SIB API - Avai Reminder1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "[CT] - Host_PostSignup 3D",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "[CT] - Host_PostSignup 7D",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "[CT] - Host_PostSignup 30D",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[CT] - Host_PostSignup 30D": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[CT] - Host_PostSignup 7D": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[CT] - Host_PostSignup 3D": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-05-12T02:59:29.880Z",
+  "id": "72",
+  "name": "[KAVI] [HOST COMMUNITY] [POST-SIGN UP ACQUISITION] - Push Users to list a car [1.1, 1.2, 1.3]",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 18
+            }
+          ]
+        }
+      },
+      "id": "c4a46420-64fe-4a74-95c7-0ac6f5fb8b24",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        500,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * \nFROM users u \nwhere u.email = 'kavindra.herat@live.com'",
+        "options": {}
+      },
+      "id": "10f5c06b-f2c5-4b06-b370-cad3b1dbcd8c",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        500,
+        760
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n  \"to\": [{\"email\": \"{{ $node[\"Switch\"].json[\"email\"] }}\" }],\n  \"templateId\": 578\n}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API - Avai Reminder3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        2400,
+        -360
+      ],
+      "id": "b2d39404-a2e6-4906-b3c6-3bd0e3ef9f3b",
+      "retryOnFail": true,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "disabled": true,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"id\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['id']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function6",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        420,
+        -1200
+      ],
+      "id": "9b5661bc-9546-46fa-a061-9446a1a9287d",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n  \"to\": [{\"email\": \"{{ $json[\"email\"] }}\" }],\n  \"templateId\": 585\n}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API - Avai Reminder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        2400,
+        -160
+      ],
+      "id": "cf9eb8f3-d94f-4de9-9291-6d6c7341027d",
+      "retryOnFail": true,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "disabled": true,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"id\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['id']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        420,
+        -1000
+      ],
+      "id": "2c748c72-c49d-415d-a88b-bd54780c6ff4",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n  \"to\": [{\"email\": \"{{ $json[\"email\"] }}\" }],\n  \"templateId\": 585\n}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API - Avai Reminder1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        2400,
+        40
+      ],
+      "id": "2af7f640-100c-41b6-a3cc-b9f144f1f115",
+      "retryOnFail": true,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "disabled": true,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newListingIds = items.map(item => item.json[\"id\"]);\nconst oldListingIds = staticData.oldListingIds; \n\nif (!oldListingIds) {\n  staticData.oldListingIds = newListingIds;\n  return items;\n}\n\n\nconst ActualNewListingIds = newListingIds.filter((id) => !oldListingIds.includes(id));\nconst actualNewListing = items.filter((data) => ActualNewListingIds.includes(data.json['id']));\nstaticData.oldListingIds = [...ActualNewListingIds, ...oldListingIds];\n\nreturn actualNewListing;"
+      },
+      "name": "Function1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        420,
+        -800
+      ],
+      "id": "a45755c9-6bbe-4217-81f8-d11d8dadef8c",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.leanplum.com/api?action=startCampaign",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={ \"appId\" : \"app_BXrjE7dc15VWXDLRfh77tActhBhSkCHeQhETDE1mXfQ\", \"clientKey\" : \"dev_L9yBjOmwfR3fNiVjL9woIYfWzsy5hMcGDx0og8isAFw\", \"apiVersion\" : \"1.0.6\", \"userId\":\"{{ $node.Switch.json.uuid }}\", \"campaignId\":\"6127220903444480\", \"createDisposition\" : \"CreateNever\"}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "LP API - Send PN - Add User to Campaign1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        660,
+        -800
+      ],
+      "id": "130df013-ecaf-4e48-9d10-a21418582e57",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.leanplum.com/api?action=startCampaign",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={ \"appId\" : \"app_BXrjE7dc15VWXDLRfh77tActhBhSkCHeQhETDE1mXfQ\", \"clientKey\" : \"dev_L9yBjOmwfR3fNiVjL9woIYfWzsy5hMcGDx0og8isAFw\", \"apiVersion\" : \"1.0.6\", \"userId\":\"{{ $node.Switch.json.uuid }}\", \"campaignId\":\"5851111716618240\", \"createDisposition\" : \"CreateNever\"}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "LP API - Send PN - Add User to Campaign",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        860,
+        -800
+      ],
+      "id": "1ad56c4b-aa96-406c-b0ef-c53d99d386c8",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.leanplum.com/api?action=startCampaign",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={ \"appId\" : \"app_BXrjE7dc15VWXDLRfh77tActhBhSkCHeQhETDE1mXfQ\", \"clientKey\" : \"dev_L9yBjOmwfR3fNiVjL9woIYfWzsy5hMcGDx0og8isAFw\", \"apiVersion\" : \"1.0.6\", \"userId\":\"{{ $node.Switch.json.uuid }}\", \"campaignId\":\"6350503770914816\", \"createDisposition\" : \"CreateNever\"} ",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "LP API - Send PN - Add User to Campaign2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        -780
+      ],
+      "id": "7d2323a3-0e0a-4499-bdc5-df2bd121e750",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT distinct u.id\n, u.first_name\n, u.last_name\n, u.email\n, u.uuid\n, u.nationality \n, u.phone_country_code \n, u.phone_number \n, COUNT(distinct case when l.status = 'approved' then l.id END) as listings\n, now()::DATE - u.created_at::DATE AS days_since_created\nFROM users u \nLEFT JOIN tag_taggables tt ON tt.taggable_id = u.id \nLEFT JOIN tags t ON t.id = tt.tag_id \nleft join listings l on l.user_id = u.id \nWHERE 1=1\nand t.id = 2 \n  AND tt.taggable = 'users' \n  AND u.created_at >= now() - interval '35 days'\n  and u.phone_country_code = '+60'\n  and u.first_name not like 'test'\n  and u.status = 'active'\n  --and u.email = 'jiunyew98@gmail.com'\ngroup by 1,2,3,4,5,6,7,8\nhaving COUNT(distinct l.id) = 0",
+        "options": {}
+      },
+      "id": "4d49db0e-036e-4db5-b2ca-5c84b8213ee0",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        660,
+        -140
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "value1": "={{ $json.days_since_created }}",
+        "rules": {
+          "rules": [
+            {
+              "operation": "equal",
+              "value2": 3
+            },
+            {
+              "operation": "equal",
+              "value2": 7,
+              "output": 1
+            },
+            {
+              "operation": "equal",
+              "value2": 30,
+              "output": 2
+            }
+          ]
+        }
+      },
+      "id": "2ea1770d-bcf3-4690-aba5-1f3e77715155",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        820,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1kgTCDPI7204YjF4YUhWd6GnwzNI4S3XhvENO6H-cz0U",
+          "mode": "list",
+          "cachedResultName": "2023.05.29 - 1 Post Sign-Up Tracking",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kgTCDPI7204YjF4YUhWd6GnwzNI4S3XhvENO6H-cz0U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 159851140,
+          "mode": "list",
+          "cachedResultName": "1.2 7D",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kgTCDPI7204YjF4YUhWd6GnwzNI4S3XhvENO6H-cz0U/edit#gid=159851140"
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "timestamp",
+              "fieldValue": "={{ $node['Schedule Trigger'].json.timestamp }}"
+            },
+            {
+              "fieldId": "uid",
+              "fieldValue": "={{ $node.Switch.json.id }}"
+            },
+            {
+              "fieldId": "uuid",
+              "fieldValue": "={{ $node.Switch.json.uuid }}"
+            },
+            {
+              "fieldId": "phone_number",
+              "fieldValue": "={{ $node.Switch.json.phone_number }}"
+            },
+            {
+              "fieldId": "first name",
+              "fieldValue": "={{ $node.Switch.json.first_name }}"
+            },
+            {
+              "fieldId": "last name",
+              "fieldValue": "={{ $node.Switch.json.last_name }}"
+            },
+            {
+              "fieldId": "sibid",
+              "fieldValue": "={{ $node['SIB API - Avai Reminder'].json.messageId }}"
+            },
+            {
+              "fieldId": "lpsent",
+              "fieldValue": "={{ $json.status }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $node.Switch.json.email }}"
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "0f1e7e9c-1f38-4b3e-bf5e-5871f949d664",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1280,
+        -160
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1kgTCDPI7204YjF4YUhWd6GnwzNI4S3XhvENO6H-cz0U",
+          "mode": "list",
+          "cachedResultName": "2023.05.29 - 1 Post Sign-Up Tracking",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kgTCDPI7204YjF4YUhWd6GnwzNI4S3XhvENO6H-cz0U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 271187313,
+          "mode": "list",
+          "cachedResultName": "1.3 30D",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kgTCDPI7204YjF4YUhWd6GnwzNI4S3XhvENO6H-cz0U/edit#gid=271187313"
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "timestamp",
+              "fieldValue": "={{ $node['Schedule Trigger'].json.timestamp }}"
+            },
+            {
+              "fieldId": "uid",
+              "fieldValue": "={{ $node.Switch.json.id }}"
+            },
+            {
+              "fieldId": "uuid",
+              "fieldValue": "={{ $node.Switch.json.uuid }}"
+            },
+            {
+              "fieldId": "phone_number",
+              "fieldValue": "={{ $node.Switch.json.phone_number }}"
+            },
+            {
+              "fieldId": "first name",
+              "fieldValue": "={{ $node.Switch.json.first_name }}"
+            },
+            {
+              "fieldId": "last name",
+              "fieldValue": "={{ $node.Switch.json.last_name }}"
+            },
+            {
+              "fieldId": "sibid",
+              "fieldValue": "={{ $node['SIB API - Avai Reminder1'].json.messageId }}"
+            },
+            {
+              "fieldId": "lpsent",
+              "fieldValue": "={{ $json.status }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $node.Switch.json.email }}"
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "59eaa44d-dbd6-484c-906d-c97817136636",
+      "name": "Google Sheets2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1280,
+        60
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1kgTCDPI7204YjF4YUhWd6GnwzNI4S3XhvENO6H-cz0U",
+          "mode": "list",
+          "cachedResultName": "2023.05.29 - 1 Post Sign-Up Tracking",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kgTCDPI7204YjF4YUhWd6GnwzNI4S3XhvENO6H-cz0U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "1.1 3D",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kgTCDPI7204YjF4YUhWd6GnwzNI4S3XhvENO6H-cz0U/edit#gid=0"
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "timestamp",
+              "fieldValue": "={{ $node['Schedule Trigger'].json.timestamp }}"
+            },
+            {
+              "fieldId": "uid",
+              "fieldValue": "={{ $node.Switch.json.id }}"
+            },
+            {
+              "fieldId": "uuid",
+              "fieldValue": "={{ $node.Switch.json.uuid }}"
+            },
+            {
+              "fieldId": "phone_number",
+              "fieldValue": "={{ $node.Switch.json.phone_number }}"
+            },
+            {
+              "fieldId": "first name",
+              "fieldValue": "={{ $node.Switch.json.first_name }}"
+            },
+            {
+              "fieldId": "last name",
+              "fieldValue": "={{ $node.Switch.json.last_name }}"
+            },
+            {
+              "fieldId": "sibid",
+              "fieldValue": "="
+            },
+            {
+              "fieldId": "lpsent",
+              "fieldValue": "={{ $json.status }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $node.Switch.json.email }}"
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "4e4deffa-f027-4042-8031-3e9f6cc8ae27",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1280,
+        -360
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "content": "3D Reminder\n",
+        "height": 80
+      },
+      "id": "ded41be4-0f56-44c6-ad7e-d66c2c252721",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"uuid\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_Signup\",\n            \"evtData\": {\n                \"time_stamp\": \"immediate\"\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "5fbce627-82a2-48da-abfe-964ac67e460c",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1500,
+        -800
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "7D Reminder\n",
+        "height": 80
+      },
+      "id": "b7f854a7-2205-47f4-a668-b07829ae5a8c",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "content": "30D Reminder\n",
+        "height": 80
+      },
+      "id": "5a29677f-e335-4a1a-91ca-3d4dddc2e310",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $node.Switch.json.uuid }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_Signup\",\n            \"evtData\": {\n                \"time_stamp\": \"3d_reminder\"\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "0435757b-8cc4-4820-bfc8-e652c151b756",
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2580,
+        -360
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $node.Switch.json.uuid }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_Signup\",\n            \"evtData\": {\n                \"time_stamp\": \"7d_reminder\"\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "82f9bcd1-9c50-4962-a6c5-4e44ea1da007",
+      "name": "HTTP Request2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2580,
+        -160
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $node.Switch.json.uuid }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_Signup\",\n            \"evtData\": {\n                \"time_stamp\": \"30d_reminder\"\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "3b763c25-dd68-43e4-ba45-f993080a29c0",
+      "name": "HTTP Request3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2580,
+        40
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"uuid\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_PostSignup\",\n            \"evtData\": {\n                \"HPS_timestamp\": \"3d\"\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "face2393-8710-4dad-ba49-f453762920d5",
+      "name": "[CT] - Host_PostSignup 3D",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1060,
+        -360
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"uuid\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_PostSignup\",\n            \"evtData\": {\n                \"HPS_timestamp\": \"7d\"\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "6527244f-13d6-4fe4-b8b2-4d3f7a474447",
+      "name": "[CT] - Host_PostSignup 7D",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1060,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"uuid\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_PostSignup\",\n            \"evtData\": {\n                \"HPS_timestamp\": \"7d\"\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "7efee915-6f8e-48b9-b81c-381c4044bbfc",
+      "name": "[CT] - Host_PostSignup 30D",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1060,
+        60
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "callerPolicy": "any",
+    "errorWorkflow": "11",
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "global": {
+      "oldListingIds": [
+        "Top.infinity33@gmail.com",
+        "powforchai@gmail.com",
+        "Mohdaizuddinelias@gmail.com",
+        "outback-heirs0e@icloud.com",
+        "sitifatimahhhameer@gmail.com",
+        "saffiyyahfarhana@gmail.com",
+        "sharizalmalek@gmail.com",
+        "tharma_remo@yahoo.com",
+        " kriticarani@rocketmail.com",
+        "linges39@gmail.com",
+        "cpebizs@gmail.com",
+        19217,
+        20190,
+        23254,
+        27519,
+        27551,
+        32133,
+        33151,
+        35444,
+        35561,
+        36079,
+        36365,
+        36521,
+        37333,
+        38267,
+        38439,
+        39151,
+        40735,
+        40921,
+        41127,
+        41608,
+        41724,
+        41749,
+        42137,
+        42399,
+        42707,
+        42849,
+        12899,
+        19353,
+        23956,
+        26261,
+        27750,
+        28472,
+        29017,
+        31146,
+        31379,
+        33164,
+        33615,
+        33926,
+        35551,
+        36174,
+        36585,
+        37073,
+        37713,
+        37728,
+        38029,
+        38260,
+        38434,
+        38473,
+        39563,
+        39641,
+        39660,
+        39933,
+        40012,
+        40057,
+        40116,
+        40220,
+        40301,
+        40892,
+        41136,
+        41268,
+        41270,
+        41407,
+        41682,
+        42300,
+        42343,
+        42438,
+        42662,
+        42690,
+        42743,
+        34796,
+        39374,
+        41105,
+        20054,
+        36923,
+        27043,
+        19995,
+        39889,
+        26974,
+        39701,
+        38092,
+        41642,
+        18799,
+        39734,
+        1740,
+        40531,
+        36804,
+        38580,
+        26805,
+        14675,
+        34334,
+        40629,
+        21248,
+        28915,
+        41586,
+        41148,
+        41139,
+        39738,
+        35016,
+        27715,
+        39435,
+        26309,
+        35073,
+        2038,
+        36791,
+        39062,
+        37948,
+        38875,
+        30729,
+        39692,
+        32406,
+        24942,
+        40221,
+        38458,
+        38202,
+        37568,
+        32750,
+        35103,
+        41550,
+        39269,
+        37792,
+        36274,
+        35383,
+        25601,
+        12864,
+        41012,
+        37433,
+        32621,
+        33630,
+        27474,
+        38553,
+        21778,
+        2497,
+        40593,
+        28185,
+        31155,
+        35009,
+        1167,
+        41172,
+        34700,
+        17005,
+        41974,
+        39461,
+        39439,
+        40705,
+        33820,
+        10983,
+        1266,
+        39774,
+        34695,
+        40850,
+        36282,
+        35342,
+        40760,
+        1166,
+        14683,
+        840,
+        37105,
+        38286,
+        40753,
+        28301,
+        32796,
+        33760,
+        40946,
+        39536,
+        39717,
+        40502,
+        36721,
+        36427,
+        36069,
+        32385,
+        40786,
+        37724,
+        37392,
+        6871,
+        41785,
+        37198,
+        31404,
+        39170,
+        37529,
+        39371,
+        39373,
+        36415,
+        36968,
+        39960,
+        19972,
+        40670,
+        17984,
+        39343,
+        40835,
+        39622,
+        30316,
+        41135,
+        31632,
+        34878,
+        38573,
+        33659,
+        41011,
+        35567,
+        38925,
+        34917,
+        40896,
+        37706,
+        39999,
+        39279,
+        9708,
+        38912,
+        33302,
+        6107,
+        29539,
+        39837,
+        38311,
+        38218,
+        28724,
+        35373,
+        9552,
+        27319,
+        848,
+        28436,
+        6,
+        1,
+        2,
+        3,
+        4,
+        5,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "node:Schedule Trigger1": {
+      "recurrencyRules": [
+        96
+      ]
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2022-12-15T07:35:21.640Z",
+      "updatedAt": "2022-12-15T07:35:21.640Z",
+      "id": "2",
+      "name": "MY"
+    },
+    {
+      "createdAt": "2023-05-12T02:58:32.100Z",
+      "updatedAt": "2023-05-12T02:58:32.100Z",
+      "id": "7",
+      "name": "Host CRM"
+    },
+    {
+      "createdAt": "2023-05-12T02:58:38.207Z",
+      "updatedAt": "2023-05-12T02:58:38.207Z",
+      "id": "8",
+      "name": "Host Community"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-05-23T02:56:51.146Z",
+  "versionId": "93361744-6a18-4f2e-a6e7-f329c70f3cb6"
+}
