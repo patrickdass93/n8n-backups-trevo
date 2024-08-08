@@ -1,0 +1,372 @@
+{
+  "active": false,
+  "connections": {
+    "Freshdesk": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Current Timestamp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Current Timestamp": {
+      "main": [
+        [
+          {
+            "node": "Get Day Before",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Day Before": {
+      "main": [
+        [
+          {
+            "node": "Freshdesk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-01-15T01:50:03.085Z",
+  "id": "Y21HPadJ8FB8smlL",
+  "name": "[CX] Trevo MY - Unresolved Ticket (Ageing)",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "options": {
+          "include": [
+            "stats"
+          ],
+          "updatedSince": "={{ $json.newDate }}"
+        }
+      },
+      "id": "71dbec1d-b9a9-4719-8384-15ea3e046f60",
+      "name": "Freshdesk",
+      "type": "n8n-nodes-base.freshdesk",
+      "typeVersion": 1,
+      "position": [
+        880,
+        140
+      ],
+      "credentials": {
+        "freshdeskApi": {
+          "id": "22",
+          "name": "SOCAR CS Freshdesk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "a08fbf82-991d-4476-9ea8-9c4a40626eec",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        360,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.custom_fields.cf_level1 }}",
+              "value2": "TREVO Bookings Conversion"
+            }
+          ]
+        }
+      },
+      "id": "3f1a63c0-a333-473b-abe5-7fe48bcba836",
+      "name": "Filter",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1ExvnVjrvgbNx7RqLG4B4ZLwKZcDftcQQgOTDJgElATI",
+          "mode": "list",
+          "cachedResultName": "[TREVO MY] [API] Unsuccessful Booking",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ExvnVjrvgbNx7RqLG4B4ZLwKZcDftcQQgOTDJgElATI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 915418252,
+          "mode": "list",
+          "cachedResultName": "N8N Paste",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ExvnVjrvgbNx7RqLG4B4ZLwKZcDftcQQgOTDJgElATI/edit#gid=915418252"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "adjusted_created_at": "={{ $json.stats.resolved_at }}",
+            "cf_level1": "={{ $json.custom_fields.cf_level1 }}",
+            "cf_level2": "={{ $json.custom_fields.cf_level2 }}",
+            "cf_level3": "={{ $json.custom_fields.cf_level3 }}",
+            "booking_ref_no": "={{ $json.custom_fields.cf_booking_ref_num }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "adjusted_created_at",
+              "displayName": "adjusted_created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cf_level1",
+              "displayName": "cf_level1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cf_level2",
+              "displayName": "cf_level2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cf_level3",
+              "displayName": "cf_level3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "booking_ref_no",
+              "displayName": "booking_ref_no",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "requester_email",
+              "displayName": "requester_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "New Gross Amount",
+              "displayName": "New Gross Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "New Net Amount",
+              "displayName": "New Net Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "New Booking Status",
+              "displayName": "New Booking Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "New Created Time",
+              "displayName": "New Created Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "43ea89ed-6905-4aa5-868d-156f61b444a2",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1720,
+        140
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $json.created_at }}",
+        "options": {
+          "timezone": false
+        }
+      },
+      "id": "c90a7a3c-3838-42b3-8cf2-23c1e4fc820f",
+      "name": "Date & Time",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        220
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "11ca7331-a52d-45da-9d66-d0c7d48b8f3c",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        1540,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "71bd4381-8a59-4c36-9bf9-6cf2b67cec9d",
+      "name": "Get Current Timestamp",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        520,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "subtractFromDate",
+        "magnitude": "={{ $json.currentDate }}",
+        "duration": 1
+      },
+      "id": "7d7396e0-2ad8-4621-afeb-03087e406ec8",
+      "name": "Get Day Before",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        700,
+        140
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-01-15T01:50:03.085Z",
+  "versionId": "64c4c381-5cac-4bd5-8cce-e6c1cfc5e1bf"
+}
