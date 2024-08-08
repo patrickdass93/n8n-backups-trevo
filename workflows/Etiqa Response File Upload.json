@@ -1,0 +1,207 @@
+{
+  "active": false,
+  "connections": {
+    "FTP": {
+      "main": [
+        [
+          {
+            "node": "FTP1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FTP1": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "FTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-07-01T06:15:11.802Z",
+  "id": "geapUx7ANqWF9Nym",
+  "name": "Etiqa Response File Upload",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "list",
+        "path": "MBB/"
+      },
+      "id": "5d8cc59f-b850-4b46-b25f-adb2e93eb799",
+      "name": "FTP",
+      "type": "n8n-nodes-base.ftp",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ],
+      "credentials": {
+        "ftp": {
+          "id": "W1Z48U7S6PiaXxTg",
+          "name": "Etiqa FTP Server"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "name": "={{ $json.name }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "https://drive.google.com/drive/folders/1_-3hoJSg2k7MqdtMgdEjfkUpk-Lba_Ly",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "id": "564fc511-5692-4b57-aa79-4a5bd5569f2a",
+      "name": "Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        880,
+        300
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "Google Chat [Pat]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "={{ $json.path }}"
+      },
+      "id": "70f89b2a-b6d3-4f72-abda-5b58c764d969",
+      "name": "FTP1",
+      "type": "n8n-nodes-base.ftp",
+      "typeVersion": 1,
+      "position": [
+        600,
+        300
+      ],
+      "credentials": {
+        "ftp": {
+          "id": "W1Z48U7S6PiaXxTg",
+          "name": "Etiqa FTP Server"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "path": "=MBB/EGIB_P2PBOOKING_TREVO_20240731.csv",
+        "options": {}
+      },
+      "id": "ec6b1a99-944f-4195-9810-aaf7187f9bc5",
+      "name": "FTP2",
+      "type": "n8n-nodes-base.ftp",
+      "typeVersion": 1,
+      "position": [
+        540,
+        100
+      ],
+      "credentials": {
+        "ftp": {
+          "id": "W1Z48U7S6PiaXxTg",
+          "name": "Etiqa FTP Server"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.name }}",
+              "operation": "contains",
+              "value2": "EGIBRSP"
+            }
+          ]
+        }
+      },
+      "id": "450b0168-d19a-4fc5-a02c-113e2abd9714",
+      "name": "Filter",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 1,
+      "position": [
+        740,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "eb8df80b-b099-41ef-b90f-cbf6ea334887",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        300,
+        300
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2023-03-31T06:52:09.032Z",
+      "updatedAt": "2023-03-31T06:52:09.032Z",
+      "id": "5",
+      "name": "Patrick"
+    },
+    {
+      "createdAt": "2023-11-07T06:07:39.984Z",
+      "updatedAt": "2023-11-07T06:07:39.984Z",
+      "id": "tJPYx3rezCqNjki3",
+      "name": "Insurance"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2024-08-08T02:57:18.774Z",
+  "versionId": "8d584be3-1b2d-4883-a0c9-b9872dc16086"
+}
