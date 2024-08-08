@@ -1,0 +1,643 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Clear Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Processed Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear Sheet": {
+      "main": [
+        [
+          {
+            "node": "Weekly Raw Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weekly Raw Data": {
+      "main": [
+        [
+          {
+            "node": "Weekly Raw Data - Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weekly Raw Data - Sheet": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Processed Sheets": {
+      "main": [
+        [
+          {
+            "node": "SendInBlue - Update Attributes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SendInBlue - Update Attributes": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-03-30T06:11:47.024Z",
+  "id": "55",
+  "name": "[CX] - ID Host Weekly Statement",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                4
+              ],
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "id": "964e267c-335a-4c34-a476-7520e8a2121e",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        560,
+        540
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 10,
+        "unit": "seconds"
+      },
+      "id": "3a944720-66ac-42d9-94d5-5e9f52e7be88",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        540
+      ],
+      "webhookId": "cfea4838-57bb-44b4-946b-ae820b6586b0"
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1JSVoiFcgZOQ1Nta2mivJW7q_v6QSlQub4fDC9y0E7BI",
+          "mode": "list",
+          "cachedResultName": "[TREVO ID] [n8n] Host Weekly Payout",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JSVoiFcgZOQ1Nta2mivJW7q_v6QSlQub4fDC9y0E7BI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1148559864,
+          "mode": "list",
+          "cachedResultName": "RAW",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gDedi2SnusO3F33VJnb89rvbKOf8UfUari4ePlR1Hfc/edit#gid=1148559864"
+        },
+        "clear": "specificRange",
+        "range": "A2:X"
+      },
+      "id": "7d7d7630-987f-4089-bcbd-76e18dbac17c",
+      "name": "Clear Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        700,
+        540
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH unique_users AS\n(\n       SELECT u.uuid ,\n              u.id AS user_id ,\n              u.email ,\n              CASE\n                     WHEN u.display_name IS NOT NULL THEN u.display_name\n                     ELSE CONCAT(u.first_name,' ',u.last_name)\n              END AS user_name\n       FROM   users u\n       JOIN   user_attributions ua\n       ON     ua.user_id = u.id\n       WHERE  1=1\n       AND    u.status = 'active'\n       AND    ((\n                            ua.KEY = 'current-country'\n                     AND    ua.value = 'ID'\n                     AND    u.dob > '1900-01-01')\n              OR     (\n                            ua.KEY = 'signup-country'\n                     AND    ua.value = 'ID'\n                     AND    u.dob > '1900-01-01'))\n       OR     u.phone_country_code IN ('+62') ) , approved_listings AS\n(\n          SELECT    l.id              AS listing_id ,\n                    l.registration_no AS plate_no ,\n                    l.url ,\n                    l.user_id AS host_id\n          FROM      listings l\n          LEFT JOIN listing_location ll\n          ON        ll.listing_id = l.id\n          WHERE     1=1\n          AND       l.status   IN ('approved')\n          AND       ll.country IN ('Indonesia')\n          AND       l.deleted_at IS NULL ) , all_bookings AS\n(\n                SELECT DISTINCT\n                ON (\n                                                b.id) -- Booking Details\n                                b.id AS booking_id ,\n                                b.listing_id ,\n                                l.host_id ,\n                                u.uuid ,\n                                u.user_name ,\n                                u.email ,\n                                l.plate_no ,\n                                l.url ,\n                                cc.NAME  AS plan_name ,\n                                b.ref_no AS booking_ref ,\n                                CASE\n                                                WHEN b.reason ~~* '%test%' THEN 'test'\n                                                WHEN b.status  IN ('cancelled',\n                                                                   'withdrawn')\n                                                AND             (\n                                                                                b.reason ~~* '%host%'\n                                                                OR              b.reason ~~* '%kunci%'\n                                                                OR              b.reason ~~* '%available%'\n                                                                OR              b.reason ~~* '%bisa%'\n                                                                OR              b.reason ~~* '%tidak datang%'\n                                                                OR              b.reason ~~* '%pemilik%'\n                                                                OR              b.reason ~~* '%late%'\n                                                                OR              b.reason ~~* '%mobil tidak%'\n                                                                OR              b.reason ~~* '%tersedia%'\n                                                                OR              b.reason ~~* '%ready%'\n                                                                OR              b.reason ~~* '%full%'\n                                                                OR              b.reason ~~* '%never%'\n                                                                OR              b.reason ~~* '%rental%'\n                                                                OR              b.reason ~~* '%owner%'\n                                                                OR              b.reason ~~* '%belum%kabar%'\n                                                                OR              b.reason ~~* '%belum%tersedia%'\n                                                                OR              b.reason ~~* '%biaya%tambahan%'\n                                                                OR              b.reason ~~* '%host%tidak%hubungi%'\n                                                                OR              b.reason ~~* '%host%tidak%respon%'\n                                                                OR              b.reason ~~* '%mobil%kosong%'\n                                                                OR              b.reason ~~* '%mobil%tidak%ada%'\n                                                                OR              b.reason ~~* '%tambahan%biaya%'\n                                                                OR              b.reason ~~* '%tdk%tersedia%'\n                                                                OR              b.reason ~~* '%tidak%operasi%'\n                                                                OR              b.reason ~~* '%tidak%respon'\n                                                                OR              b.reason ~~* '%tidak%tersedia%'\n                                                                OR              b.reason ~~* '%uang%tambahan%'\n                                                                OR              b.reason ~~* '%cancel'\n                                                                OR              b.reason ~~* '%full%'\n                                                                OR              b.reason ~~* '%respond%' ) THEN 'rejected'\n                                                WHEN b.status IN ('rejected')\n                                                AND             (\n                                                                                b.reason ~~* '%sim %'\n                                                                OR              b.reason ~~* '%guest%'\n                                                                OR              b.reason ~~* '%expired%' ) THEN 'withdrawn'\n                                                ELSE b.status\n                                END                                                                 AS booking_status ,\n                                b.created_at at time zone 'Asia/Jakarta'                            AS booking_request_ts ,\n                                date_trunc('month', b.created_at at     time zone 'Asia/Jakarta')::date AS booking_request_month ,\n                                date_trunc('week', b.created_at at      time zone 'Asia/Jakarta')::date AS booking_request_week ,\n                                date_trunc('month', b.request_end_at at time zone 'Asia/Jakarta')::date AS booking_end_month ,\n                                date_trunc('week', b.request_end_at at  time zone 'Asia/Jakarta')::date AS booking_end_week ,\n                                ceil(extract(epoch FROM b.request_end_at - b.request_start_at)/86400)   AS booking_dur_days -- Booking Value\n                                ,\n                                bp.discount_amount AS discount,\n                                COALESCE(\n                                CASE\n                                                WHEN cc.NAME='Shield 25' THEN 0.2*bp.discount_amount\n                                                ELSE 0\n                                END,0) AS host_deduction,\n                                CASE\n                                                WHEN hp.booking_id IS NULL THEN ceil(b.gross_amount*(100-cc.PERCENT)/100)\n                                                ELSE hp.amount\n                                END AS payout_amount\n                FROM            bookings b\n                LEFT JOIN       booking_common_promos bp\n                ON              b.id=bp.booking_id\n                LEFT JOIN       approved_listings l\n                ON              l.listing_id = b.listing_id\n                LEFT JOIN       unique_users u\n                ON              u.user_id = l.host_id\n                LEFT JOIN       listing_commission_class lc\n                ON              lc.listing_id = b.listing_id\n                LEFT JOIN       commission_class cc\n                ON              cc.id = lc.commission_id\n                LEFT JOIN       payouts hp\n                ON              hp.booking_id = b.id\n                AND             hp.country ~* 'ID'\n                WHERE           b.currency = 'idr') , bookings_data AS\n(\n         SELECT   b.host_id ,\n                  b.uuid ,\n                  b.email ,\n                  b.user_name ,\n                  b.booking_end_week ,\n                  b.listing_id ,\n                  b.plate_no ,\n                  b.url ,\n                  b.plan_name ,\n                  count(DISTINCT\n                  CASE\n                           WHEN b.booking_status IN ('accepted',\n                                                     'completed',\n                                                     'start_driving',\n                                                     'waiting_for_inspection',\n                                                     'return_car',\n                                                     'cancelled',\n                                                     'rejected',\n                                                     'requested') THEN b.booking_id\n                           ELSE NULL\n                  END) AS received_booking ,\n                  count(DISTINCT\n                  CASE\n                           WHEN b.booking_status IN ('accepted',\n                                                     'completed',\n                                                     'start_driving',\n                                                     'waiting_for_inspection',\n                                                     'return_car') THEN b.booking_id\n                           ELSE NULL\n                  END) AS fulfiled_booking ,\n                  count(DISTINCT\n                  CASE\n                           WHEN b.booking_status IN ('completed',\n                                                     'start_driving',\n                                                     'waiting_for_inspection',\n                                                     'return_car') THEN b.booking_id\n                           ELSE NULL\n                  END) AS completed_booking ,\n                  sum(\n                  CASE\n                           WHEN b.booking_status IN ('completed',\n                                                     'start_driving',\n                                                     'waiting_for_inspection',\n                                                     'return_car')\n                           AND      b.discount IS NOT NULL THEN 1\n                           ELSE 0\n                  END) AS discounted_booking ,\n                  to_char(COALESCE(sum(\n                  CASE\n                           WHEN b.booking_status IN ('completed',\n                                                     'start_driving',\n                                                     'waiting_for_inspection',\n                                                     'return_car') THEN b.discount\n                           ELSE 0\n                  END),0),'fm999999999d') AS total_discount ,\n                  count(DISTINCT\n                  CASE\n                           WHEN b.booking_status IN ('rejected') THEN b.booking_id\n                           ELSE NULL\n                  END) AS rejected_booking ,\n                  to_char((count(DISTINCT\n                  CASE\n                           WHEN b.booking_status IN ('accepted',\n                                                     'completed',\n                                                     'start_driving',\n                                                     'waiting_for_inspection',\n                                                     'return_car') THEN b.booking_id\n                           ELSE NULL\n                  END)::decimal / NULLIF(count(DISTINCT\n                  CASE\n                           WHEN b.booking_status IN ('accepted',\n                                                     'completed',\n                                                     'start_driving',\n                                                     'waiting_for_inspection',\n                                                     'return_car',\n                                                     'cancelled',\n                                                     'rejected',\n                                                     'requested') THEN b.booking_id\n                           ELSE NULL\n                  END),0)::decimal)*100,'fm990D00%') AS fr ,\n                  sum(\n                  CASE\n                           WHEN b.booking_status IN ('completed',\n                                                     'start_driving',\n                                                     'waiting_for_inspection',\n                                                     'return_car') THEN b.booking_dur_days\n                           ELSE 0\n                  END) AS booking_dur_days ,\n                  to_char(sum(\n                  CASE\n                           WHEN b.booking_status IN ('accepted',\n                                                     'completed',\n                                                     'start_driving',\n                                                     'waiting_for_inspection',\n                                                     'return_car') THEN b.host_deduction\n                           ELSE 0\n                  END),'fm999999999d') AS host_deduction ,\n                  to_char(COALESCE(sum(\n                  CASE\n                           WHEN b.booking_status IN ('accepted',\n                                                     'completed',\n                                                     'start_driving',\n                                                     'waiting_for_inspection',\n                                                     'return_car') THEN b.payout_amount - b.host_deduction\n                           ELSE 0\n                  END),0),'fm999999999d') AS est_payout ,\n                  sum(\n                  CASE\n                           WHEN b.booking_status IN ('rejected') THEN b.payout_amount\n                           ELSE 0\n                  END) AS est_loss\n         FROM     all_bookings b\n         WHERE    booking_end_week = date_trunc('week', CURRENT_DATE - interval '1 WEEK')\n         GROUP BY 1,\n                  2,\n                  3,\n                  4,\n                  5,\n                  6,\n                  7,\n                  8,\n                  9)\nSELECT   concat(extract(day FROM date_trunc('week', CURRENT_DATE - interval '1 WEEK')), ' ',\n         CASE\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE - interval '1 WEEK'))=1 THEN 'Januari'\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE - interval '1 WEEK'))=2 THEN 'Februari'\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE - interval '1 WEEK'))=3 THEN 'Maret'\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE - interval '1 WEEK'))=4 THEN 'April'\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE - interval '1 WEEK'))=5 THEN 'Mei'\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE - interval '1 WEEK'))=6 THEN 'Juni'\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE - interval '1 WEEK'))=7 THEN 'Juli'\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE - interval '1 WEEK'))=8 THEN 'Agustus'\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE - interval '1 WEEK'))=9 THEN 'September'\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE - interval '1 WEEK'))=10 THEN 'Oktober'\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE - interval '1 WEEK'))=11 THEN 'November'\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE - interval '1 WEEK'))=12 THEN 'Desember'\n                  ELSE ''\n         END) AS weekstart,\n                  concat(extract(day FROM date_trunc('week', CURRENT_DATE) - interval '1 DAY'), ' ',\n         CASE\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE) - interval '1 DAY')=1 THEN 'Januari'\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE) - interval '1 DAY')=2 THEN 'Februari'\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE) - interval '1 DAY')=3 THEN 'Maret'\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE) - interval '1 DAY')=4 THEN 'April'\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE) - interval '1 DAY')=5 THEN 'Mei'\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE) - interval '1 DAY')=6 THEN 'Juni'\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE) - interval '1 DAY')=7 THEN 'Juli'\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE) - interval '1 DAY')=8 THEN 'Agustus'\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE) - interval '1 DAY')=9 THEN 'September'\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE) - interval '1 DAY')=10 THEN 'Oktober'\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE) - interval '1 DAY')=11 THEN 'November'\n                  WHEN extract(month FROM date_trunc('week', CURRENT_DATE) - interval '1 DAY')=12 THEN 'Desember'\n                  ELSE ''\n         END,' ', extract(year FROM date_trunc('week', CURRENT_DATE) - interval '1 DAY')) AS weekend,\n                  concat(extract(day FROM CURRENT_DATE), ' ',\n         CASE\n                  WHEN extract(month FROM CURRENT_DATE)=1 THEN 'Januari'\n                  WHEN extract(month FROM CURRENT_DATE)=2 THEN 'Februari'\n                  WHEN extract(month FROM CURRENT_DATE)=3 THEN 'Maret'\n                  WHEN extract(month FROM CURRENT_DATE)=4 THEN 'April'\n                  WHEN extract(month FROM CURRENT_DATE)=5 THEN 'Mei'\n                  WHEN extract(month FROM CURRENT_DATE)=6 THEN 'Juni'\n                  WHEN extract(month FROM CURRENT_DATE)=7 THEN 'Juli'\n                  WHEN extract(month FROM CURRENT_DATE)=8 THEN 'Agustus'\n                  WHEN extract(month FROM CURRENT_DATE)=9 THEN 'September'\n                  WHEN extract(month FROM CURRENT_DATE)=10 THEN 'Oktober'\n                  WHEN extract(month FROM CURRENT_DATE)=11 THEN 'November'\n                  WHEN extract(month FROM CURRENT_DATE)=12 THEN 'Desember'\n                  ELSE ''\n         END) AS estweekstart,\n                  concat(extract(day FROM CURRENT_DATE + interval '5 DAY'), ' ',\n         CASE\n                  WHEN extract(month FROM CURRENT_DATE + interval '5 DAY')=1 THEN 'Januari'\n                  WHEN extract(month FROM CURRENT_DATE + interval '5 DAY')=2 THEN 'Februari'\n                  WHEN extract(month FROM CURRENT_DATE + interval '5 DAY')=3 THEN 'Maret'\n                  WHEN extract(month FROM CURRENT_DATE + interval '5 DAY')=4 THEN 'April'\n                  WHEN extract(month FROM CURRENT_DATE + interval '5 DAY')=5 THEN 'Mei'\n                  WHEN extract(month FROM CURRENT_DATE + interval '5 DAY')=6 THEN 'Juni'\n                  WHEN extract(month FROM CURRENT_DATE + interval '5 DAY')=7 THEN 'Juli'\n                  WHEN extract(month FROM CURRENT_DATE + interval '5 DAY')=8 THEN 'Agustus'\n                  WHEN extract(month FROM CURRENT_DATE + interval '5 DAY')=9 THEN 'September'\n                  WHEN extract(month FROM CURRENT_DATE + interval '5 DAY')=10 THEN 'Oktober'\n                  WHEN extract(month FROM CURRENT_DATE + interval '5 DAY')=11 THEN 'November'\n                  WHEN extract(month FROM CURRENT_DATE + interval '5 DAY')=12 THEN 'Desember'\n                  ELSE ''\n         END,' ', extract(year FROM CURRENT_DATE + interval '5 DAY')) AS estweekend,\n         *\nFROM     bookings_data\nWHERE    1=1\nAND      received_booking > 0\nAND      host_id NOT IN ( -- Trevo Operated\n                         93151,\n                         280508,\n                         951523, -- Non Car\n                         353865,\n                         478706,\n                         451183,\n                         1168033,\n                         285505,\n                         102,\n                         2272516 )\n         /*AND      host_id IN ( 126582,\n848165,\n1447243,\n1215945,\n98167,\n90409,\n291231,\n329663,\n379472,\n832140,\n1073731,\n575968 )*/\nORDER BY 1,\n         15 DESC",
+        "additionalFields": {}
+      },
+      "id": "31c5b6cd-1587-41f5-87b2-d5373ddd593b",
+      "name": "Weekly Raw Data",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        840,
+        540
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "16",
+          "name": "trevodb_recreated"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1JSVoiFcgZOQ1Nta2mivJW7q_v6QSlQub4fDC9y0E7BI",
+          "mode": "list",
+          "cachedResultName": "[TREVO ID] [n8n] Host Weekly Payout",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JSVoiFcgZOQ1Nta2mivJW7q_v6QSlQub4fDC9y0E7BI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1148559864,
+          "mode": "list",
+          "cachedResultName": "RAW",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gDedi2SnusO3F33VJnb89rvbKOf8UfUari4ePlR1Hfc/edit#gid=1148559864"
+        },
+        "dataMode": "autoMapInputData",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "ec114e9b-1a04-412d-93ee-12da62e479f2",
+      "name": "Weekly Raw Data - Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        980,
+        540
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1JSVoiFcgZOQ1Nta2mivJW7q_v6QSlQub4fDC9y0E7BI",
+          "mode": "list",
+          "cachedResultName": "[TREVO ID] [n8n] Host Weekly Payout",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JSVoiFcgZOQ1Nta2mivJW7q_v6QSlQub4fDC9y0E7BI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2030623506,
+          "mode": "list",
+          "cachedResultName": "Final",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eFv3fMg-eDhLJyyiTCtwZL70crk9dAn3GV3FjZOQfmg/edit#gid=2030623506"
+        },
+        "options": {
+          "outputFormatting": {
+            "values": {
+              "general": "FORMATTED_VALUE",
+              "date": "FORMATTED_STRING"
+            }
+          }
+        }
+      },
+      "id": "3df8279f-300d-4fd6-916e-c2b9652724fc",
+      "name": "Processed Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1260,
+        540
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendTemplate",
+        "templateId": 528,
+        "receipients": "={{ $node[\"Processed Sheets\"].json[\"EMAIL\"] }}",
+        "additionalFields": {}
+      },
+      "id": "56576a82-0d6a-4045-a0f4-543239dbbfe5",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.sendInBlue",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        540
+      ],
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "upsert",
+        "email": "={{ $node[\"Processed Sheets\"].json[\"EMAIL\"] }}",
+        "upsertAttributes": {
+          "upsertAttributesValues": [
+            {
+              "fieldName": "HOSTNAME",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"HOSTNAME\"] }}"
+            },
+            {
+              "fieldName": "COMPBOOKING",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"COMPBOOKING\"] }}"
+            },
+            {
+              "fieldName": "COMPDAYS",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"COMPDAYS\"] }}"
+            },
+            {
+              "fieldName": "ESTPAYOUT",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"ESTPAYOUT\"] }}"
+            },
+            {
+              "fieldName": "WEEKSTART",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"WEEKSTART\"] }}"
+            },
+            {
+              "fieldName": "WEEKEND",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"WEEKEND\"] }}"
+            },
+            {
+              "fieldName": "C1PLATE",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C1PLATE\"] }}"
+            },
+            {
+              "fieldName": "C1REQUESTBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C1REQUESTBOOK\"] }}"
+            },
+            {
+              "fieldName": "C1REJECTBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C1REJECTBOOK\"] }}"
+            },
+            {
+              "fieldName": "C1COMPBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C1COMPBOOK\"] }}"
+            },
+            {
+              "fieldName": "C1DAYSBOOKED",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C1DAYSBOOKED\"] }}"
+            },
+            {
+              "fieldName": "C1HOSTDEDUCTION",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C1HOSTDEDUCTION\"] }}"
+            },
+            {
+              "fieldName": "C1ESTPAYOUT",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C1ESTPAYOUT\"] }}"
+            },
+            {
+              "fieldName": "C1ESTLOSS",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C1ESTLOSS\"] }}"
+            },
+            {
+              "fieldName": "C1ACCEPTRATE",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C1ACCEPTRATE\"] }}"
+            },
+            {
+              "fieldName": "C1URL",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C1URL\"] }}"
+            },
+            {
+              "fieldName": "C2PLATE",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C2PLATE\"] }}"
+            },
+            {
+              "fieldName": "C2REQUESTBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C2REQUESTBOOK\"] }}"
+            },
+            {
+              "fieldName": "C2REJECTBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C2REJECTBOOK\"] }}"
+            },
+            {
+              "fieldName": "C2COMPBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C2COMPBOOK\"] }}"
+            },
+            {
+              "fieldName": "C2DAYSBOOKED",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C2DAYSBOOKED\"] }}"
+            },
+            {
+              "fieldName": "C2HOSTDEDUCTION",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C2HOSTDEDUCTION\"] }}"
+            },
+            {
+              "fieldName": "C2ESTPAYOUT",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C2ESTPAYOUT\"] }}"
+            },
+            {
+              "fieldName": "C2ESTLOSS",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C2ESTLOSS\"] }}"
+            },
+            {
+              "fieldName": "C2ACCEPTRATE",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C2ACCEPTRATE\"] }}"
+            },
+            {
+              "fieldName": "C2URL",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C2URL\"] }}"
+            },
+            {
+              "fieldName": "C3PLATE",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C3PLATE\"] }}"
+            },
+            {
+              "fieldName": "C3REQUESTBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C3REQUESTBOOK\"] }}"
+            },
+            {
+              "fieldName": "C3REJECTBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C3REJECTBOOK\"] }}"
+            },
+            {
+              "fieldName": "C3COMPBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C3COMPBOOK\"] }}"
+            },
+            {
+              "fieldName": "C3DAYSBOOKED",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C3DAYSBOOKED\"] }}"
+            },
+            {
+              "fieldName": "C3HOSTDEDUCTION",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C3HOSTDEDUCTION\"] }}"
+            },
+            {
+              "fieldName": "C3ESTPAYOUT",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C3ESTPAYOUT\"] }}"
+            },
+            {
+              "fieldName": "C3ESTLOSS",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C3ESTLOSS\"] }}"
+            },
+            {
+              "fieldName": "C3ACCEPTRATE",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C3ACCEPTRATE\"] }}"
+            },
+            {
+              "fieldName": "C3URL",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C3URL\"] }}"
+            },
+            {
+              "fieldName": "C4PLATE",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C4PLATE\"] }}"
+            },
+            {
+              "fieldName": "C4REQUESTBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C4REQUESTBOOK\"] }}"
+            },
+            {
+              "fieldName": "C4REJECTBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C4REJECTBOOK\"] }}"
+            },
+            {
+              "fieldName": "C4COMPBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C4COMPBOOK\"] }}"
+            },
+            {
+              "fieldName": "C4DAYSBOOKED",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C4DAYSBOOKED\"] }}"
+            },
+            {
+              "fieldName": "C4HOSTDEDUCTION",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C4HOSTDEDUCTION\"] }}"
+            },
+            {
+              "fieldName": "C4ESTPAYOUT",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C4ESTPAYOUT\"] }}"
+            },
+            {
+              "fieldName": "C4ESTLOSS",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C4ESTLOSS\"] }}"
+            },
+            {
+              "fieldName": "C4ACCEPTRATE",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C4ACCEPTRATE\"] }}"
+            },
+            {
+              "fieldName": "C4URL",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C4URL\"] }}"
+            },
+            {
+              "fieldName": "C5PLATE",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C5PLATE\"] }}"
+            },
+            {
+              "fieldName": "C5REQUESTBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C5REQUESTBOOK\"] }}"
+            },
+            {
+              "fieldName": "C5REJECTBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C5REJECTBOOK\"] }}"
+            },
+            {
+              "fieldName": "C5COMPBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C5COMPBOOK\"] }}"
+            },
+            {
+              "fieldName": "C5DAYSBOOKED",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C5DAYSBOOKED\"] }}"
+            },
+            {
+              "fieldName": "C5HOSTDEDUCTION",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C5HOSTDEDUCTION\"] }}"
+            },
+            {
+              "fieldName": "C5ESTPAYOUT",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C5ESTPAYOUT\"] }}"
+            },
+            {
+              "fieldName": "C5ESTLOSS",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C5ESTLOSS\"] }}"
+            },
+            {
+              "fieldName": "C5ACCEPTRATE",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C5ACCEPTRATE\"] }}"
+            },
+            {
+              "fieldName": "C5URL",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C5URL\"] }}"
+            },
+            {
+              "fieldName": "C6PLATE",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C6PLATE\"] }}"
+            },
+            {
+              "fieldName": "C6REQUESTBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C6REQUESTBOOK\"] }}"
+            },
+            {
+              "fieldName": "C6REJECTBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C6REJECTBOOK\"] }}"
+            },
+            {
+              "fieldName": "C6COMPBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C6COMPBOOK\"] }}"
+            },
+            {
+              "fieldName": "C6DAYSBOOKED",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C6DAYSBOOKED\"] }}"
+            },
+            {
+              "fieldName": "C6HOSTDEDUCTION",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C6HOSTDEDUCTION\"] }}"
+            },
+            {
+              "fieldName": "C6ESTPAYOUT",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C6ESTPAYOUT\"] }}"
+            },
+            {
+              "fieldName": "C6ESTLOSS",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C6ESTLOSS\"] }}"
+            },
+            {
+              "fieldName": "C6ACCEPTRATE",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C6ACCEPTRATE\"] }}"
+            },
+            {
+              "fieldName": "C6URL",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C6URL\"] }}"
+            },
+            {
+              "fieldName": "C1DISCBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C1DISCBOOK\"] }}"
+            },
+            {
+              "fieldName": "C2DISCBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C2DISCBOOK\"] }}"
+            },
+            {
+              "fieldName": "C3DISCBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C3DISCBOOK\"] }}"
+            },
+            {
+              "fieldName": "C4DISCBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C4DISCBOOK\"] }}"
+            },
+            {
+              "fieldName": "C5DISCBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C5DISCBOOK\"] }}"
+            },
+            {
+              "fieldName": "C6DISCBOOK",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C6DISCBOOK\"] }}"
+            },
+            {
+              "fieldName": "C1TOTALDISC",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C1TOTALDISC\"] }}"
+            },
+            {
+              "fieldName": "C2TOTALDISC",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C2TOTALDISC\"] }}"
+            },
+            {
+              "fieldName": "C3TOTALDISC",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C3TOTALDISC\"] }}"
+            },
+            {
+              "fieldName": "C4TOTALDISC",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C4TOTALDISC\"] }}"
+            },
+            {
+              "fieldName": "C5TOTALDISC",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C5TOTALDISC\"] }}"
+            },
+            {
+              "fieldName": "C6TOTALDISC",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"C6TOTALDISC\"] }}"
+            },
+            {
+              "fieldName": "ESTWEEKSTART",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"ESTWEEKSTART\"] }}"
+            },
+            {
+              "fieldName": "ESTWEEKEND",
+              "fieldValue": "={{ $node[\"Processed Sheets\"].json[\"ESTWEEKEND\"] }}"
+            }
+          ]
+        }
+      },
+      "id": "2e03a4c1-f840-41c9-bb99-2ed590a68acf",
+      "name": "SendInBlue - Update Attributes",
+      "type": "n8n-nodes-base.sendInBlue",
+      "typeVersion": 1,
+      "position": [
+        1400,
+        540
+      ],
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 1800,
+    "errorWorkflow": "11",
+    "saveDataSuccessExecution": "all",
+    "timezone": "Asia/Jakarta"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2023-11-28T06:07:53.488Z",
+  "versionId": "d0642910-4013-443a-ac24-13659193db6f"
+}
