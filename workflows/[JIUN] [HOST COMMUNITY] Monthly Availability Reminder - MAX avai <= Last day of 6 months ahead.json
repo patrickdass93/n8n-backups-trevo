@@ -1,0 +1,723 @@
+{
+  "active": true,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets4": {
+      "main": [
+        [
+          {
+            "node": "SendInBlue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets3": {
+      "main": [
+        [
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SendInBlue1": {
+      "main": [
+        [
+          {
+            "node": "SIB API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets5": {
+      "main": [
+        [
+          {
+            "node": "SendInBlue1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SendInBlue": {
+      "main": [
+        [
+          {
+            "node": "SIB API1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Postgres3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres3": {
+      "main": [
+        [
+          {
+            "node": "[CT] - Host_Availability",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-01-31T02:04:29.699Z",
+  "id": "31",
+  "name": "[JIUN] [HOST COMMUNITY] Monthly Availability Reminder - MAX avai <= Last day of 6 months ahead",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "triggerAtDayOfMonth": 26,
+              "triggerAtHour": 12
+            }
+          ]
+        }
+      },
+      "id": "f3f64d51-56bf-4c4b-ae9f-2f6f9a6abed1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        720,
+        380
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\n--Group A\n--All cars with avai ending in THAT month\nselect A.*,\nEL.withdrawn as L90D_with,\nEL.est_lost as potential_withdrawn_lost,\nEE.requested as L90D_req,\nEE.est_earnings as potential_instant_earnings,\nOEL.withdrawn as overall_L90D_with,\nOEL.est_lost as overall_potential_withdrawn_lost,\nOEE.requested as overall_L90D_req,\nOEE.est_earnings as overall_potential_instant_earnings,\nLE.month_earnings,\nLAD.month_avai_days\nfrom \n        (select distinct l.registration_no,\n        case when ll.city_id in (1) then 'KV'   \n\t\twhen ll.city_id in (2,12) then 'PGM' when ll.city_id in (48) then 'PGI'\n\t\twhen ll.city_id in (3,19,20,21) then 'KK'   when ll.city_id in (4,15) then 'JB' \n\t\twhen ll.city_id in (5) then 'IP'   when ll.city_id in (47) then 'NS'\n\t\twhen ll.city_id in (13) then 'LGK' else 'Others' end as city,\n        l.user_id, \n        concat(u.first_name,' ',u.last_name)as name, \n        u.phone_number,\n        u.email, \n        u.uuid, \n        max(la.end_date)as avai_end_date,\n        lp.base_price, \n        cc.percent,\n        (lp.base_price - (lp.base_price*(cc.percent/100)))*10 est_earning_10D\n        from listings l \n        left join listing_availability la on la.listing_id = l.id\n        left join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = l.id\n        left join users u on u.id = l.user_id \n        left join listing_pricing lp on lp.listing_id = l.id\n        left join listing_commission_class lcc ON lcc.listing_id = l.id\n        left join commission_class cc on cc.id = lcc.commission_id\n        left join \n        \t(select distinct l.id as listing_id, t.name as tag\n\t\t\tfrom listings l \n\t\t\tleft join tag_taggables tt on tt.taggable_id = l.id\n\t\t\tleft join tags t on t.id = tt.tag_id \n\t\t\twhere t.name = 'Bad Host')bh\n\t\t\ton bh.listing_id = l.id\n        where l.status = 'approved'\n        and l.deleted_at is null\n        and ll.country = 'Malaysia'\n        and bh.tag is null\n        group by 1,2,3,4,5,6,7,9,10\n        order by 2,1)A\nleft join\n        --\n        (select distinct z.registration_no, \n        count(distinct z.ref_no) withdrawn,\n        sum(z.est_earning) as est_lost\n        from\n        (select b.ref_no, l.registration_no, b.status, b.reason, d5.rental, (d5.rental - (d5.rental*(cc.percent/100))) est_earning\n        from bookings b \n        left join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = b.listing_id\n        left join listings l on l.id = b.listing_id\n        left join listing_commission_class lcc ON lcc.listing_id = b.listing_id\n        left join commission_class cc on cc.id = lcc.commission_id\n        left join\n        (select bl.booking_id, bl.amount as rental from booking_lines bl where bl.slug = 'rental-fee') d5\n        on b.id = d5.booking_id\n        where b.status = 'withdrawn'\n        and b.reason ~* '(response|respond)'\n        and b.created_at::timestamp between (NOW() - interval'90 days') and NOW()\n        and ll.country = 'Malaysia')Z\n        group by 1)EL\n        on EL.registration_no = A.registration_no\n        --\nleft join\n        --\n        (select distinct z.user_id, \n        count(distinct z.ref_no) withdrawn,\n        sum(z.est_earning) as est_lost\n        from\n        (select b.ref_no, l.user_id, b.status, b.reason, d5.rental, (d5.rental - (d5.rental*(cc.percent/100))) est_earning\n        from bookings b \n        left join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = b.listing_id\n        left join listings l on l.id = b.listing_id\n        left join listing_commission_class lcc ON lcc.listing_id = b.listing_id\n        left join commission_class cc on cc.id = lcc.commission_id\n        left join\n        (select bl.booking_id, bl.amount as rental from booking_lines bl where bl.slug = 'rental-fee') d5\n        on b.id = d5.booking_id\n        where b.status = 'withdrawn'\n        and b.reason ~* '(response|respond)'\n        and b.created_at::timestamp between (NOW() - interval'90 days') and NOW()\n        and ll.country = 'Malaysia')Z\n        group by 1)OEL\n        on OEL.user_id = A.user_id\n        --\nleft join\n        --\n        (select distinct z.registration_no, \n        count(distinct z.ref_no) requested,\n        sum(z.est_earning) as est_earnings\n        from\n        (select b.ref_no, l.registration_no, b.status, b.reason, d5.rental, (d5.rental - (d5.rental*(cc.percent/100))) est_earning\n        from bookings b \n        left join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = b.listing_id\n        left join listings l on l.id = b.listing_id\n        left join listing_commission_class lcc ON lcc.listing_id = b.listing_id\n        left join commission_class cc on cc.id = lcc.commission_id\n        left join\n        (select bl.booking_id, bl.amount as rental from booking_lines bl where bl.slug = 'rental-fee') d5\n        on b.id = d5.booking_id\n        where b.status not in ('payment_failed')\n        and b.created_at::timestamp between (NOW() - interval'90 days') and NOW()\n        and ll.country = 'Malaysia')Z\n        group by 1)EE\n        on EE.registration_no = A.registration_no\n        --\nleft join\n        --\n        (select distinct z.registration_no, \n        count(distinct z.ref_no) requested,\n        sum(z.est_earning) as month_earnings\n        from\n        (select b.ref_no, l.registration_no, b.status, b.reason, d5.rental, (d5.rental - (d5.rental*(cc.percent/100))) est_earning\n        from bookings b \n        left join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = b.listing_id\n        left join listings l on l.id = b.listing_id\n        left join listing_commission_class lcc ON lcc.listing_id = b.listing_id\n        left join commission_class cc on cc.id = lcc.commission_id\n        left join\n        (select bl.booking_id, bl.amount as rental from booking_lines bl where bl.slug = 'rental-fee') d5\n        on b.id = d5.booking_id\n        where b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')\n        and b.request_end_at::timestamp between (NOW() - interval'25 days') and (NOW() + interval'4 days')\n        and ll.country = 'Malaysia')Z\n        group by 1)LE\n        on LE.registration_no = A.registration_no\n        --\nleft join\n        --\n        (select distinct z.registration_no, \n        count(Z.ymd)as month_avai_days\n        from\n        (select distinct l.registration_no, dates.ymd\n        from listings l\n        left join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = l.id\n        left join listing_availability la on la.listing_id = l.id\n        join (SELECT generate_series((NOW() - interval'25 days'), (NOW() + interval'4 days'), interval '1 day')::date ymd) dates on \n\t\tdates.ymd between la.start_date::date and la.end_date::date\n        where ll.country = 'Malaysia')Z\n        group by 1)LAD\n        on LAD.registration_no = A.registration_no\n        --\nleft join\n        --\n        (select distinct z.user_id, \n        count(distinct z.ref_no) requested,\n        sum(z.est_earning) as est_earnings\n        from\n        (select b.ref_no, l.user_id, b.status, b.reason, d5.rental, (d5.rental - (d5.rental*(cc.percent/100))) est_earning\n        from bookings b \n        left join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = b.listing_id\n        left join listings l on l.id = b.listing_id\n        left join listing_commission_class lcc ON lcc.listing_id = b.listing_id\n        left join commission_class cc on cc.id = lcc.commission_id\n        left join\n        (select bl.booking_id, bl.amount as rental from booking_lines bl where bl.slug = 'rental-fee') d5\n        on b.id = d5.booking_id\n        where b.status not in ('payment_failed')\n        and b.created_at::timestamp between (NOW() - interval'90 days') and NOW()\n        and ll.country = 'Malaysia')Z\n        group by 1)OEE\n        on OEE.user_id = A.user_id\n        --\nwhere A.avai_end_date between (NOW() + interval'4 days') and (NOW() + interval'34 days')\norder by 3\n",
+        "additionalFields": {}
+      },
+      "id": "062505cc-f23d-4b3f-a0d8-1b7223f53410",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        280
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1P-SjyVoRFhS9u_4VwxB2zK0W1T-8wJ9nFHnU9LZ1exY",
+          "mode": "list",
+          "cachedResultName": "TREVO MY Host Car Availability Ending next month (NEW TEST)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P-SjyVoRFhS9u_4VwxB2zK0W1T-8wJ9nFHnU9LZ1exY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "N8N - Group A Import",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P-SjyVoRFhS9u_4VwxB2zK0W1T-8wJ9nFHnU9LZ1exY/edit#gid=0"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "registration_no",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "03f0a958-3e4e-4cfa-afb4-437595699f78",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1240,
+        280
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1P-SjyVoRFhS9u_4VwxB2zK0W1T-8wJ9nFHnU9LZ1exY",
+          "mode": "list",
+          "cachedResultName": "TREVO MY Host Car Availability Ending next month (NEW TEST)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P-SjyVoRFhS9u_4VwxB2zK0W1T-8wJ9nFHnU9LZ1exY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "N8N - Group A Import",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P-SjyVoRFhS9u_4VwxB2zK0W1T-8wJ9nFHnU9LZ1exY/edit#gid=0"
+        },
+        "clear": "specificRange",
+        "range": "A2:Z"
+      },
+      "id": "afcc1418-e516-49bb-a7b4-51cfeeff2c4f",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        920,
+        280
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\n--Group B\n--avai_days = 0\n--NEW CFT listings (L5M CFTed listings, based on CFT date)\n--Active Cars (L90D >=1 completed bookings) \nselect A.*,\nEL.withdrawn as L90D_with,\nEL.est_lost as potential_withdrawn_lost,\nEE.requested as L90D_req,\nEE.est_earnings as potential_instant_earnings,\nOEL.withdrawn as overall_L90D_with,\nOEL.est_lost as overall_potential_withdrawn_lost,\nOEE.requested as overall_L90D_req,\nOEE.est_earnings as overall_potential_instant_earnings\nfrom\n(select distinct l.registration_no,\ncase when ll.city_id in (1) then 'KV'   \nwhen ll.city_id in (2,12) then 'PGM' when ll.city_id in (48) then 'PGI'\nwhen ll.city_id in (3,19,20,21) then 'KK'   when ll.city_id in (4,15) then 'JB' \nwhen ll.city_id in (5) then 'IP'   when ll.city_id in (47) then 'NS'\nwhen ll.city_id in (13) then 'LGK' else 'Others' end as city,\nl.user_id,\nconcat(u.first_name,' ',u.last_name)as host_name, \nu.phone_number,\nu.email, \nu.uuid,\navai.total_days,\nlp.base_price as daily_rate, \ncc.percent,\n(lp.base_price - (lp.base_price*(cc.percent/100)))*10 est_earning_10D\n--min(b.request_end_at) as cft, --NEW CFT listings (L5M CFTed listings, based on CFT date)\n--max(b.request_end_at) as clt --Active Cars (L90D >=1 completed bookings) \nfrom bookings b \nleft join listings l on l.id = b.listing_id\nleft join users u on u.id = l.user_id \nleft join listing_pricing lp on lp.listing_id = l.id\nleft join listing_commission_class lcc ON lcc.listing_id = l.id\nleft join commission_class cc on cc.id = lcc.commission_id        \nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = b.listing_id\nleft join \n--\n        (select l.id,\n        count(dates.ymd) as total_days\n        from listings l\n        left join listing_availability la on la.listing_id=l.id\n        left join (SELECT generate_series(NOW() + interval '4 days', NOW() + interval '34 days', interval '1 day')::date ymd) dates on \n        dates.ymd between la.start_date::date and la.end_date::date\n        where l.status='approved' and l.deleted_at is null\n        GROUP BY 1)avai\n        on avai.id = b.listing_id\n--\n        left join \n    \t(select distinct l.id as listing_id, t.name as tag\n\t\tfrom listings l \n\t\tleft join tag_taggables tt on tt.taggable_id = l.id\n\t\tleft join tags t on t.id = tt.tag_id \n\t\twhere t.name = 'Bad Host')bh\n\t\ton bh.listing_id = b.listing_id \nwhere ll.country = 'Malaysia'\nand l.status = 'approved'\nand l.deleted_at is null\nand b.status = 'completed'\nand bh.tag is null\nand (avai.total_days is null or avai.total_days = '0')\ngroup by 1,2,3,4,5,6,7,8,9,10,11\nhaving ((min(b.request_end_at::timestamp) between (NOW() - interval'150 days') and NOW()) or (max(b.request_end_at::timestamp) between (NOW() - interval'90 days') and NOW())))A\nleft join\n        --\n        (select distinct z.registration_no, \n        count(distinct z.ref_no) withdrawn,\n        sum(z.est_earning) as est_lost\n        from\n        (select b.ref_no, l.registration_no, b.status, b.reason, d5.rental, (d5.rental - (d5.rental*(cc.percent/100))) est_earning\n        from bookings b \n        left join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = b.listing_id\n        left join listings l on l.id = b.listing_id\n        left join listing_commission_class lcc ON lcc.listing_id = b.listing_id\n        left join commission_class cc on cc.id = lcc.commission_id\n        left join\n        (select bl.booking_id, bl.amount as rental from booking_lines bl where bl.slug = 'rental-fee') d5\n        on b.id = d5.booking_id\n        where b.status = 'withdrawn'\n        and b.reason ~* '(response|respond)'\n        and b.created_at::timestamp between (NOW() - interval'90 days') and NOW()\n        and ll.country = 'Malaysia')Z\n        group by 1)EL\n        on EL.registration_no = A.registration_no\n        --\nleft join\n        --\n        (select distinct z.user_id, \n        count(distinct z.ref_no) withdrawn,\n        sum(z.est_earning) as est_lost\n        from\n        (select b.ref_no, l.user_id, b.status, b.reason, d5.rental, (d5.rental - (d5.rental*(cc.percent/100))) est_earning\n        from bookings b \n        left join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = b.listing_id\n        left join listings l on l.id = b.listing_id\n        left join listing_commission_class lcc ON lcc.listing_id = b.listing_id\n        left join commission_class cc on cc.id = lcc.commission_id\n        left join\n        (select bl.booking_id, bl.amount as rental from booking_lines bl where bl.slug = 'rental-fee') d5\n        on b.id = d5.booking_id\n        where b.status = 'withdrawn'\n        and b.reason ~* '(response|respond)'\n        and b.created_at::timestamp between (NOW() - interval'90 days') and NOW()\n        and ll.country = 'Malaysia')Z\n        group by 1)OEL\n        on OEL.user_id = A.user_id\n        --\nleft join\n        --\n        (select distinct z.registration_no, \n        count(distinct z.ref_no) requested,\n        sum(z.est_earning) as est_earnings\n        from\n        (select b.ref_no, l.registration_no, b.status, b.reason, d5.rental, (d5.rental - (d5.rental*(cc.percent/100))) est_earning\n        from bookings b \n        left join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = b.listing_id\n        left join listings l on l.id = b.listing_id\n        left join listing_commission_class lcc ON lcc.listing_id = b.listing_id\n        left join commission_class cc on cc.id = lcc.commission_id\n        left join\n        (select bl.booking_id, bl.amount as rental from booking_lines bl where bl.slug = 'rental-fee') d5\n        on b.id = d5.booking_id\n        where b.status not in ('payment_failed')\n        and b.created_at::timestamp between (NOW() - interval'90 days') and NOW()\n        and ll.country = 'Malaysia')Z\n        group by 1)EE\n        on EE.registration_no = A.registration_no\n        --\nleft join\n        --\n        (select distinct z.user_id, \n        count(distinct z.ref_no) requested,\n        sum(z.est_earning) as est_earnings\n        from\n        (select b.ref_no, l.user_id, b.status, b.reason, d5.rental, (d5.rental - (d5.rental*(cc.percent/100))) est_earning\n        from bookings b \n        left join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = b.listing_id\n        left join listings l on l.id = b.listing_id\n        left join listing_commission_class lcc ON lcc.listing_id = b.listing_id\n        left join commission_class cc on cc.id = lcc.commission_id\n        left join\n        (select bl.booking_id, bl.amount as rental from booking_lines bl where bl.slug = 'rental-fee') d5\n        on b.id = d5.booking_id\n        where b.status not in ('payment_failed')\n        and b.created_at::timestamp between (NOW() - interval'90 days') and NOW()\n        and ll.country = 'Malaysia')Z\n        group by 1)OEE\n        on OEE.user_id = A.user_id",
+        "additionalFields": {}
+      },
+      "id": "7f3df2df-f312-4804-9d98-e85b8b25f13f",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        460
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1P-SjyVoRFhS9u_4VwxB2zK0W1T-8wJ9nFHnU9LZ1exY",
+          "mode": "list",
+          "cachedResultName": "TREVO MY Host Car Availability Ending next month (NEW TEST)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P-SjyVoRFhS9u_4VwxB2zK0W1T-8wJ9nFHnU9LZ1exY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 356165893,
+          "mode": "list",
+          "cachedResultName": "N8N - Group B Import",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P-SjyVoRFhS9u_4VwxB2zK0W1T-8wJ9nFHnU9LZ1exY/edit#gid=356165893"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "registration_no",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "8269f794-469b-44d5-a9ef-77ecfc9e77cb",
+      "name": "Google Sheets2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1240,
+        460
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1P-SjyVoRFhS9u_4VwxB2zK0W1T-8wJ9nFHnU9LZ1exY",
+          "mode": "list",
+          "cachedResultName": "TREVO MY Host Car Availability Ending next month (NEW AUTOMATED)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P-SjyVoRFhS9u_4VwxB2zK0W1T-8wJ9nFHnU9LZ1exY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1350187453,
+          "mode": "list",
+          "cachedResultName": "N8N - Summary Export (Group B)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P-SjyVoRFhS9u_4VwxB2zK0W1T-8wJ9nFHnU9LZ1exY/edit#gid=1350187453"
+        },
+        "options": {
+          "outputFormatting": {
+            "values": {
+              "general": "UNFORMATTED_VALUE",
+              "date": "FORMATTED_STRING"
+            }
+          }
+        }
+      },
+      "id": "9dc5a4f2-1594-4d6e-92fd-0addb7f9fc42",
+      "name": "Google Sheets4",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1400,
+        460
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n\"to\":[{\"email\":\"{{$node[\"Google Sheets5\"].json[\"EMAIL\"]}}\",\"name\":\"{{$node[\"Google Sheets5\"].json[\"MAHOSTNAME\"]}}\"}],\n\"templateId\":573\n}\n",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1720,
+        280
+      ],
+      "id": "ac30b81e-3e3f-4d46-b144-3044f8471a7d",
+      "retryOnFail": true,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "disabled": true,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1P-SjyVoRFhS9u_4VwxB2zK0W1T-8wJ9nFHnU9LZ1exY",
+          "mode": "list",
+          "cachedResultName": "TREVO MY Host Car Availability Ending next month (NEW TEST)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P-SjyVoRFhS9u_4VwxB2zK0W1T-8wJ9nFHnU9LZ1exY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 356165893,
+          "mode": "list",
+          "cachedResultName": "N8N - Group B Import",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P-SjyVoRFhS9u_4VwxB2zK0W1T-8wJ9nFHnU9LZ1exY/edit#gid=356165893"
+        },
+        "clear": "specificRange",
+        "range": "A2:Z"
+      },
+      "id": "2e416b50-efed-4500-900f-1bde738da411",
+      "name": "Google Sheets3",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        920,
+        460
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "update",
+        "identifier": "={{ $json.EMAIL }}",
+        "updateAttributes": {
+          "updateAttributesValues": [
+            {
+              "fieldName": "AMAHOSTNAME",
+              "fieldValue": "={{ $json.MAHOSTNAME }}"
+            },
+            {
+              "fieldName": "AMACPLATE",
+              "fieldValue": "={{ $json.MACPLATE }}"
+            },
+            {
+              "fieldName": "AMADAYS",
+              "fieldValue": "={{ $json.month_avai_days }}"
+            },
+            {
+              "fieldName": "AMAEARNINGS",
+              "fieldValue": "={{ $json.month_earnings }}"
+            },
+            {
+              "fieldName": "AMAESTPAYOUT",
+              "fieldValue": "={{ $json.MAESTPAYOUT }}"
+            }
+          ]
+        }
+      },
+      "id": "c7249ab1-238b-4ca4-bdcf-9f8745c57e3c",
+      "name": "SendInBlue1",
+      "type": "n8n-nodes-base.sendInBlue",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        280
+      ],
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1P-SjyVoRFhS9u_4VwxB2zK0W1T-8wJ9nFHnU9LZ1exY",
+          "mode": "list",
+          "cachedResultName": "TREVO MY Host Car Availability Ending next month (NEW AUTOMATED)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P-SjyVoRFhS9u_4VwxB2zK0W1T-8wJ9nFHnU9LZ1exY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2073802721,
+          "mode": "list",
+          "cachedResultName": "N8N - Summary Export (Group A)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P-SjyVoRFhS9u_4VwxB2zK0W1T-8wJ9nFHnU9LZ1exY/edit#gid=2073802721"
+        },
+        "options": {
+          "outputFormatting": {
+            "values": {
+              "general": "UNFORMATTED_VALUE",
+              "date": "FORMATTED_STRING"
+            }
+          }
+        }
+      },
+      "id": "769809fa-7f6f-4f50-b4b0-af002f379fb4",
+      "name": "Google Sheets5",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1400,
+        280
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "requestMethod": "POST",
+        "url": "https://api.sendinblue.com/v3/smtp/email",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n\"to\":[{\"email\":\"{{$node[\"Google Sheets4\"].json[\"EMAIL\"]}}\",\"name\":\"{{$node[\"Google Sheets4\"].json[\"MAHOSTNAME\"]}}\"}],\n\"templateId\":466\n}\n",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "SIB API1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1720,
+        460
+      ],
+      "id": "71d1d4fa-8459-4a03-98e6-2e7d80fbda14",
+      "retryOnFail": true,
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "disabled": true,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "update",
+        "identifier": "={{ $json.EMAIL }}",
+        "updateAttributes": {
+          "updateAttributesValues": [
+            {
+              "fieldName": "MAHOSTNAME",
+              "fieldValue": "={{ $json.MAHOSTNAME }}"
+            },
+            {
+              "fieldName": "MACPLATE",
+              "fieldValue": "={{ $json.MACPLATE }}"
+            },
+            {
+              "fieldName": "MAESTPAYOUT",
+              "fieldValue": "={{ $json.MAESTPAYOUT }}"
+            }
+          ]
+        }
+      },
+      "id": "407beda1-538d-4b73-99c6-62475105555e",
+      "name": "SendInBlue",
+      "type": "n8n-nodes-base.sendInBlue",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        460
+      ],
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "7",
+          "name": "SendInBlue"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "triggerAtHour": 12
+            }
+          ]
+        }
+      },
+      "id": "3fc7b3fc-ee2d-420f-a2ce-adc196430534",
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        720,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Ending Next Month",
+        "height": 87.41935483870967,
+        "width": 174.67741935483872
+      },
+      "id": "edd90c2e-7c77-44cf-92ef-d9db5f0487ae",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        480,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## MAX avai <= last day of 6 months ahead",
+        "height": 126.25147162703084,
+        "width": 217.6701200847657
+      },
+      "id": "b7b1c36f-625c-4a56-86ef-fcdeb89fed4b",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        440,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "content": "No migration workflows\n- SIB nodes were turned off\n- Turned all other nodes off"
+      },
+      "id": "5693abdb-105c-4d5b-9938-6820d25402e2",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1980,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sg1.api.clevertap.com/1/upload",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={ \n    \"X-CleverTap-Account-Id\": \"6Z6-KR8-966Z\",\n    \"X-CleverTap-Passcode\": \"dddf3562-fc72-479d-8940-544009845a3d\",\n    \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"d\": [\n        {\n            \"identity\": \"{{ $json[\"uuid\"] }}\",\n            \"ts\": {{ Math.floor(Date.now() / 1000) }},\n            \"type\": \"event\",\n            \"evtName\": \"Host_Availability\",\n            \"evtData\": {\n                \"HA_com_id\": \"Next6Month\"\n\n            }\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "11a56714-92b5-4d15-90af-0d0f34c223f2",
+      "name": "[CT] - Host_Availability",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1120,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nwith list_avai as\n(select distinct l.id, \nl.user_id,\nmax(la.end_date) as max_avai\nfrom listings l\nleft join listing_availability la on la.listing_id = l.id\nleft join listing_location ll on ll.listing_id = l.id\nwhere 1=1\nand l.status = 'approved'\nand l.deleted_at is null\nand ll.country = 'Malaysia'\ngroup by 1,2\nhaving max(la.end_date) < NOW() + interval '6 months'),\n\n--\nhosts as\n(select distinct u.id, \nconcat(u.first_name,' ',u.last_name)as host_name, \nu.email, \nu.phone_number,\nu.uuid\nfrom users u),\n--\nbad_host as\n(select distinct l.id, t.name as tag\nfrom listings l \nleft join tag_taggables tt on tt.taggable_id = l.id\nleft join tags t on t.id = tt.tag_id \nwhere t.name = 'Bad Host')\n--\nselect distinct la.user_id as host_id, \nh.*\nfrom list_avai la\nleft join hosts h on h.id  = la.user_id\nleft join bad_host bh on bh.id = la.id\nwhere bh.tag is null\n--and la.user_id = '5162'",
+        "additionalFields": {}
+      },
+      "id": "66992f28-54ec-4b16-9eff-4f1b76434ae0",
+      "name": "Postgres3",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        920,
+        720
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11",
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "all"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "node:Schedule Trigger1": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-07-11T05:57:24.650Z",
+  "versionId": "29c41599-4051-4d8a-a68c-b9b93bdcb2e9"
+}
