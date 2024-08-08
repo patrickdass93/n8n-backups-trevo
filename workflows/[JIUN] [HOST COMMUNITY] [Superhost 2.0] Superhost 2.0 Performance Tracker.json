@@ -1,0 +1,117 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets15",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets15": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-01-13T07:27:06.964Z",
+  "id": "25",
+  "name": "[JIUN] [HOST COMMUNITY] [Superhost 2.0] Superhost 2.0 Performance Tracker",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "2ec3ddfd-ab62-40fb-8aaa-0659d394b7c3",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        340,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1mFRG6LqZzXb4fACMRanQ1hWwRFuf7Ce5FgPPSJNDV_8",
+          "mode": "list",
+          "cachedResultName": "Superhost 2.0 Monthly Refresh",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mFRG6LqZzXb4fACMRanQ1hWwRFuf7Ce5FgPPSJNDV_8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1486826953,
+          "mode": "list",
+          "cachedResultName": "Q2 Superhost List",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mFRG6LqZzXb4fACMRanQ1hWwRFuf7Ce5FgPPSJNDV_8/edit#gid=1486826953"
+        },
+        "options": {}
+      },
+      "id": "ff2b320f-319c-42e9-a6cc-7cafdb7bd937",
+      "name": "Google Sheets15",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        540,
+        440
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "rules": {
+          "rules": [
+            {}
+          ]
+        }
+      },
+      "id": "b9ddd528-14af-4b4e-953d-09da7a9974db",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        760,
+        440
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "11"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2023-04-10T08:02:12.022Z",
+  "versionId": "94990c92-0adc-40f4-bc45-746a9c0c38d7"
+}
