@@ -1,0 +1,465 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets3": {
+      "main": [
+        [
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets4": {
+      "main": [
+        [
+          {
+            "node": "Postgres2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-06-19T03:21:56.786Z",
+  "id": "95",
+  "name": "[KAVI] Catalyst Payout Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "triggerAtHour": 9
+            },
+            {
+              "field": "months",
+              "triggerAtDayOfMonth": 2,
+              "triggerAtHour": 9
+            },
+            {
+              "field": "months",
+              "triggerAtDayOfMonth": 3,
+              "triggerAtHour": 9
+            },
+            {
+              "field": "months",
+              "triggerAtDayOfMonth": 4,
+              "triggerAtHour": 9
+            },
+            {
+              "field": "months",
+              "triggerAtDayOfMonth": 5,
+              "triggerAtHour": 9
+            },
+            {
+              "field": "months",
+              "triggerAtDayOfMonth": 6,
+              "triggerAtHour": 9
+            },
+            {
+              "field": "months",
+              "triggerAtDayOfMonth": 7,
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "9e4423ae-9547-4647-9c4e-71a317967aae",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        720,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nSELECT \n    l.id,\n    b.month,\n    l.registration_no,\n    CASE\n        WHEN ll.city_id IN (1) THEN '1. KV'\n        WHEN ll.city_id IN (2, 12) THEN '2. PG'\n        WHEN ll.city_id IN (3, 19, 20, 21) THEN '3. KK'\n        WHEN ll.city_id IN (4, 15) THEN '4. JB'\n        WHEN ll.city_id IN (5) THEN '5. IP'\n        WHEN ll.city_id IN (47) THEN '6. NS'\n        WHEN ll.city_id IN (13) THEN '7. LGK'\n        WHEN ll.city_id IN (14) THEN '8. Perlis'\n        WHEN ll.city_id IN (15) THEN '9. Melaka'\n        WHEN ll.city_id IN (16) THEN '10. Pahang'\n        WHEN ll.city_id IN (17) THEN '11. Terengganu'\n        WHEN ll.city_id IN (18) THEN '12. Kelantan'\n        WHEN ll.city_id IN (22, 23) THEN '13. Sarawak'\n        ELSE '14. Others'\n    END AS city,\n    l.user_id AS host_id,\n    concat(u.first_name, ' ', u.last_name) AS host_name,\n    to_char(l.created_at, 'YYYY-MM-DD') AS listing_created_at_date,\n    to_char(l.created_at, 'YYYY-MM') AS listing_created_at,\n    t.\"name\" AS catalyst_tag,\n    t.ct_id AS catalyst_id,\n    ct.ct_name,\n    ct.ct_email,\n    ct.ct_acc_status,\n    ct.ct_acc_created_date,\n    ct.ct_sc_name,\n    b.acceptance_rate,\n    la.month_avai_days,\n    l.deleted_at::DATE,\n    l.status,\ncase when l.first_approved_at is null then to_char(l.approved_at,'YYYY-MM-DD') else to_char(l.first_approved_at,'YYYY-MM-DD') end as approved_at_date,\n    case when l.first_approved_at is null then to_char(l.approved_at,'YYYY-MM') else to_char(l.first_approved_at,'YYYY-MM') end as approved_at,\n    to_char(cft.cft,'YYYY-MM') as cft_month\nFROM\n    listings l\n    LEFT JOIN listing_location ll ON ll.listing_id = l.id\n    LEFT JOIN (\n\t    select to_char(b.created_at,'YYYY-MM') as month, \n\t    b.listing_id,\n\t    CASE\n\t\t    WHEN count(DISTINCT CASE WHEN b.status IN ('accepted', 'waiting_for_inspection', 'start_driving', 'return_car', 'completed') THEN b.id END) = 0 THEN NULL\n\t\t    ELSE (count(DISTINCT CASE WHEN b.status IN ('accepted', 'waiting_for_inspection', 'start_driving', 'return_car', 'completed') THEN b.id END) * 100.0) / NULLIF(count(distinct case when ((b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')) or (b.status = 'rejected' AND (b.reason !~* '(guest)' OR b.reason IS NULL)) OR (b.status IN ('withdrawn', 'cancelled') AND b.reason ~* '(host|owner|avai|car)' AND b.reason !~* '(after i read|dont need|extended|rebook|rebooking|wrong date|wrong time|I didnt|manual|I want|I need|sorry|I would|mistake|my own car|wrong|change)')) then b.id end), 0)\n\t\tEND AS acceptance_rate\n\t   \tfrom bookings b group by 1,2) b  ON b.listing_id = l.id\n    LEFT JOIN users u ON u.id = l.user_id\n    LEFT JOIN tag_taggables tt ON tt.taggable_id = l.id AND tt.taggable = 'listings'\n    LEFT JOIN (\n        SELECT\n            t.id,\n            t.name,\n            CAST(substring(t.name from '\\[(\\d+)\\]') AS INTEGER) AS ct_id\n        FROM\n            tags t\n    ) t ON t.id = tt.tag_id AND (t.\"name\" LIKE 'CT%' or t.name like 'SOFAMCT%')\n    LEFT JOIN (\n        SELECT\n            u.id AS ct_id,\n            u.display_name AS ct_name,\n            u.email AS ct_email,\n            u.status AS ct_acc_status,\n            u.created_at::DATE AS ct_acc_created_date,\n            CASE WHEN t.name LIKE 'SC-%' THEN t.name END AS ct_sc_name\n        FROM\n            users u\n            LEFT JOIN tag_taggables tt ON tt.taggable_id = u.id AND tt.taggable = 'users'\n            LEFT JOIN tags t ON t.id = tt.tag_id AND t.name LIKE 'SC%'\n        where 1=1\n            --t.name IS NOT NULL\n    ) ct ON ct.ct_id = t.ct_id\n    LEFT JOIN (\n        SELECT\n            Z.id,\n            to_char(Z.ymd, 'YYYY-MM') AS month,\n            count(Z.ymd) AS month_avai_days\n        FROM (\n            SELECT DISTINCT\n                l.id,\n                dates.ymd\n            FROM\n                listings l\n                LEFT JOIN (\n                    SELECT DISTINCT listing_id, country, city_id\n                    FROM listing_location\n                ) ll ON ll.listing_id = l.id\n                LEFT JOIN listing_availability la ON la.listing_id = l.id\n                JOIN (\n                    SELECT generate_series(NOW() - interval '1 year', NOW(), interval '1 day')::date ymd\n                ) dates ON dates.ymd BETWEEN la.start_date::date AND la.end_date::date\n            WHERE\n                ll.country = 'Malaysia'\n        ) Z\n        GROUP BY\n            Z.id,\n            to_char(Z.ymd, 'YYYY-MM')\n    ) la ON la.id = l.id AND la.month = b.month\n    left join\n\t\t(select distinct b.listing_id, \n\t\tmin(b.request_end_at) as cft\n\t\tfrom bookings b \n\t\twhere b.status = 'completed'\n\t\tgroup by 1)cft\n\t\ton cft.listing_id = l.id\nWHERE\n    ll.country = 'Malaysia'\n    AND t.name IS NOT null\n    and l.created_at between '2023-04-01 00:00' and '2023-10-31 23:59'\n    --and b.month  >= '2023-04'\n    --and l.id = 22917\nGROUP BY\n    b.month,\n    l.id,\n    l.registration_no,\n    city,\n    host_id,\n    host_name,\n    listing_created_at,\n    catalyst_tag,\n    catalyst_id,\n    ct.ct_name,\n    ct.ct_email,\n    ct.ct_acc_status,\n    ct.ct_acc_created_date,\n    ct.ct_sc_name,\n    la.month_avai_days,\n    b.acceptance_rate,\n    l.deleted_at,\n    l.status,\n    approved_at,\n   cft_month;",
+        "options": {}
+      },
+      "id": "5a00be34-a49a-49a9-b470-ca7e20ccfccd",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.1,
+      "position": [
+        1000,
+        320
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1kQRlkP_gc0mHIEiB7qLXoIIoAS1q3v2Qf36goGOXBL8",
+          "mode": "list",
+          "cachedResultName": "[N8N] Catalyst 5.0 Payout Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kQRlkP_gc0mHIEiB7qLXoIIoAS1q3v2Qf36goGOXBL8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "[N8N] Import Raw",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kQRlkP_gc0mHIEiB7qLXoIIoAS1q3v2Qf36goGOXBL8/edit#gid=0"
+        },
+        "clear": "specificRange",
+        "range": "A2:Z"
+      },
+      "id": "af79e5f4-4258-4723-a62b-6a765402d6b7",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        860,
+        320
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1kQRlkP_gc0mHIEiB7qLXoIIoAS1q3v2Qf36goGOXBL8",
+          "mode": "list",
+          "cachedResultName": "[N8N] Catalyst 5.0 Payout Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kQRlkP_gc0mHIEiB7qLXoIIoAS1q3v2Qf36goGOXBL8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "[N8N] Import Raw",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kQRlkP_gc0mHIEiB7qLXoIIoAS1q3v2Qf36goGOXBL8/edit#gid=0"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "month",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "389a00af-b34c-4f1c-a310-a54c0f4e82b8",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1140,
+        320
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=--active booking months\nselect distinct A.month,\nA.listing_id\nfrom\n(select distinct b.listing_id,\ndates.ymd, \nto_char(dates.ymd,'YYYY-MM') as month\nfrom bookings b \nleft join listing_location ll on ll.listing_id = b.listing_id \njoin (SELECT generate_series(timestamp '2023-04-01', 'NOW()' , interval '1 day')::date as ymd) dates -- MAKE SURE IT STARTS FROM APRIL 1st\non dates.ymd between b.request_start_at::date and b.request_end_at::date\nwhere b.status in ('completed','start_driving','waiting_for_inspection', 'return_car')\nand ll.country = 'Malaysia')A\n",
+        "options": {}
+      },
+      "id": "ca60ee6e-a3c1-463b-a874-b57a65bd96b0",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.1,
+      "position": [
+        1000,
+        480
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1kQRlkP_gc0mHIEiB7qLXoIIoAS1q3v2Qf36goGOXBL8",
+          "mode": "list",
+          "cachedResultName": "[N8N] Catalyst 5.0 Payout Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kQRlkP_gc0mHIEiB7qLXoIIoAS1q3v2Qf36goGOXBL8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 818090243,
+          "mode": "list",
+          "cachedResultName": "[N8N] Import Active",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kQRlkP_gc0mHIEiB7qLXoIIoAS1q3v2Qf36goGOXBL8/edit#gid=818090243"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "month",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "2f5ab99c-519c-413e-8626-833b9caa5be9",
+      "name": "Google Sheets2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1140,
+        480
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1kQRlkP_gc0mHIEiB7qLXoIIoAS1q3v2Qf36goGOXBL8",
+          "mode": "list",
+          "cachedResultName": "[N8N] Catalyst 5.0 Payout Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kQRlkP_gc0mHIEiB7qLXoIIoAS1q3v2Qf36goGOXBL8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 818090243,
+          "mode": "list",
+          "cachedResultName": "[N8N] Import Active",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kQRlkP_gc0mHIEiB7qLXoIIoAS1q3v2Qf36goGOXBL8/edit#gid=818090243"
+        },
+        "clear": "specificRange",
+        "range": "A2:B"
+      },
+      "id": "36d45e67-69db-4f45-a083-596e3ee166ce",
+      "name": "Google Sheets3",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        860,
+        480
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1kQRlkP_gc0mHIEiB7qLXoIIoAS1q3v2Qf36goGOXBL8",
+          "mode": "list",
+          "cachedResultName": "[N8N] Catalyst 5.0 Payout Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kQRlkP_gc0mHIEiB7qLXoIIoAS1q3v2Qf36goGOXBL8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1489642385,
+          "mode": "list",
+          "cachedResultName": "[N8N] Deleted Listings",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kQRlkP_gc0mHIEiB7qLXoIIoAS1q3v2Qf36goGOXBL8/edit#gid=1489642385"
+        },
+        "clear": "specificRange",
+        "range": "A2:C"
+      },
+      "id": "de21ba22-c898-4976-84cf-0745c9178c8f",
+      "name": "Google Sheets4",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        860,
+        640
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=select distinct l.id, l.registration_no, \nto_char(l.deleted_at,'YYYY-MM')as deleted_at\nfrom listings l \nleft join listing_location ll on ll.listing_id = l.id\nwhere ll.country = 'Malaysia'\nand l.deleted_at is not null\norder by 2",
+        "options": {}
+      },
+      "id": "c059e2c1-1eb8-42bf-99ba-473c0fe38a17",
+      "name": "Postgres2",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.1,
+      "position": [
+        1000,
+        640
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1kQRlkP_gc0mHIEiB7qLXoIIoAS1q3v2Qf36goGOXBL8",
+          "mode": "list",
+          "cachedResultName": "[N8N] Catalyst 5.0 Payout Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kQRlkP_gc0mHIEiB7qLXoIIoAS1q3v2Qf36goGOXBL8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1489642385,
+          "mode": "list",
+          "cachedResultName": "[N8N] Deleted Listings",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kQRlkP_gc0mHIEiB7qLXoIIoAS1q3v2Qf36goGOXBL8/edit#gid=1489642385"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "id",
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "2ebb8041-1045-4087-82d7-19ba1d77be3f",
+      "name": "Google Sheets5",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1140,
+        640
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "15",
+          "name": "Google Sheets - Kavi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nSELECT \n    l.id,\n    b.month,\n    l.registration_no,\n    CASE\n        WHEN ll.city_id IN (1) THEN '1. KV'\n        WHEN ll.city_id IN (2, 12) THEN '2. PG'\n        WHEN ll.city_id IN (3, 19, 20, 21) THEN '3. KK'\n        WHEN ll.city_id IN (4, 15) THEN '4. JB'\n        WHEN ll.city_id IN (5) THEN '5. IP'\n        WHEN ll.city_id IN (47) THEN '6. NS'\n        WHEN ll.city_id IN (13) THEN '7. LGK'\n        WHEN ll.city_id IN (14) THEN '8. Perlis'\n        WHEN ll.city_id IN (15) THEN '9. Melaka'\n        WHEN ll.city_id IN (16) THEN '10. Pahang'\n        WHEN ll.city_id IN (17) THEN '11. Terengganu'\n        WHEN ll.city_id IN (18) THEN '12. Kelantan'\n        WHEN ll.city_id IN (22, 23) THEN '13. Sarawak'\n        ELSE '14. Others'\n    END AS city,\n    l.user_id AS host_id,\n    concat(u.first_name, ' ', u.last_name) AS host_name,\n    to_char(l.created_at, 'YYYY-MM-DD') AS listing_created_at,\n    t.\"name\" AS catalyst_tag,\n    t.ct_id AS catalyst_id,\n    ct.ct_name,\n    ct.ct_email,\n    ct.ct_acc_status,\n    ct.ct_acc_created_date,\n    ct.ct_sc_name,\n    b.acceptance_rate,\n    la.month_avai_days,\n    l.deleted_at,\n    l.status \nFROM\n    listings l\n    LEFT JOIN listing_location ll ON ll.listing_id = l.id\n    LEFT JOIN (\n\t    select to_char(b.created_at,'YYYY-MM') as month, \n\t    b.listing_id,\n\t    CASE\n\t\t    WHEN count(DISTINCT CASE WHEN b.status IN ('accepted', 'waiting_for_inspection', 'start_driving', 'return_car', 'completed') THEN b.id END) = 0 THEN NULL\n\t\t    ELSE (count(DISTINCT CASE WHEN b.status IN ('accepted', 'waiting_for_inspection', 'start_driving', 'return_car', 'completed') THEN b.id END) * 100.0) / NULLIF(count(distinct case when ((b.status in ('accepted', 'completed','start_driving','waiting_for_inspection','return_car')) or (b.status = 'rejected' AND (b.reason !~* '(guest)' OR b.reason IS NULL)) OR (b.status IN ('withdrawn', 'cancelled') AND b.reason ~* '(host|owner|avai|car)' AND b.reason !~* '(after i read|dont need|extended|rebook|rebooking|wrong date|wrong time|I didnt|manual|I want|I need|sorry|I would|mistake|my own car|wrong|change)')) then b.id end), 0)\n\t\tEND AS acceptance_rate\n\t   \tfrom bookings b group by 1,2) b  ON b.listing_id = l.id\n    LEFT JOIN users u ON u.id = l.user_id\n    LEFT JOIN tag_taggables tt ON tt.taggable_id = l.id AND tt.taggable = 'listings'\n    LEFT JOIN (\n        SELECT\n            t.id,\n            t.name,\n            CAST(substring(t.name from '\\[(\\d+)\\]') AS INTEGER) AS ct_id\n        FROM\n            tags t\n    ) t ON t.id = tt.tag_id AND t.\"name\" LIKE 'CT%'\n    LEFT JOIN (\n        SELECT\n            u.id AS ct_id,\n            u.display_name AS ct_name,\n            u.email AS ct_email,\n            u.status AS ct_acc_status,\n            u.created_at::DATE AS ct_acc_created_date,\n            CASE WHEN t.name LIKE 'SC-%' THEN t.name END AS ct_sc_name\n        FROM\n            users u\n            LEFT JOIN tag_taggables tt ON tt.taggable_id = u.id AND tt.taggable = 'users'\n            LEFT JOIN tags t ON t.id = tt.tag_id AND t.name LIKE 'SC%'\n        where 1=1\n            --t.name IS NOT NULL\n    ) ct ON ct.ct_id = t.ct_id\n    LEFT JOIN (\n        SELECT\n            Z.id,\n            to_char(Z.ymd, 'YYYY-MM') AS month,\n            count(Z.ymd) AS month_avai_days\n        FROM (\n            SELECT DISTINCT\n                l.id,\n                dates.ymd\n            FROM\n                listings l\n                LEFT JOIN (\n                    SELECT DISTINCT listing_id, country, city_id\n                    FROM listing_location\n                ) ll ON ll.listing_id = l.id\n                LEFT JOIN listing_availability la ON la.listing_id = l.id\n                JOIN (\n                    SELECT generate_series(NOW() - interval '1 year', NOW(), interval '1 day')::date ymd\n                ) dates ON dates.ymd BETWEEN la.start_date::date AND la.end_date::date\n            WHERE\n                ll.country = 'Malaysia'\n        ) Z\n        GROUP BY\n            Z.id,\n            to_char(Z.ymd, 'YYYY-MM')\n    ) la ON la.id = l.id AND la.month = b.month\nWHERE\n    ll.country = 'Malaysia'\n    AND t.name IS NOT null\n    and l.created_at >= '2023-04-01 00:00'\n    --and b.month  >= '2023-04'\n    --and l.id = 22917\nGROUP BY\n    b.month,\n    l.id,\n    l.registration_no,\n    city,\n    host_id,\n    host_name,\n    listing_created_at,\n    catalyst_tag,\n    catalyst_id,\n    ct.ct_name,\n    ct.ct_email,\n    ct.ct_acc_status,\n    ct.ct_acc_created_date,\n    ct.ct_sc_name,\n    la.month_avai_days,\n    b.acceptance_rate,\n    l.deleted_at,\n    l.status;\n",
+        "options": {}
+      },
+      "id": "1529544e-94d0-40dd-bb71-430f91b2185f",
+      "name": "Postgres3",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.1,
+      "position": [
+        1000,
+        140
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "Trevo DB"
+        }
+      },
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionOrder": "v0"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-02-14T05:31:40.434Z",
+  "versionId": "742ad92a-c75b-4815-91a0-a715c8a360cd"
+}
