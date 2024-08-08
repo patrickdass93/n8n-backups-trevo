@@ -1,0 +1,235 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-02-07T05:16:58.138Z",
+  "id": "9otCyAtuwEfAKwUq",
+  "name": "[JIUN] - Tracker for APAD (UUID)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "55bcd21f-f332-4c43-9724-d9443a850a9c",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        600,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select distinct k.user_id, k.id_number\nfrom KYC k\nwhere k.user_id = $1\nand k.id_number is not null and k.id_number != ''\norder by 1",
+        "options": {
+          "queryReplacement": "={{ $json.uuid }}"
+        }
+      },
+      "id": "cca77c3a-c9cd-4390-8fa3-8ab195d08157",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1080,
+        260
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "11",
+          "name": "KYC DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Qz4O5zCVlF-Fj_jQXaXA96ZWYf-RyJUUoVtCPnpNgbc",
+          "mode": "list",
+          "cachedResultName": "Automated - Tracker for APAD (MONTH 2024)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Qz4O5zCVlF-Fj_jQXaXA96ZWYf-RyJUUoVtCPnpNgbc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1096017804,
+          "mode": "list",
+          "cachedResultName": "N8N Export - UUID",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Qz4O5zCVlF-Fj_jQXaXA96ZWYf-RyJUUoVtCPnpNgbc/edit#gid=1096017804"
+        },
+        "options": {}
+      },
+      "id": "1deb84b0-561c-4517-9905-0f924c2fde6f",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        920,
+        260
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1Qz4O5zCVlF-Fj_jQXaXA96ZWYf-RyJUUoVtCPnpNgbc",
+          "mode": "list",
+          "cachedResultName": "Automated - Tracker for APAD (MONTH 2024)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Qz4O5zCVlF-Fj_jQXaXA96ZWYf-RyJUUoVtCPnpNgbc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 609819418,
+          "mode": "list",
+          "cachedResultName": "N8N Import - UUID",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Qz4O5zCVlF-Fj_jQXaXA96ZWYf-RyJUUoVtCPnpNgbc/edit#gid=609819418"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "user_id"
+          ],
+          "schema": [
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "id_number",
+              "displayName": "id_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "57809d01-51c9-4532-922e-4d615f8aa158",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1240,
+        260
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1Qz4O5zCVlF-Fj_jQXaXA96ZWYf-RyJUUoVtCPnpNgbc",
+          "mode": "list",
+          "cachedResultName": "Automated - Tracker for APAD (MONTH 2024)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Qz4O5zCVlF-Fj_jQXaXA96ZWYf-RyJUUoVtCPnpNgbc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 609819418,
+          "mode": "list",
+          "cachedResultName": "N8N Import - UUID",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Qz4O5zCVlF-Fj_jQXaXA96ZWYf-RyJUUoVtCPnpNgbc/edit#gid=609819418"
+        },
+        "clear": "specificRange",
+        "range": "A2:Z"
+      },
+      "id": "28880f0d-fa30-4b2d-9451-ca8c6a042f98",
+      "name": "Google Sheets2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        760,
+        260
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "19",
+          "name": "Google Sheet - Jiun's Account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-07-22T02:37:45.103Z",
+  "versionId": "427c70cd-d1a2-4812-b064-d78e83eb62ab"
+}
