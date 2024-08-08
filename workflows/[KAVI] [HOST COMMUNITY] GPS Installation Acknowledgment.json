@@ -1,0 +1,99 @@
+{
+  "active": false,
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "All hosts with approved and not deleted listings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "All hosts with approved and not deleted listings": {
+      "main": [
+        [
+          {
+            "node": "Send PN - Add User to Campaign",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-03-15T08:52:26.946Z",
+  "id": "39",
+  "name": "[KAVI] [HOST COMMUNITY] GPS Installation Acknowledgment",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "e4fa679b-3c0a-4b33-aa6b-6af28275ec1a",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        -1280,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.leanplum.com/api?action=startCampaign",
+        "jsonParameters": true,
+        "options": {
+          "batchInterval": 500
+        },
+        "bodyParametersJson": "={ \"appId\" : \"app_BXrjE7dc15VWXDLRfh77tActhBhSkCHeQhETDE1mXfQ\", \"clientKey\" : \"dev_L9yBjOmwfR3fNiVjL9woIYfWzsy5hMcGDx0og8isAFw\", \"apiVersion\" : \"1.0.6\", \"userId\":\"{{ $json[\"host_uuid\"] }}\", \"campaignId\":\"4680348617736192\", \"createDisposition\" : \"CreateNever\"}",
+        "headerParametersJson": "={\"accept\": \"application/json\",\"content-type\": \"application/json\"}"
+      },
+      "name": "Send PN - Add User to Campaign",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        -920,
+        -40
+      ],
+      "id": "4cb72fe5-3df3-4c7b-88cf-df59daf86e76"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=select distinct u.uuid as host_uuid\nfrom listings l \nleft join users u on u.id = l.user_id \nleft join listing_location ll on ll.listing_id = l.id\nwhere l.status = 'approved'\nand l.deleted_at is null\nand ll.country = 'Malaysia'",
+        "additionalFields": {}
+      },
+      "name": "All hosts with approved and not deleted listings",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        -1120,
+        -40
+      ],
+      "id": "378512d9-68ff-466c-9fdf-01941a9c9693",
+      "notesInFlow": false,
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "trevodb"
+        }
+      },
+      "notes": "Active user status\nApproved listings\nLess than 3 days available for current week"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveExecutionProgress": "DEFAULT",
+    "saveManualExecutions": false,
+    "callerPolicy": "any",
+    "executionTimeout": 3600,
+    "saveDataSuccessExecution": "all"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2023-03-16T01:06:21.794Z",
+  "versionId": "4699c60d-0714-4421-ba67-5ecc7394d6a4"
+}
