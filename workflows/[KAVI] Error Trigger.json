@@ -1,0 +1,170 @@
+{
+  "active": false,
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2022-12-16T01:57:49.352Z",
+  "id": "11",
+  "name": "[KAVI] Error Trigger",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1akRBCYF5NfTHpMefgQocnPIKtjp3HiZoGfzWfBKeMnk",
+          "mode": "list",
+          "cachedResultName": "N8N Workflow Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1akRBCYF5NfTHpMefgQocnPIKtjp3HiZoGfzWfBKeMnk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 307628025,
+          "mode": "list",
+          "cachedResultName": "Errors",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1akRBCYF5NfTHpMefgQocnPIKtjp3HiZoGfzWfBKeMnk/edit#gid=307628025"
+        },
+        "columnToMatchOn": "id",
+        "valueToMatchOn": "={{ $json[\"execution\"][\"id\"] }}",
+        "fieldsUi": {
+          "values": [
+            {
+              "column": "error",
+              "fieldValue": "={{ $json[\"execution\"][\"error\"][\"message\"] }}"
+            },
+            {
+              "column": "workflow",
+              "fieldValue": "={{ $json[\"workflow\"][\"name\"] }}"
+            },
+            {
+              "column": "link",
+              "fieldValue": "={{ $json[\"execution\"][\"url\"] }}"
+            },
+            {
+              "column": "workflow_id",
+              "fieldValue": "={{ $json[\"workflow\"][\"id\"] }}"
+            },
+            {
+              "column": "date",
+              "fieldValue": "={{ $json[\"data\"] }}"
+            },
+            {
+              "column": "data",
+              "fieldValue": "={{ $json.execution.error.stack }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2bcf536a-e22a-4c7e-a9e3-12c4cd734c8b",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        980,
+        680
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google - Patrick"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "9da366a1-a7e6-4b86-a74e-2c01bbc7de28",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        660,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "action": "calculate",
+        "value": "={{new Date().toISOString()}}",
+        "options": {}
+      },
+      "id": "72adc46a-06eb-44a2-8209-77fab6ab612b",
+      "name": "Date & Time",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 1,
+      "position": [
+        840,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAAAUZSDQxE",
+        "messageUi": {
+          "text": "=*ERROR*\n\n*Date*: {{ $json[\"data\"] }}\n*Workflow*: {{ $json[\"workflow\"][\"name\"] }}\n*Error Message*: {{ $json.execution.error.message }}\n*URL*: <{{ $node[\"Error Trigger\"].json[\"execution\"][\"url\"] }}>\n\n\n*Stack*:  \n{{ $json.execution.error.stack }}"
+        },
+        "additionalFields": {}
+      },
+      "id": "6b9a813f-259e-4504-b816-69d03655a009",
+      "name": "Google Chat",
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        980,
+        380
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "26",
+          "name": "[Pat] - Google Chat"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "any",
+    "executionTimeout": 2,
+    "errorWorkflow": "11",
+    "executionOrder": "v0"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "node:Schedule Trigger1": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-02-08T02:56:36.152Z",
+  "versionId": "23ed2d83-b532-435d-9712-3e699b67999e"
+}
