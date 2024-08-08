@@ -1,0 +1,62 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-12-13T07:50:21.155Z",
+  "id": "t8ULpuUyBoJHslL4",
+  "name": "My workflow 8",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "fda70538-7a55-4ef9-9d50-fe1c37554eb6",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        620,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "@TREVO_TestChannel",
+        "text": "Hey gurllll",
+        "additionalFields": {}
+      },
+      "id": "364670c4-facd-4b4c-bc4c-85d657706cd0",
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        840,
+        240
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "iWtMtBADYGSmBfIy",
+          "name": "Telegram account - [TREVO MY] Captain Converter"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-12-13T07:50:21.155Z",
+  "versionId": "ef2d1b65-b5d7-4c18-a1ce-aa1f8de63e81"
+}
