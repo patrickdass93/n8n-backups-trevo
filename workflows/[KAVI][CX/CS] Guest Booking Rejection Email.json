@@ -222,6 +222,24 @@
     },
     "global": {
       "oldListingIds": [
+        "QMK1FJKS",
+        "570SZV6K",
+        "3BSG34FO",
+        "3IW7QZL8",
+        "LAWUDN6K",
+        "IYT00BAD",
+        "QG5V6YHO",
+        "CJTX3NNQ",
+        "WPDRAWNM",
+        "0X2081Q0",
+        "AOI3FN69",
+        "K3PPATI6",
+        "AT8VMIY6",
+        "F8P833R7",
+        "36CWTV9R",
+        "J0RGYBKG",
+        "SWO62HU1",
+        "CBRIOMYW",
         "IS20C3V0",
         "E26IDT2I",
         "ERX0WYO4",
@@ -8885,6 +8903,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2024-08-08T05:18:29.600Z",
+  "updatedAt": "2024-08-09T03:57:26.908Z",
   "versionId": "47e1cdb5-f52b-486b-b5de-d84cb5f10f11"
 }
