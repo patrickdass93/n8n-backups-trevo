@@ -90,7 +90,7 @@
     "node:Google Sheets Trigger": {
       "documentId": "1-kq_ufeX-Kw5f92mLpSTGlwHJpgOc8GrxkVVMC0CrAE",
       "sheetId": 1922465935,
-      "lastIndexChecked": 61
+      "lastIndexChecked": 62
     }
   },
   "tags": [
@@ -108,6 +108,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2024-08-06T02:10:12.659Z",
+  "updatedAt": "2024-08-08T09:36:42.111Z",
   "versionId": "d0977fc8-d393-48b7-9053-1756ea233aea"
 }
