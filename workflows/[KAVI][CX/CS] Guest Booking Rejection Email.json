@@ -222,6 +222,8 @@
     },
     "global": {
       "oldListingIds": [
+        "MBPLI476",
+        "DFBZPAKU",
         "NSQMXG2K",
         "SJ61IHCO",
         "ZVKZ05LP",
@@ -8950,6 +8952,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2024-08-12T15:54:42.009Z",
+  "updatedAt": "2024-08-13T15:59:28.338Z",
   "versionId": "47e1cdb5-f52b-486b-b5de-d84cb5f10f11"
 }
