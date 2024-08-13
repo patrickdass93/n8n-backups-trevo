@@ -98,7 +98,7 @@
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "3",
-          "name": "Google - Patrick"
+          "name": "Google Sheets [Pat]"
         }
       }
     },
@@ -157,7 +157,7 @@
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "3",
-          "name": "Google - Patrick"
+          "name": "Google Sheets [Pat]"
         }
       }
     },
@@ -284,7 +284,7 @@
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "3",
-          "name": "Google - Patrick"
+          "name": "Google Sheets [Pat]"
         }
       }
     }
@@ -311,6 +311,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2024-06-13T09:00:24.934Z",
-  "versionId": "13604cf5-0836-4237-8191-9e3177d94836"
+  "updatedAt": "2024-08-13T07:03:52.816Z",
+  "versionId": "8fa6c3cd-be3a-445f-a120-136e33144752"
 }
