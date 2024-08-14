@@ -146,6 +146,8 @@
     },
     "global": {
       "oldListingIds": [
+        "86b1b0be-6cc4-42b6-afac-8e746409310b",
+        "c96d9ff9-8285-4324-8d73-9e1f38cb5070",
         "85b8d9a0-5857-470d-ab16-b660048fd7f6",
         "ec6a5417-967c-43ff-a5c7-2efb4a6e03c6",
         "73809655-f658-4b69-8178-a84b44561c71",
@@ -3001,6 +3003,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2024-08-13T16:00:36.489Z",
+  "updatedAt": "2024-08-14T03:55:36.303Z",
   "versionId": "6d886f2a-79ba-4b39-b8e1-6956a73f35d7"
 }
