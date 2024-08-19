@@ -492,6 +492,9 @@
     },
     "global": {
       "oldListingIds": [
+        "NETGO9DE",
+        "T701QN9U",
+        "XM6B646A",
         "9P3GXGTY",
         "K3KWGO8Q",
         "DAZSTW9O",
@@ -7668,6 +7671,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2024-08-19T02:09:52.477Z",
+  "updatedAt": "2024-08-19T15:36:03.800Z",
   "versionId": "ebcd58eb-9545-4a33-a6cd-ec6eb33b13bf"
 }
