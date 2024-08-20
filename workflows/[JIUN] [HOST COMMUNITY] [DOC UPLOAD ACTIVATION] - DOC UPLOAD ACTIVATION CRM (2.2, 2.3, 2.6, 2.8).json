@@ -495,7 +495,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "=SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nwith first_listing as\n(select distinct l.user_id, \nl.registration_no,\nl.status, \nl.created_at,\nl.first_approved_at,\nconcat(u.first_name,' ',u.last_name)as name, \nu.email,\nu.uuid, \nceiling((extract(EPOCH from NOW()) - extract(EPOCH from l.first_approved_at))/86400) as days_since_approved,\nRANK() OVER (PARTITION BY l.user_id ORDER BY l.first_approved_at) AS rank\nfrom listings l \nleft join users u on u.id = l.user_id\nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = l.id\nwhere 1=1\n--and l.status = 'approved'\n--and l.deleted_at is null\nand ll.country = 'Malaysia')\n--\nselect * \nfrom first_listing fl\nwhere 1=1 \nand fl.rank = '1'\nand fl.days_since_approved = '3'\n--and fl.user_id in ('29759')",
+        "query": "=SET TIMEZONE = 'Asia/Kuala_Lumpur';\n\nwith first_listing as\n(select distinct l.user_id, \nl.registration_no,\nl.status, \nl.created_at,\nl.first_approved_at,\nconcat(u.first_name,' ',u.last_name)as name, \nu.email,\nu.uuid, \nceiling((extract(EPOCH from NOW()) - extract(EPOCH from l.first_approved_at))/86400) as days_since_approved,\nRANK() OVER (PARTITION BY l.user_id ORDER BY l.first_approved_at) AS rank\nfrom listings l \nleft join users u on u.id = l.user_id\nleft join (select distinct listing_id, country, city_id from listing_location) ll on ll.listing_id = l.id\nwhere 1=1\n--and l.status = 'approved'\n--and l.deleted_at is null\nand ll.country = 'Malaysia')\n--\nselect * \nfrom first_listing fl\nwhere 1=1 \nand fl.rank = '1'\nand fl.days_since_approved = '3'\n--and fl.user_id in ('5162')",
         "options": {}
       },
       "id": "72618bfa-5e8f-4410-9e2f-e21a3ea79f84",
@@ -567,8 +567,7 @@
       "position": [
         3020,
         380
-      ],
-      "disabled": true
+      ]
     },
     {
       "parameters": {
@@ -767,6 +766,12 @@
     },
     "global": {
       "oldListingIds": [
+        56286,
+        56284,
+        56283,
+        56281,
+        56277,
+        56275,
         56274,
         56272,
         56271,
@@ -13152,6 +13157,14 @@
         null
       ],
       "oldListingIds_2": [
+        3357033,
+        1015809,
+        2133867,
+        90702,
+        92171,
+        2223928,
+        1734223,
+        3347489,
         2942433,
         453333,
         644889,
@@ -14161,6 +14174,12 @@
         3002211
       ],
       "oldListingIds_3": [
+        46886,
+        56201,
+        56204,
+        56120,
+        56179,
+        13537,
         33927,
         43045,
         56195,
@@ -15867,6 +15886,11 @@
         52448
       ],
       "oldListingIds_1": [
+        56284,
+        56282,
+        56283,
+        56277,
+        56255,
         54819,
         56223,
         56213,
@@ -17007,6 +17031,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2024-08-19T15:55:55.165Z",
-  "versionId": "0629e7bc-f035-4149-b248-b859cb5b7029"
+  "updatedAt": "2024-08-20T15:54:40.420Z",
+  "versionId": "73a985ef-1d04-4ece-98c6-16b160b56dd0"
 }
