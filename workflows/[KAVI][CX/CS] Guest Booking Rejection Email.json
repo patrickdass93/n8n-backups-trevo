@@ -222,6 +222,11 @@
     },
     "global": {
       "oldListingIds": [
+        "SVRJ1Q0F",
+        "8Y5AA1O6",
+        "BW39LNC0",
+        "983VVG85",
+        "ZZQO9TRL",
         "22WW5KAU",
         "P16EPQPA",
         "H4PXA8C4",
@@ -9005,6 +9010,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2024-08-19T15:58:38.902Z",
+  "updatedAt": "2024-08-20T15:55:39.742Z",
   "versionId": "47e1cdb5-f52b-486b-b5de-d84cb5f10f11"
 }
