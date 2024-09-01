@@ -359,7 +359,7 @@
   "staticData": {
     "node:Schedule Trigger": {
       "recurrencyRules": [
-        0
+        12
       ]
     }
   },
@@ -372,6 +372,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2024-08-31T16:00:00.151Z",
+  "updatedAt": "2024-09-01T04:00:00.015Z",
   "versionId": "9c57dba7-c3ff-463b-a1c3-344a6d7ce8a4"
 }
