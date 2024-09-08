@@ -492,6 +492,8 @@
     },
     "global": {
       "oldListingIds": [
+        "62F8XKRV",
+        "FZTG7KS1",
         "GSZRYRYD",
         "GDIEPO79",
         "DMA1I784",
@@ -7710,6 +7712,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2024-09-06T03:06:09.582Z",
+  "updatedAt": "2024-09-08T00:06:09.029Z",
   "versionId": "ebcd58eb-9545-4a33-a6cd-ec6eb33b13bf"
 }
